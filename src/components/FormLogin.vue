@@ -9,8 +9,8 @@
                 <v-img
                   class="img"
                   :src="require('@/assets/logo.png')"
-                  height="30%"
-                  width="15%"
+                  height="50%"
+                  width="25%"
                 />
 
                 <v-row align="center" justify="center" class="mt-15" no-gutters>
@@ -49,7 +49,7 @@
                   align="center"
                   justify="center"
                 >
-                  Inicia sesión
+                  Inicia sesión con tu cuenta de Google
                 </p>
               </v-img>
               <!--  <div class="imm">Hola</div> -->
@@ -77,6 +77,6 @@ export default {
   height: 100%;
 }
 .pa {
-  margin-top: 250px;
+  margin-top: 300px;
 }
 </style>
