@@ -7,21 +7,33 @@ export default new Vuetify({
     theme:{ //Paleta de colores elegida para el proyecto
         themes: { 
             light:{ 
-                primary: '#3e527e',
-                secondary: '#46606f',
-                error: '#d84a54',
-                info: '#d9ffff',
-                success: '#a1db45',
-                warning: '#ffbd45'
+                primary: '0C2A52',
+                secondary: '1B3644',
+                error: 'A10B2B',
+                warning: "FF8C00",
+                success: "6EA900",
+                info: 'A6E6DB',
+                primaryLight: '#3e527e',
+                secondaryLight: '#46606f',
+                errorLight: '#d84a54',
+                infoLight: '#d9ffff',
+                successLight: '#a1db45',
+                warningLight: '#ffbd45',
+                primaryDark: '#000029',
+                secondaryDark: '#00101d',
+                errorDark: '#6b0001',
+                infoDark: '#75b4a9',
+                successDark: '#3b7900',
+                warningDark: '#c55d00'
             },
-            dark: {
-                primary: '#000029',
-                secondary: '#00101d',
-                error: '#6b0001',
-                info: '#75b4a9',
-                success: '#3b7900',
-                warning: '#c55d00'
-            }
+           /*  dark: {
+                primaryDark: '#000029',
+                secondaryDark: '#00101d',
+                errorDark: '#6b0001',
+                infoDark: '#75b4a9',
+                successDark: '#3b7900',
+                warningDark: '#c55d00'
+            } */
         }
     }
 });

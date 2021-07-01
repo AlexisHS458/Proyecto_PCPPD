@@ -28,7 +28,11 @@
                     </v-btn>
                   </v-col>
                 </v-row>
-                <p class="mt-12 mb-12" color="primary">Regístrate con google</p>
+                <!-- <router-link to="/register"> -->
+                <v-btn plain class="mt-10" to="/register">
+                  Regístrate con google
+                </v-btn>
+                <!--      </router-link> -->
               </v-card-text>
             </v-col>
             <v-col cols="5">
@@ -52,7 +56,6 @@
                   Inicia sesión con tu cuenta de Google
                 </p>
               </v-img>
-              <!--  <div class="imm">Hola</div> -->
             </v-col>
           </v-row>
         </v-card>
