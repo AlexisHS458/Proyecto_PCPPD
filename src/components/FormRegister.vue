@@ -37,7 +37,7 @@
                     color="primary"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="8">
+                <v-col cols="4">
                   <v-btn color="primary" class="white--text" block>
                     Registrarse
                   </v-btn>
@@ -55,14 +55,14 @@
                   align="center"
                   justify="center"
                 >
-                  Registrate a <strong>Kun</strong>
+                  Regístrate a <strong>Kun</strong>
                 </p>
                 <p
                   class="text-h5 white--text text-center"
                   align="center"
                   justify="center"
                 >
-                  Ingresa tus datos para registrarte
+                  Completa tus datos para terminar tu registro
                 </p>
               </v-img>
               <!--  <div class="imm">Hola</div> -->
@@ -77,6 +77,7 @@
 <script>
 export default {
   data: () => ({}),
+
 };
 </script>
 
