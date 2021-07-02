@@ -18,7 +18,12 @@
                   width="25%"
                 />
                 <v-col cols="8">
-                  <v-text-field label="Nombre" outlined dense></v-text-field>
+                  <v-text-field
+                    label="Nombre"
+                    outlined
+                    dense
+                    prepend-inner-icon="mdi-account "
+                  ></v-text-field>
                 </v-col>
                 <v-col cols="8">
                   <v-text-field
@@ -27,6 +32,7 @@
                     dense
                     color="primary"
                     class="hola"
+                    prepend-inner-icon="mdi-account"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="8">
@@ -35,6 +41,7 @@
                     outlined
                     dense
                     color="primary"
+                    prepend-inner-icon="mdi-credit-card-outline"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="4">
@@ -77,17 +84,16 @@
 <script>
 export default {
   data: () => ({}),
-
 };
 </script>
 
 <style scoped lang="sass">
 .img
-    border-radius: 25px
+  border-radius: 25px
 
 .pa
-    margin-top: 300px
+  margin-top: 300px
 
 .arrow
-    position: absolute
+  position: absolute
 </style>
