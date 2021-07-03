@@ -46,7 +46,8 @@
                   align="center"
                   justify="center"
                 >
-                  Bienvenido a <strong>Kun</strong>
+                  <!--  Bienvenido a <strong>Kun</strong> -->
+                  <strong> EL ZAMUDIO SE LA COME </strong>
                 </p>
                 <p
                   class="text-h5 white--text text-center"
