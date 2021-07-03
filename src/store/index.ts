@@ -1,7 +1,9 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import Auth from './modules/auth.module';
+import LoginForm from './modules/login_form.module';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
@@ -11,5 +13,7 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-  }
-})
+    Auth,
+    LoginForm
+  },
+});
