@@ -37,9 +37,9 @@ class User extends VuexModule {
   }
 
   @Mutation
-  public start(target: String, successURL: String): void{
+  public startAuthUI(): void{
     this.ui?.start(
-      target.valueOf(),
+      'container',
       {
         signInOptions: [
           firebase.auth.EmailAuthProvider.PROVIDER_ID,
@@ -47,7 +47,7 @@ class User extends VuexModule {
           firebase.auth.FacebookAuthProvider.PROVIDER_ID,
           firebase.auth.TwitterAuthProvider.PROVIDER_ID
         ],
-        signInSuccessUrl: successURL.valueOf(),
+        signInSuccessUrl: '/registro',
         siteName: "Kun",
       }
     );
@@ -63,6 +63,12 @@ class User extends VuexModule {
   initAuthUI(): void{
     let authUI = AuthService.initLoginUI;
     this.context.commit('setAuthUI',authUI);
+  }
+
+  @Action
+  startUI(){
+    this.context.commit('startAuthUI');
+    
   }
 
   get isLoggedIn(): boolean {
