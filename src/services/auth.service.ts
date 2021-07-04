@@ -1,15 +1,14 @@
 import { auth } from '@/utils/firebase';
+import * as firebaseui from 'firebaseui'
 
 
 class AuthService {
-    private auth = auth;
-
-    get authChanges(){
-        return this.auth.onAuthStateChanged;
+    initLoginUI(): firebaseui.auth.AuthUI{
+        return new firebaseui.auth.AuthUI(auth);
     }
 
-    logout() {
-        return this.auth.signOut();
+    logout(){
+        return auth.signOut();
     }
 }
 
