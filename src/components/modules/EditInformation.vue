@@ -1,15 +1,15 @@
 <template>
   <v-container class="fill-height" fluid>
     <v-row align="center" justify="center">
-      <v-col cols="10">
+      <v-col cols="6">
         <v-card rounded="lg" height="100%" width="100%">
           <v-row no-gutters>
             <v-col cols="7" class="arrow">
-              <v-btn class="ma-2" text icon to="/">
+              <v-btn class="ma-2" text icon to="/dashboard">
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
             </v-col>
-            <v-col cols="7" class="d-flex align-center">
+            <v-col class="d-flex align-center">
               <v-card-text align="center">
                 <v-img
                   class="img mb-12"
@@ -46,33 +46,10 @@
                 </v-col>
                 <v-col cols="4">
                   <v-btn color="primary" class="white--text" block>
-                    Registrarse
+                    Editar Información
                   </v-btn>
                 </v-col>
               </v-card-text>
-            </v-col>
-            <v-col cols="5">
-              <v-img
-                :src="require('@/assets/background.jpg')"
-                height="600"
-                width="100%"
-              >
-                <p
-                  class="text-h4 white--text text-center pa"
-                  align="center"
-                  justify="center"
-                >
-                  Regístrate a <strong>Kun</strong>
-                </p>
-                <p
-                  class="text-h5 white--text text-center"
-                  align="center"
-                  justify="center"
-                >
-                  Completa tus datos para terminar tu registro
-                </p>
-              </v-img>
-              <!--  <div class="imm">Hola</div> -->
             </v-col>
           </v-row>
         </v-card>

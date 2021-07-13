@@ -22,7 +22,7 @@
         <v-list-item-content class="justify-center">
           <div class="mx-auto text-right">
             <v-divider class="my-3"></v-divider>
-            <v-btn depressed text block class="btn">
+            <v-btn depressed text block class="btn" to="/edit">
               <v-icon class="mr-6"> mdi-pencil </v-icon> Editar información
             </v-btn>
             <v-divider class="my-3"></v-divider>
