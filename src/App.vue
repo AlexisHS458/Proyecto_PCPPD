@@ -1,19 +1,15 @@
 <template>
   <v-app>
-    <home />
+    <v-main>
+      <router-view />
+    </v-main>
   </v-app>
 </template>
-
-<script lang="ts">
-import Vue from 'vue';
-import Home from './views/Home.vue';
-
-export default Vue.extend({
-  components: { Home },
-  name: 'App',
-
-  data: () => ({
-    //
-  }),
-});
+<script>
+export default {};
 </script>
+<style scoped>
+#app {
+  background-color: #46606f;
+}
+</style>

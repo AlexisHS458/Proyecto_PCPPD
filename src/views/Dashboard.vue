@@ -1,16 +1,17 @@
 <template>
-  <login-form />
+  <dashboard-view />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import LoginForm from "@/components/modules/LoginForm.vue";
+import DashboardView from "@/components/modules/DashboardView.vue";
 
 export default Vue.extend({
-  name: "Home",
+  name: "Dashboard",
 
   components: {
-    LoginForm,
+    DashboardView,
   },
 });
 </script>
+

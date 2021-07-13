@@ -39,7 +39,7 @@ class User extends VuexModule {
   @Mutation
   public startAuthUI(): void{
     this.ui?.start(
-      'container',
+      '#firebaseui-auth-container',
       {
         signInOptions: [
           firebase.auth.EmailAuthProvider.PROVIDER_ID,
@@ -47,7 +47,7 @@ class User extends VuexModule {
           firebase.auth.FacebookAuthProvider.PROVIDER_ID,
           firebase.auth.TwitterAuthProvider.PROVIDER_ID
         ],
-        signInSuccessUrl: '/registro',
+        signInSuccessUrl: '/register',
         siteName: "Kun",
       }
     );
@@ -61,12 +61,12 @@ class User extends VuexModule {
 
   @Action
   initAuthUI(): void{
-    let authUI = AuthService.initLoginUI;
+    const authUI = AuthService.initLoginUI;
     this.context.commit('setAuthUI',authUI);
   }
 
   @Action
-  startUI(){
+  startUI(): void{
     this.context.commit('startAuthUI');
     
   }
