@@ -84,8 +84,27 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import { namespace } from "vuex-class";
+import Firebase from "firebase/app";
+const Auth = namespace("Register");
+
 @Component
-export default class Register extends Vue {}
+export default class Register extends Vue {
+  @Auth.Action
+  private fetchCurrentUser!: () => void;
+
+  @Auth.State("userAuth")
+  private currentUser!: /* Firebase.User */ any;
+
+  created(): void {
+    this.fetchCurrentUser();
+  }
+
+  mounted(): void {
+    this.currentUser;
+    console.log(this.currentUser);
+  }
+}
 </script>
 
 <style scoped >

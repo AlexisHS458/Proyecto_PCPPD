@@ -12,33 +12,33 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
-    meta: {
+  /*   meta: {
       guest: true
-    }
+    } */
   },
   {
     path: '/register',
     name: 'Register',
     component: Register,
-    meta: {
+   /*  meta: {
       auth: true
-    }
+    } */
   },
   {
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-    meta: {
+   /*  meta: {
       auth: true
-    }
+    } */
   },
   {
     path: '/edit',
     name: 'Edit',
     component: EditInformation,
-    meta: {
+    /* meta: {
       auth: true
-    }
+    } */
   },
   
 ];
@@ -48,7 +48,7 @@ const router = new VueRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+/* router.beforeEach((to, from, next) => {
 
   if (to.matched.some(record => record.meta.auth)) {
     firebase.auth().onAuthStateChanged(user => {
@@ -75,6 +75,6 @@ router.beforeEach((to, from, next) => {
     next()
   }
 
-})
+}) */
 
 export default router;

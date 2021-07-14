@@ -49,6 +49,9 @@ import { Component, Vue } from "vue-property-decorator";
 import { firebase } from "@/utils/firebase";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
+import { namespace } from "vuex-class";
+import Firebase from "firebase/app";
+const Auth = namespace("Register");
 
 @Component
 export default class LoginForm extends Vue {

@@ -4,7 +4,7 @@ import Firebase from 'firebase/app';
 
 class UserService {
     getUserAuthInfo(): Firebase.User | null {
-        var user = auth.currentUser
+        const user = auth.currentUser;
         return user;
     }
 }
