@@ -85,16 +85,16 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
-import Firebase from "firebase/app";
-const Auth = namespace("Register");
+import {User} from '@/models/user';
+const Auth = namespace("UserModule");
 
 @Component
 export default class Register extends Vue {
   @Auth.Action
   private fetchCurrentUser!: () => void;
 
-  @Auth.State("userAuth")
-  private currentUser!: /* Firebase.User */ any;
+  @Auth.State("user")
+  private currentUser!: User;
 
   created(): void {
     this.fetchCurrentUser();
@@ -102,7 +102,6 @@ export default class Register extends Vue {
 
   mounted(): void {
     this.currentUser;
-    console.log(this.currentUser);
   }
 }
 </script>
