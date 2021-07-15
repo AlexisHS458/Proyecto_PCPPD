@@ -2,7 +2,7 @@ import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
 import Firebase from 'firebase/app';
 import userService from '@/services/user.service';
 
-const storedUser = localStorage.getItem('userAuth');
+const storedUser = localStorage.getItem('user');
 
 /**
  * Clase para el manejo de la información de usuario.
@@ -12,9 +12,9 @@ class User extends VuexModule {
   //States
 
   /**
-   * Actual usuario de Firebase
+   * Usuario actual
    */
-  public userAuth = storedUser ? JSON.parse(storedUser) : null;
+  public user = storedUser ? JSON.parse(storedUser) : null;
 
   //Mutations
 
@@ -23,9 +23,8 @@ class User extends VuexModule {
    */
   @Mutation
   public setUser(user: Firebase.User): void {
-    this.userAuth = user;
+    this.user = user;
   }
-
 
   //Actions
 
@@ -33,10 +32,8 @@ class User extends VuexModule {
    * Obtiene información de usuario a través de Authentication
    */
   @Action
-  fetchCurrentUser(): void {
-    
-    const user = userService.getUserAuthInfo();
- 
+   async fetchCurrentUser() {
+    const user = await userService.getUserAuthInfo();
     this.context.commit('setUser',user);
   }
 
