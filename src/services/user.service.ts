@@ -26,6 +26,15 @@ class UserService {
             });
         });
     }
+
+    /**
+     * Registra la información del usuario.
+     * @param user Usuario a almacenar en la db 
+     * @returns Promise<void>
+     */
+    async register(user: User): Promise<void> {
+        return  await db.collection("usuarios").doc(user.uid).set(user);
+    }
 }
 
 export default new UserService();

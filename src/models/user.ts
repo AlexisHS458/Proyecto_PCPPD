@@ -1,5 +1,7 @@
 export interface User {
+    uid: string,
     nombre: string,
     apellido: string,
-    boleta: string
+    boleta: string,
+    fotoURL: string
 }
