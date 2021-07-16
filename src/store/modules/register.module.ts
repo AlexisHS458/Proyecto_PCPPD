@@ -1,27 +1,49 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
 import {User} from '@/models/user';
-import userService from '@/services/user.service';
+import UserService from '@/services/user.service';
 
 /**
  * Clase para el manejo de la información de usuario.
  */
 @Module({ namespaced: true })
-class UserModule extends VuexModule {
-  //States
+class RegisterUserModule extends VuexModule {
+  //Status
 
   /**
-   * Usuario actual
+   * Usuario ha registrar
    */
   public user? : User = undefined;
 
-  //Mutations
+  /**
+   * Status de obtención de información del usuario
+   */
+  public getUserStatus = 'notLoading';
 
   /**
-   * Obtiene la información del usuario autenticado
+   * Status del registro de un usuario
    */
+  public saveUserStatus= 'notSaved';
+
+  //Mutations
+
   @Mutation
   public setUser(user: User): void {
     this.user = user;
+  }
+
+  @Mutation
+  public setLoadingStatus(status: string): void{
+    this.getUserStatus = status;
+  }
+
+  @Mutation
+  public registerSuccess(status: string): void {
+    this.saveUserStatus =  status;
+  }
+
+  @Mutation
+  public registerFailure(status: string): void {
+    this.saveUserStatus =  status;
   }
 
   //Actions
@@ -30,11 +52,27 @@ class UserModule extends VuexModule {
    * Obtiene información de usuario a través de Authentication
    */
   @Action
-  async fetchCurrentUser()  {
-    const user = await userService.getUserAuthInfo();
-    console.log("Modulo.Action: ", user);
+  async fetchCurrentUser(): Promise<void>  {
+    this.context.commit('setLoadingStatus', 'loading');
+    const user = await UserService.getUserAuthInfo();
+    this.context.commit('setLoadingStatus', 'notloading');
     this.context.commit('setUser',user);
+  }
+
+  /**
+   * Registra usuario en la base de datos
+   * @param user Usuario a registrar
+   */
+  @Action
+  async registerUser(user: User): Promise<void> {
+    return await UserService.register(user)
+      .then((value) => {
+        this.context.commit('registerSuccess', 'saved');
+      })
+      .catch(e => {
+        this.context.commit('registerFailure', 'notSaved');
+      })
   }
 }
 
-export default UserModule;
+export default RegisterUserModule;
