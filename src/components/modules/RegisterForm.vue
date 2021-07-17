@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height" fluid>
+  <v-container v-if="!isLoading" class="fill-height" fluid>
     <v-row align="center" justify="center">
       <v-col cols="10">
         <v-card rounded="lg" height="100%" width="100%">
@@ -9,7 +9,7 @@
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
             </v-col>
-            <v-col v-if="currentUser" cols="7" class="d-flex align-center">
+            <v-col cols="7" class="d-flex align-center">
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-img
@@ -78,16 +78,7 @@
                 </template>
               </v-snackbar>
             </v-col>
-            <div v-else class="coll">
-              <v-progress-circular
-                indeterminate
-                :size="120"
-                :width="4"
-                color="primary"
-                class="progress"
-              >
-              </v-progress-circular>
-            </div>
+
             <v-col cols="5">
               <v-img
                 :src="require('@/assets/background.jpg')"
@@ -114,6 +105,10 @@
         </v-card>
       </v-col>
     </v-row>
+  </v-container>
+  <v-container v-else class="coll">
+    <v-progress-circular indeterminate :size="120" :width="4" color="primary">
+    </v-progress-circular>
   </v-container>
 </template>
 
@@ -152,18 +147,21 @@ export default class Register extends Vue {
   @Auth.State("user")
   private currentUser!: User;
 
-  @Auth.State("saveUserStatus")
-  private saveUserStatus!: string;
+  @Auth.Getter
+  private isLoggedIn!: boolean;
 
-  created(): void {
-    this.fetchCurrentUser();
+  @Auth.Getter
+  private isLoading!: boolean;
+
+  async created(): Promise<void> {
+    await this.fetchCurrentUser();
+    if (this.isLoggedIn) {
+      this.$router.push("/dashboard");
+    }
   }
 
-  async mounted(): Promise<void> {
-    await this.currentUser;
-    if (this.currentUser.boleta != "") {
-      this.$router.replace({ path: "dashboard" });
-    }
+  mounted(): void {
+    this.currentUser;
   }
 
   async handleRegister(): Promise<void> {
@@ -171,7 +169,7 @@ export default class Register extends Vue {
       this.loading = true;
       this.snackbar = false;
       await this.registerUser(this.currentUser);
-      if (this.saveUserStatus == "saved") {
+      if (this.isLoggedIn) {
         this.loading = false;
         this.$router.push({ path: "dashboard" });
       } else {
@@ -195,5 +193,9 @@ export default class Register extends Vue {
 }
 .coll {
   margin: auto;
+  width: 100%;
+  height: 100%;
+  align-content: center;
+  justify-content: center;
 }
 </style>
