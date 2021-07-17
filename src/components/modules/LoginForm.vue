@@ -26,7 +26,7 @@
                   align="center"
                   justify="center"
                 >
-                  <strong> EL ZAMUDIO SE LA COME </strong>
+                  <strong> Bienvenido a Kun </strong>
                 </p>
                 <p
                   class="text-h5 white--text text-center"
