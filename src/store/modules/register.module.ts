@@ -1,7 +1,7 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
 import {User} from '@/models/user';
 import UserService from '@/services/user.service';
-
+import Vue from "vue";
 /**
  * Clase para el manejo de la información de usuario.
  */
@@ -66,10 +66,10 @@ class RegisterUserModule extends VuexModule {
   @Action
   async registerUser(user: User): Promise<void> {
     return await UserService.register(user)
-      .then((value) => {
+      .then((_) => {
         this.context.commit('registerSuccess', 'saved');
       })
-      .catch(e => {
+      .catch((_) => {
         this.context.commit('registerFailure', 'notSaved');
       })
   }

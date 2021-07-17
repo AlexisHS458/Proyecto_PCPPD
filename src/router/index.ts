@@ -13,7 +13,7 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
-  /*   meta: {
+    /* meta: {
       guest: true
     } */
   },
@@ -29,7 +29,7 @@ const routes: Array<RouteConfig> = [
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-   /*  meta: {
+  /*   meta: {
       auth: true
     } */
   },

@@ -33,7 +33,7 @@ class UserService {
      * @returns Promise<void>
      */
     async register(user: User): Promise<void> {
-        return  await db.collection("usuarios").doc(user.uid).set(user);
+        return  await db.collection("usuarios").doc(user.uid).update(user);
     }
 }
 

@@ -4,15 +4,14 @@
     <v-spacer></v-spacer>
     <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-list-item v-on="on" v-bind="attrs">
+        <v-list-item v-if="currentUser" v-on="on" v-bind="attrs">
           <v-list-item-avatar>
-            <v-img
-              src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
-            ></v-img>
+            <v-img :src="currentUser.fotoURL"></v-img>
           </v-list-item-avatar>
-
           <v-list-item-content>
-            <v-list-item-title>Alexis Herrera Saucedo</v-list-item-title>
+            <v-list-item-title>{{
+              currentUser.nombre + " " + currentUser.apellido
+            }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </template>
@@ -37,27 +36,29 @@
   </v-app-bar>
 </template>
 
-<script>
-import { firebase } from "@/utils/firebase";
-export default {
-  data: () => ({
-    showMenu: false,
-    user: null,
-    items: [
-      { title: "Click Me" },
-      { title: "Click Me" },
-      { title: "Click Me" },
-      { title: "Click Me 2" },
-    ],
-  }),
-  created() {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.user = user;
-      }
-    });
-  },
-};
+<script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
+import { namespace } from "vuex-class";
+import { User } from "@/models/user";
+const Auth = namespace("RegisterUserModule");
+
+@Component
+export default class AppBar extends Vue {
+  @Auth.Action
+  private fetchCurrentUser!: () => void;
+
+  @Auth.State("user")
+  private currentUser!: User;
+
+  created(): void {
+    this.fetchCurrentUser();
+  }
+
+  mounted(): void {
+    this.currentUser;
+  }
+}
 </script>
 
 <style>
