@@ -1,16 +1,16 @@
 <template>
-  <register-form />
+  <space-work />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import RegisterForm from "@/components/modules/RegisterForm.vue";
+import SpaceWork from "@/components/modules/SpaceWork.vue";
 
 export default Vue.extend({
-  name: "Register",
+  name: "Space",
 
   components: {
-    RegisterForm,
+    SpaceWork,
   },
 });
 </script>
