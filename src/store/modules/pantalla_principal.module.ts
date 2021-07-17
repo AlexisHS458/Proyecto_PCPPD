@@ -6,11 +6,11 @@ import Vue from "vue";
  * Clase para el manejo de la información de usuario.
  */
 @Module({ namespaced: true })
-class RegisterUserModule extends VuexModule {
+class PantallaPrincipalModule extends VuexModule {
   //Status
 
   /**
-   * Usuario a registrar
+   * Usuario
    */
   public user? : User = undefined;
 
@@ -18,11 +18,6 @@ class RegisterUserModule extends VuexModule {
    * Status de obtención de información del usuario
    */
   public getUserStatus = 'notLoading';
-
-  /**
-   * Status del registro de un usuario
-   */
-  public saveUserStatus= 'notSaved';
 
   //Mutations
 
@@ -34,16 +29,6 @@ class RegisterUserModule extends VuexModule {
   @Mutation
   public setLoadingStatus(status: string): void{
     this.getUserStatus = status;
-  }
-
-  @Mutation
-  public registerSuccess(status: string): void {
-    this.saveUserStatus =  status;
-  }
-
-  @Mutation
-  public registerFailure(status: string): void {
-    this.saveUserStatus =  status;
   }
 
   //Actions
@@ -59,20 +44,6 @@ class RegisterUserModule extends VuexModule {
     this.context.commit('setUser',user);
   }
 
-  /**
-   * Registra usuario en la base de datos
-   * @param user Usuario a registrar
-   */
-  @Action
-  async registerUser(user: User): Promise<void> {
-    return await UserService.register(user)
-      .then((_) => {
-        this.context.commit('registerSuccess', 'saved');
-      })
-      .catch((_) => {
-        this.context.commit('registerFailure', 'notSaved');
-      })
-  }
 }
 
-export default RegisterUserModule;
+export default PantallaPrincipalModule;
