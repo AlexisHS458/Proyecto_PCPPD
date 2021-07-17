@@ -22,6 +22,7 @@
                     <v-text-field
                       label="Nombre"
                       v-model="currentUser.nombre"
+                      :rules="[rules.required, rules.regex]"
                       outlined
                       dense
                       prepend-inner-icon="mdi-account "
@@ -31,6 +32,7 @@
                     <v-text-field
                       label="Apellidos"
                       v-model="currentUser.apellido"
+                      :rules="[rules.required, rules.regexLastName]"
                       outlined
                       dense
                       color="primary"
@@ -42,6 +44,7 @@
                     <v-text-field
                       label="Boleta o Número de empleado"
                       v-model="currentUser.boleta"
+                      :rules="[rules.required, rules.regexBoleta]"
                       outlined
                       dense
                       color="primary"
@@ -128,7 +131,18 @@ export default class Register extends Vue {
   public snackbar = false;
   public text = "Ocurrio un error al registrarte";
   public timeout = 2000;
-
+  public rules = {
+    required: (v: any) => !!v || "Campo requerido",
+    regex: (v: any) =>
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
+        v
+      ) || "Nombre inválido",
+    regexLastName: (v: any) =>
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
+        v
+      ) || "Apellido inválido",
+    regexBoleta: (v: any) => /^[a-zA-Z0-9]+$/.test(v),
+  };
   @Auth.Action
   private fetchCurrentUser!: () => void;
 

@@ -5,7 +5,7 @@ import Register from '../views/Register.vue';
 import Dashboard from '../views/Dashboard.vue';
 import EditInformation from '../views/Edit.vue';
 import SpaceWork from '../views/Space.vue';
-import { firebase } from "@/utils/firebase";
+/* import { firebase } from "@/utils/firebase"; */
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [

@@ -1,7 +1,7 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
 import {User} from '@/models/user';
 import UserService from '@/services/user.service';
-import Vue from "vue";
+
 /**
  * Clase para el manejo de la información de usuario.
  */
