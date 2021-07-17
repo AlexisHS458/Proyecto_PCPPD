@@ -7,56 +7,48 @@ import UserService from '@/services/user.service';
  */
 @Module({ namespaced: true })
 class RegisterUserModule extends VuexModule {
-  //Status
-
   /**
    * Usuario a registrar
    */
   public user? : User = undefined;
 
   /**
-   * Status de obtención de información del usuario
+   * Status del registro
    */
-  public getUserStatus = 'notLoading';
+  public status = { logged: false, loading: true};
 
-  /**
-   * Status del registro de un usuario
-   */
-  public saveUserStatus= 'notSaved';
-
-  //Mutations
 
   @Mutation
   public setUser(user: User): void {
     this.user = user;
+    if(user.boleta != '')
+      this.status.logged = true;
   }
 
   @Mutation
-  public setLoadingStatus(status: string): void{
-    this.getUserStatus = status;
+  public setLoadingStatus(status: boolean): void{
+    this.status.loading = status;
   }
 
   @Mutation
-  public registerSuccess(status: string): void {
-    this.saveUserStatus =  status;
+  public registerSuccess(): void {
+    this.status.logged = true;
   }
 
   @Mutation
-  public registerFailure(status: string): void {
-    this.saveUserStatus =  status;
+  public registerFailure(): void {
+    this.status.logged = false;
   }
-
-  //Actions
 
   /**
    * Obtiene información de usuario a través de Authentication
    */
   @Action
   async fetchCurrentUser(): Promise<void>  {
-    this.context.commit('setLoadingStatus', 'loading');
+    this.context.commit('setLoadingStatus',true);
     const user = await UserService.getUserAuthInfo();
-    this.context.commit('setLoadingStatus', 'notloading');
-    this.context.commit('setUser',user);
+    this.context.commit('setUser', user);
+    this.context.commit('setLoadingStatus', false);
   }
 
   /**
@@ -67,12 +59,22 @@ class RegisterUserModule extends VuexModule {
   async registerUser(user: User): Promise<void> {
     return await UserService.register(user)
       .then((_) => {
-        this.context.commit('registerSuccess', 'saved');
+        this.context.commit('registerSuccess');
       })
       .catch((_) => {
-        this.context.commit('registerFailure', 'notSaved');
+        this.context.commit('registerFailure');
       })
   }
+
+  get isLoggedIn(): boolean{
+    return this.status.logged;
+  }
+
+  get isLoading(): boolean{
+    return this.status.loading;
+  }
 }
+
+
 
 export default RegisterUserModule;
