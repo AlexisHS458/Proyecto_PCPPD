@@ -1,4 +1,4 @@
-import { db } from "@/firebase";
+import { db } from '@/utils/firebase';
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 
