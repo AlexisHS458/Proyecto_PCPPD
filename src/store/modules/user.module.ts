@@ -6,7 +6,7 @@ import UserService from '@/services/user.service';
  * Clase para el manejo de la información de usuario.
  */
 @Module({ namespaced: true })
-class RegisterUserModule extends VuexModule {
+class UserModule extends VuexModule {
   /**
    * Usuario a registrar
    */
@@ -31,17 +31,17 @@ class RegisterUserModule extends VuexModule {
   }
 
   @Mutation
-  public registerSuccess(): void {
+  public saveUserSuccess(): void {
     this.status.logged = true;
   }
 
   @Mutation
-  public registerFailure(): void {
+  public saveUserFailure(): void {
     this.status.logged = false;
   }
 
   /**
-   * Obtiene información de usuario a través de Authentication
+   * Obtiene información de usuario.
    */
   @Action
   async fetchCurrentUser(): Promise<void>  {
@@ -52,17 +52,17 @@ class RegisterUserModule extends VuexModule {
   }
 
   /**
-   * Registra usuario en la base de datos
+   * Almcena la información del usuario en la base de datos
    * @param user Usuario a registrar
    */
   @Action
-  async registerUser(user: User): Promise<void> {
+  async saveUser(user: User): Promise<void> {
     return await UserService.register(user)
       .then((_) => {
-        this.context.commit('registerSuccess');
+        this.context.commit('saveUserSuccess');
       })
       .catch((_) => {
-        this.context.commit('registerFailure');
+        this.context.commit('saveUserFailure');
       })
   }
 
@@ -75,6 +75,4 @@ class RegisterUserModule extends VuexModule {
   }
 }
 
-
-
-export default RegisterUserModule;
+export default UserModule;

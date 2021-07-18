@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import LoginForm from './modules/login_form.module';
-import RegisterUserModule from './modules/register.module'
+import UserModule from './modules/user.module'
 import PantallaPrincipalModule from './modules/pantalla_principal.module'
 
 
@@ -16,7 +16,7 @@ export default new Vuex.Store({
   },
   modules: {
     LoginForm,
-    RegisterUserModule,
+    UserModule,
     PantallaPrincipalModule
   },
 });

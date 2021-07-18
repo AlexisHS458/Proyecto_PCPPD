@@ -1,4 +1,4 @@
-export interface project {
+export interface Project {
     id_usuario: string,
     nombre: string,
 }

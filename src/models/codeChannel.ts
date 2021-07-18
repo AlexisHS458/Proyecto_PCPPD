@@ -1,8 +1,8 @@
-import { project} from "./project";
+import { Project } from "./project";
 
-export interface codeChannel {
+export interface CodeChannel {
     id: string,
     nombre: string,
     permisos: string[],
-    proyecto: project
+    proyecto: Project
 }
