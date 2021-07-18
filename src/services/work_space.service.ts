@@ -1,5 +1,4 @@
 import { db } from "@/firebase";
-import firebase from "firebase/app";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 
@@ -11,10 +10,12 @@ class WorkSpaceService {
     /**
      * Agrega un nuevo espacio de trabajo
      * @param workspace 
-     * @returns 
+     * @returns WorkSpace. Referencia del espacio de trabajo creado.
      */
-    async createWorkSpace(workspace: Workspace): Promise<firebase.firestore.DocumentReference> {
-        return await db.collection(Collection.WORK_SPACE).add(workspace);
+    async createWorkSpace(workspace: Workspace): Promise<Workspace> {
+        const workSpaceRef  = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+        return <Workspace>(await workSpaceRef).data();
+        
 
     }
 }
