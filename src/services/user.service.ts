@@ -1,5 +1,6 @@
 import { db,auth } from '@/utils/firebase';
 import {User} from '@/models/user';
+import { Collection } from '@/utils/collections';
 
 /**
  * Conexion a servicios para la información del usuario.
@@ -13,7 +14,7 @@ class UserService {
         return new Promise((resolve, reject) => {
             auth.onAuthStateChanged(user => {
                 if(user){
-                    db.collection("usuarios")
+                    db.collection(Collection.USERS)
                         .doc(user?.uid).onSnapshot((value) => {
                             const userData = value.data();
                             if(userData){
@@ -32,8 +33,8 @@ class UserService {
      * @param user Usuario a almacenar en la db 
      * @returns Promise<void>
      */
-    async register(user: User): Promise<void> {
-        return  await db.collection("usuarios").doc(user.uid).update(user);
+    async saveUser(user: User): Promise<void> {
+        return  await db.collection(Collection.USERS).doc(user.uid).update(user);
     }
 }
 

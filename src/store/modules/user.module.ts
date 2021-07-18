@@ -1,6 +1,7 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
 import {User} from '@/models/user';
 import UserService from '@/services/user.service';
+import AuthService from '@/services/auth.service';
 
 /**
  * Clase para el manejo de la información de usuario.
@@ -8,12 +9,12 @@ import UserService from '@/services/user.service';
 @Module({ namespaced: true })
 class UserModule extends VuexModule {
   /**
-   * Usuario a registrar
+   * Usuario actual autenticado
    */
   public user? : User = undefined;
 
   /**
-   * Status del registro
+   * Status del usuario
    */
   public status = { logged: false, loading: true};
 
@@ -39,6 +40,15 @@ class UserModule extends VuexModule {
   public saveUserFailure(): void {
     this.status.logged = false;
   }
+  @Mutation
+  public logoutSuccess(): void {
+    this.status.loading = true;
+  }
+
+  @Mutation
+  public logoutFailure(): void {
+    this.status.logged = false;
+  }
 
   /**
    * Obtiene información de usuario.
@@ -57,12 +67,23 @@ class UserModule extends VuexModule {
    */
   @Action
   async saveUser(user: User): Promise<void> {
-    return await UserService.register(user)
+    return await UserService.saveUser(user)
       .then((_) => {
         this.context.commit('saveUserSuccess');
       })
       .catch((_) => {
         this.context.commit('saveUserFailure');
+      })
+  }
+
+  @Action
+  async logout(): Promise<void> {
+    return await AuthService.logout()
+      .then((_) => {
+        this.context.commit("logoutSuccess");
+      })
+      .catch((_) =>{
+        this.context.commit("logoutFailure");
       })
   }
 

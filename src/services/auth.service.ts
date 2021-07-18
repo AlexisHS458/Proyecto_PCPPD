@@ -8,8 +8,8 @@ class AuthService {
      * Funcion para cerrar sesión.
      * @returns [Promise] de la sesión cerrada
      */
-    logout(){
-        return auth.signOut();
+    async logout(): Promise<void>{
+        return await auth.signOut();
     }
 }
 
