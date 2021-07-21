@@ -18,6 +18,30 @@ class WorkSpaceService {
         
 
     }
+
+    /**
+     * Recupera los espacios de trabajo de un usuario
+     * @param uid ID del usuario a recuperar sus espacios de trabajo
+     * @returns Lista de espacios de trabajo
+     */
+    async getWorkspaces(uid: string): Promise<Workspace[]>{
+        return new Promise((resolve, reject) => {
+            const workSpaceRef = db.collection(Collection.WORK_SPACE);
+            workSpaceRef
+                .where('uid', '==', uid)
+                .onSnapshot(querySnapshot => {
+                    const workspaces = querySnapshot.docs.map(doc =>{
+                        doc.data();
+                    });
+                    if (workspaces) {
+                        resolve(<Workspace[]><unknown>workspaces);
+                    }
+                }, (error) => {
+                    reject(error);
+                }
+                );
+        });  
+    }
 }
 
 export default new WorkSpaceService();

@@ -26,6 +26,16 @@ class WorkSpaceModule extends VuexModule {
   };
 
   @Mutation
+  public setWorkspaces(workspaces: Workspace[]): void {
+    this.workSpacesList = workspaces;
+  }
+
+  public setLoadingStatus(status: boolean): void {
+    this.status.loadingList = status;
+  }
+
+
+  @Mutation
   public setWorkSpacesList(workspaces: Array<Workspace>){
     this.workSpacesList = workspaces;
   }
@@ -55,6 +65,14 @@ class WorkSpaceModule extends VuexModule {
         this.context.commit("createWorkSpaceFailure")
       })
 
+  }
+
+  @Action
+  async fetchWorkspaces(uid: string): Promise<void>{
+    this.context.commit('setLoadingStatus',true);
+    const workspaces = await WorkSpaceService.getWorkspaces(uid);
+    this.context.commit('setWorkSpacesList',workspaces);
+    this.context.commit('setLoadingStatus', false);
   }
 
 }
