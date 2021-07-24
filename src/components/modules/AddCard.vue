@@ -1,6 +1,10 @@
 <template>
   <v-col cols="4">
-    <v-dialog transition="dialog-top-transition" max-width="600">
+    <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
+      v-model="dialog"
+    >
       <template v-slot:activator="{ on, attrs }">
         <v-card v-bind="attrs" v-on="on">
           <v-card-title class="card-title"> + </v-card-title>
@@ -10,12 +14,11 @@
           <v-card-actions class="card-actions"> </v-card-actions>
         </v-card>
       </template>
-      <template v-slot:default="dialog">
-        <v-card>
-          <v-toolbar color="primary" dark>
-            Crea tu espacio de trabajo
-          </v-toolbar>
-          <v-card-text>
+
+      <v-card>
+        <v-toolbar color="primary" dark> Crea tu espacio de trabajo </v-toolbar>
+        <v-card-text>
+          <v-form ref="form" v-model="valid" lazy-validation>
             <v-row align="center" justify="center" class="mt-6">
               <v-col cols="9">
                 <v-text-field
@@ -24,32 +27,57 @@
                   dense
                   color="primary"
                   prepend-inner-icon="mdi-account"
+                  v-model="workspace.nombre"
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
             </v-row>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn color="success">Aceptar</v-btn>
-            <v-btn text @click="dialog.value = false">Cancelar</v-btn>
-          </v-card-actions>
-        </v-card>
-      </template>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="justify-end">
+          <v-btn color="success" @click="handleAddSpace">Aceptar</v-btn>
+          <v-btn text @click="dialog = false">Cancelar</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
   </v-col>
 </template>
 
- <script >
+ <script lang="ts">
+import Component from "vue-class-component";
+import { namespace } from "vuex-class";
+import { User } from "@/models/user";
+import { Workspace } from "@/models/workspace";
+const Add = namespace("WorkSpaceModule");
+const User = namespace("UserModule");
 import Vue from "vue";
 
-export default Vue.extend({
-  data: () => ({
-    show: false,
-    user: null,
-    dialog: false,
-    items: [{ title: "Aplicaciones para la comunicación" }],
-  }),
-});
+@Component
+export default class AddCard extends Vue {
+  public show = false;
+  public dialog = false;
+  public valid = true;
+  public workspace = {} as Workspace;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+  };
+
+  @Add.Action
+  private addWorkSpace!: (workspace: Workspace) => void;
+
+  @User.State("user")
+  private currentUser!: User;
+
+  async handleAddSpace(): Promise<void> {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.workspace.uid = this.currentUser.uid;
+      await this.addWorkSpace(this.workspace);
+      this.dialog = false;
+    }
+  }
+}
 </script>
+
 
 <style scoped>
 .card-title {

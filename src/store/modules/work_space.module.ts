@@ -30,6 +30,7 @@ class WorkSpaceModule extends VuexModule {
     this.workSpacesList = workspaces;
   }
 
+  @Mutation
   public setLoadingStatus(status: boolean): void {
     this.status.loadingList = status;
   }
@@ -58,10 +59,10 @@ class WorkSpaceModule extends VuexModule {
   @Action
   async addWorkSpace(workspace: Workspace){
     return await WorkSpaceService.createWorkSpace(workspace)
-      .then((_) => {
+      .then(() => {
         this.context.commit("createWorkSpaceSuccess")
       })
-      .catch((_) => {
+      .catch(() => {
         this.context.commit("createWorkSpaceFailure")
       })
 

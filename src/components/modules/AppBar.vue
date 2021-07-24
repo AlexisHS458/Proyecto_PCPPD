@@ -2,8 +2,7 @@
   <v-app-bar app color="primary" flat dark>
     <v-toolbar-title>Tus espacios de trabajo</v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-menu v-if="currentUser"  offset-y>
-      
+    <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
         <v-list-item v-on="on" v-bind="attrs">
           <v-list-item-avatar>
@@ -14,7 +13,7 @@
               currentUser.nombre + " " + currentUser.apellido
             }}</v-list-item-title>
           </v-list-item-content>
-        </v-list-item> 
+        </v-list-item>
       </template>
 
       <v-card>
@@ -22,12 +21,19 @@
 
         <v-list-item-content class="justify-center card-list">
           <div class="mx-auto text-right">
-           <v-divider class="my-3"></v-divider>
+            <v-divider class="my-3"></v-divider>
             <v-btn depressed text block class="btn" to="/edit">
               <v-icon class="mr-6"> mdi-pencil </v-icon> Editar información
             </v-btn>
             <v-divider class="my-3"></v-divider>
-            <v-btn depressed text block class="btn">
+            <v-btn
+              depressed
+              text
+              block
+              class="btn"
+              @click="handleLogout"
+              :loading="loading"
+            >
               <v-icon color="error" class="mr-6"> mdi-logout </v-icon> Cerrar
               sesión
             </v-btn>
@@ -35,15 +41,10 @@
         </v-list-item-content>
       </v-card>
     </v-menu>
-    <div v-else>
-              <v-progress-circular
-                indeterminate
-                :size="30"
-                :width="2"
-                color="white"
-              >
-        </v-progress-circular>
-    </div>
+    <!--   <div v-else>
+      <v-progress-circular indeterminate :size="30" :width="2" color="white">
+      </v-progress-circular>
+    </div>-->
   </v-app-bar>
 </template>
 
@@ -52,23 +53,44 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
-const Auth = namespace("PantallaPrincipalModule");
+const User = namespace("UserModule");
 
 @Component
 export default class AppBar extends Vue {
-  @Auth.Action
-  private fetchCurrentUser!: () => void;
+  public loading = false;
 
-  @Auth.State("user")
+  /* public loading = false;
+  @User.Getter
+  private isLoading!: boolean; */
+
+  @User.State("user")
   private currentUser!: User;
 
-  created(): void {
-    this.fetchCurrentUser();
-  }
+  /*  @User.Getter
+  private isLoggedIn!: boolean;
+
+  @User.Action
+  private fetchCurrentUser!: () => void;  */
+
+  @User.Action
+  private logout!: () => void;
+
+  /* created(): void {
+    if (this.isLoading) {
+      this.fetchCurrentUser();
+    }
+  } */
 
   mounted(): void {
     this.currentUser;
     console.log(this.currentUser);
+  }
+
+  async handleLogout(): Promise<void> {
+    this.loading = true;
+    await this.logout();
+    this.loading = false;
+    this.$router.push({ path: "/" });
   }
 }
 </script>

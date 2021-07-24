@@ -68,10 +68,10 @@ class UserModule extends VuexModule {
   @Action
   async saveUser(user: User): Promise<void> {
     return await UserService.saveUser(user)
-      .then((_) => {
+      .then(() => {
         this.context.commit('saveUserSuccess');
       })
-      .catch((_) => {
+      .catch(() => {
         this.context.commit('saveUserFailure');
       })
   }
@@ -79,10 +79,10 @@ class UserModule extends VuexModule {
   @Action
   async logout(): Promise<void> {
     return await AuthService.logout()
-      .then((_) => {
+      .then(() => {
         this.context.commit("logoutSuccess");
       })
-      .catch((_) =>{
+      .catch(() =>{
         this.context.commit("logoutFailure");
       })
   }

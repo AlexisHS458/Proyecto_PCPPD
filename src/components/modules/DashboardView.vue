@@ -1,31 +1,30 @@
 <template>
-  <v-container>
+  <v-container v-if="!isLoading">
     <v-row>
       <app-bar></app-bar>
     </v-row>
-    <v-row>
-      <own-card></own-card>
-      <collaboration-card></collaboration-card>
-      <invitation-card></invitation-card>
-      <add-card></add-card>
-    </v-row>
+    <own-card></own-card>
+    <invitation-card></invitation-card>
   </v-container>
+  <div v-else class="coll">
+    <v-progress-circular indeterminate :size="120" :width="4" color="primary">
+    </v-progress-circular>
+  </div>
 </template>
 
-<script >
+<script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
+import { namespace } from "vuex-class";
 import AppBar from "@/components/modules/AppBar.vue";
-import { firebase } from "@/utils/firebase";
 import OwnCard from "@/components/modules/OwnCard.vue";
 import CollaborationCard from "@/components/modules/CollaborationCard.vue";
 import InvitationCard from "@/components/modules/InvitationCard.vue";
 import AddCard from "@/components/modules/AddCard.vue";
-export default Vue.extend({
-  data: () => ({
-    show: false,
-    user: null,
-    items: [{ title: "Aplicaciones para la comunicación" }],
-  }),
+import { User } from "@/models/user";
+const User = namespace("UserModule");
+
+@Component({
   components: {
     AppBar,
     OwnCard,
@@ -33,15 +32,45 @@ export default Vue.extend({
     InvitationCard,
     AddCard,
   },
-  mounted() {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.user = user;
-      }
-    });
-  },
-});
+})
+export default class DashboardView extends Vue {
+  @User.Getter
+  private isLoading!: boolean;
+
+  @User.State("user")
+  private currentUser!: User;
+
+  @User.Getter
+  private isLoggedIn!: boolean;
+
+  @User.Action
+  private fetchCurrentUser!: () => void;
+
+  /*   @User.Action
+  private logout!: () => void; */
+
+  created(): void {
+    if (!this.isLoggedIn) {
+      this.fetchCurrentUser();
+    }
+  }
+
+  mounted(): void {
+    this.currentUser;
+  }
+}
 </script>
+
+<style scoped>
+.coll {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
  
 
 

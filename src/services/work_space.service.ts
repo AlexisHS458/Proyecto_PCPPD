@@ -24,23 +24,20 @@ class WorkSpaceService {
      * @param uid ID del usuario a recuperar sus espacios de trabajo
      * @returns Lista de espacios de trabajo
      */
-    async getWorkspaces(uid: string): Promise<Workspace[]>{
-        return new Promise((resolve, reject) => {
-            const workSpaceRef = db.collection(Collection.WORK_SPACE);
-            workSpaceRef
-                .where('uid', '==', uid)
-                .onSnapshot(querySnapshot => {
-                    const workspaces = querySnapshot.docs.map(doc =>{
-                        doc.data();
-                    });
-                    if (workspaces) {
-                        resolve(<Workspace[]><unknown>workspaces);
-                    }
-                }, (error) => {
-                    reject(error);
-                }
-                );
-        });  
+     async getWorkspaces(uid: string): Promise<Workspace[]>{
+      /*   return new Promise((resolve, reject) => {
+            const workSpaceRef = db.collection(Collection.WORK_SPACE)
+                .where('uid', '==', uid).get();
+            workSpaceRef.then( (querySnapshot) => {
+                const workspaces: Array<Workspace> = [];
+                querySnapshot.forEach((doc)=>{
+                    workspaces.push(<Workspace> doc.data())
+                });
+                resolve(workspaces);
+            }
+            )
+        });   */
+        return ((await db.collection(Collection.WORK_SPACE).where('uid', '==', uid).get()).docs).map((snapshot) => <Workspace>snapshot.data());
     }
 }
 

@@ -106,10 +106,10 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-container v-else class="coll">
+  <div v-else class="coll">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -117,7 +117,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
-const Auth = namespace("RegisterUserModule");
+const Auth = namespace("UserModule");
 
 @Component
 export default class Register extends Vue {
@@ -127,22 +127,23 @@ export default class Register extends Vue {
   public text = "Ocurrio un error al registrarte";
   public timeout = 2000;
   public rules = {
-    required: (v: any) => !!v || "Campo requerido",
-    regex: (v: any) =>
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+    regex: (v: string): string | boolean =>
       /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
         v
       ) || "Nombre inválido",
-    regexLastName: (v: any) =>
+    regexLastName: (v: string): string | boolean =>
       /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
         v
       ) || "Apellido inválido",
-    regexBoleta: (v: any) => /^[a-zA-Z0-9]+$/.test(v),
+    regexBoleta: (v: string): string | boolean =>
+      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido",
   };
   @Auth.Action
   private fetchCurrentUser!: () => void;
 
   @Auth.Action
-  private registerUser!: (user: User) => Promise<void>;
+  private saveUser!: (user: User) => Promise<void>;
 
   @Auth.State("user")
   private currentUser!: User;
@@ -158,6 +159,9 @@ export default class Register extends Vue {
     if (this.isLoggedIn) {
       this.$router.push("/dashboard");
     }
+    /*  if (!this.isLoggedIn) {
+      this.$router.push("/");
+    } */
   }
 
   mounted(): void {
@@ -168,10 +172,10 @@ export default class Register extends Vue {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
       this.snackbar = false;
-      await this.registerUser(this.currentUser);
+      await this.saveUser(this.currentUser);
       if (this.isLoggedIn) {
         this.loading = false;
-        this.$router.push({ path: "dashboard" });
+        this.$router.push({ path: "/dashboard" });
       } else {
         this.loading = false;
         this.snackbar = true;
@@ -195,7 +199,8 @@ export default class Register extends Vue {
   margin: auto;
   width: 100%;
   height: 100%;
-  align-content: center;
+  display: flex;
   justify-content: center;
+  align-items: center;
 }
 </style>
