@@ -12,7 +12,7 @@ class WorkSpaceModule extends VuexModule {
   /**
    * Lista de los espacios de trabajo del usuario.
    */
-  public workSpacesList?: Array<Workspace> = undefined;
+  public workSpacesList: Workspace[]= [];
   
 
   /**
@@ -43,7 +43,7 @@ class WorkSpaceModule extends VuexModule {
 
   @Mutation
   public addWorkSpaceToList(workspace: Workspace){
-    this.workSpacesList?.push(workspace)
+    this.workSpacesList = [workspace, ...this.workSpacesList];
   }
 
   @Mutation
@@ -65,15 +65,12 @@ class WorkSpaceModule extends VuexModule {
   async addWorkSpace(workspace: Workspace){
     return await WorkSpaceService.createWorkSpace(workspace)
       .then(() => {
-        this.context.commit('setLoadingStatus',true);
         this.context.commit("addWorkSpaceToList", workspace);
         this.context.commit("createWorkSpaceSuccess");
-        this.context.commit('setLoadingStatus',false);
       })
       .catch(() => {
         this.context.commit("createWorkSpaceFailure");
       })
-
   }
 
   /**
@@ -82,7 +79,7 @@ class WorkSpaceModule extends VuexModule {
    */
   @Action
   async fetchWorkspaces(uid: string): Promise<void>{
-    this.context.commit('setLoadingStatus',true);
+    this.context.commit('setLoadingStatus', true);
     const workspaces = await WorkSpaceService.getWorkspaces(uid);
     this.context.commit('setWorkSpacesList',workspaces);
     this.context.commit('setLoadingStatus', false);
@@ -95,7 +92,6 @@ class WorkSpaceModule extends VuexModule {
   get isCreatedWorkSpace(): boolean{
     return this.status.createdWorkSpace;
   }
-
 }
 
 export default WorkSpaceModule;
