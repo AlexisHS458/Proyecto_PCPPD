@@ -1,63 +1,7 @@
 <template>
   <v-row>
     <v-col v-for="(item, index) in workSpacesList" :key="index" cols="4">
-      <v-card>
-        <v-card-title class="card-title">
-          {{ getInitials(item.nombre) }}
-        </v-card-title>
-        <v-card-subtitle class="card-subtitle">{{
-          item.nombre
-        }}</v-card-subtitle>
-        <v-card-actions class="card-actions">
-          <v-spacer></v-spacer>
-
-          <v-btn icon @click="toggle(index)">
-            <v-icon color="white">
-              {{ space[index].visible ? "mdi-chevron-up" : "mdi-chevron-down" }}
-            </v-icon>
-          </v-btn>
-        </v-card-actions>
-        <v-expand-transition>
-          <div v-show="space[index].visible" color="primary">
-            <v-divider></v-divider>
-            <v-card-text class="card-text">
-              <v-row align="center" justify="center">
-                <v-dialog transition="dialog-top-transition" max-width="600">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="error" text v-bind="attrs" v-on="on">
-                      Eliminar espacio de trabajo
-                      <v-icon color="error" class="ml-6"> mdi-delete </v-icon>
-                    </v-btn>
-                  </template>
-                  <template v-slot:default="dialog">
-                    <v-card>
-                      <v-toolbar color="error" dark>
-                        Solicitud de confirmación
-                      </v-toolbar>
-                      <v-card-text>
-                        <div class="text-h6 pa-5 text-center">
-                          <p>
-                            ¿SEGURO QUE QUIERES ELIMINAR TU ESPACIO DE TRABAJO?
-                          </p>
-                          <p>SE ELIMINARÁN TODOS LOS ARCHIVOS ENVIADOS.</p>
-                        </div>
-                        <v-row align="center" justify="center">
-                          <v-btn color="error"> SI, QUIERO ELIMINARLO </v-btn>
-                        </v-row>
-                      </v-card-text>
-                      <v-card-actions class="justify-end">
-                        <v-btn text @click="dialog.value = false"
-                          >Cancelar</v-btn
-                        >
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog>
-              </v-row>
-            </v-card-text>
-          </div>
-        </v-expand-transition>
-      </v-card>
+      <workspace-card :workspace="item"></workspace-card>
     </v-col>
     <collaboration-card></collaboration-card>
     <add-card></add-card>
@@ -70,21 +14,21 @@ import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
-const User = namespace("UserModule");
-const OwnSpacework = namespace("WorkSpaceModule");
-import { StringUtils } from "@/utils/stringsUtils";
 import CollaborationCard from "@/components/modules/CollaborationCard.vue";
 import AddCard from "@/components/modules/AddCard.vue";
+import WorkspaceCard from "@/components/modules/WorkspaceCard.vue";
+
+const User = namespace("UserModule");
+const OwnSpacework = namespace("WorkSpaceModule");
 
 @Component({
   components: {
     CollaborationCard,
     AddCard,
+    WorkspaceCard
   },
 })
-
 export default class OwnCard extends Vue {
-  public getInitials = StringUtils.getInitials;
   public space: { visible: boolean }[] = [];
 
   @User.State("user")
@@ -99,14 +43,11 @@ export default class OwnCard extends Vue {
 
 
 
-  async mounted(): Promise<void> {
-    this.currentUser;
-    await this.fetchWorkspaces(this.currentUser.uid);
-    this.workSpacesList;
-
-    for (let i = 0; i < this.workSpacesList.length; i++) {
-      this.space.push({ visible: false });
-    }
+  mounted(): void {
+    this.fetchWorkspaces(this.currentUser.uid);
+    // for (let i = 0; i < this.workSpacesList.length; i++) {
+    //   this.space.push({ visible: false });
+    // }
   }
 
   toggle(key: number) {

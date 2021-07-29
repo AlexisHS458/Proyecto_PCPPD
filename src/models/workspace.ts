@@ -4,7 +4,7 @@ import { VoiceChannel } from "./voiceChannel";
 import { User } from "./user";
 
 
-export interface Workspace {
+export interface Workspace  {
   uid: string;
   nombre: string;
   canales_codigo?: CodeChannel;

@@ -1,4 +1,4 @@
-import { db } from '@/utils/firebase';
+import { db,firebase } from '@/utils/firebase';
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 
@@ -22,13 +22,13 @@ class WorkSpaceService {
     /**
      * Recupera los espacios de trabajo de un usuario
      * @param uid ID del usuario a recuperar sus espacios de trabajo
-     * @returns Lista de espacios de trabajo
      */
-    async getWorkspaces(uid: string): Promise<Workspace[]>{
-        return ((await db.collection(Collection.WORK_SPACE)
-        .where('uid', '==', uid).get()).docs)
-        .map((snapshot) => <Workspace>snapshot.data());
-
+    getWorkspaces(uid: string, onSnapshot: (workspaces: Workspace[]) => void ): void{
+        db.collection(Collection.WORK_SPACE).where('uid', '==', uid).onSnapshot((snapshot)=>{
+            onSnapshot(snapshot.docs.map<Workspace>((doc)=>
+                <Workspace>doc.data()
+            ));
+        });
     }
 }
 

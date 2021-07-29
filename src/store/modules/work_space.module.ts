@@ -1,6 +1,6 @@
 import { Workspace } from '@/models/workspace';
 import WorkSpaceService from '@/services/work_space.service';
-import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
+import { VuexModule, Module, Mutation, Action} from 'vuex-module-decorators';
 
 
 /**
@@ -67,7 +67,6 @@ class WorkSpaceModule extends VuexModule {
   async addWorkSpace(workspace: Workspace){
     return await WorkSpaceService.createWorkSpace(workspace)
       .then(() => {
-        this.context.commit("addWorkSpaceToList", workspace);
         this.context.commit("createWorkSpaceSuccess");
       })
       .catch(() => {
@@ -80,13 +79,14 @@ class WorkSpaceModule extends VuexModule {
    * @param uid id del usuario
    */
   @Action
-  async fetchWorkspaces(uid: string): Promise<void>{
+  fetchWorkspaces(uid: string): void{
     this.context.commit('setLoadingStatus', true);
-    const workspaces = await WorkSpaceService.getWorkspaces(uid);
-    this.context.commit('setWorkSpacesList',workspaces);
-    this.context.commit('setLoadingStatus', false);
+    WorkSpaceService.getWorkspaces(uid,(workspaces)=>{
+      this.context.commit('setWorkSpacesList',workspaces);
+      this.context.commit('setLoadingStatus', false);
+    });
   }
-
+  
   get isLoadingList(): boolean{
     return this.status.loadingList;
   }
