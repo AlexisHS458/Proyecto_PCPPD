@@ -43,7 +43,9 @@ class WorkSpaceModule extends VuexModule {
 
   @Mutation
   public addWorkSpaceToList(workspace: Workspace){
-    this.workSpacesList = [workspace, ...this.workSpacesList];
+    const lastState = this.workSpacesList;
+    lastState.push(workspace)
+    this.workSpacesList = lastState;
   }
 
   @Mutation

@@ -63,7 +63,7 @@
     <add-card></add-card>
   </v-row>
 </template>
- 
+
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
@@ -82,6 +82,7 @@ import AddCard from "@/components/modules/AddCard.vue";
     AddCard,
   },
 })
+
 export default class OwnCard extends Vue {
   public getInitials = StringUtils.getInitials;
   public space: { visible: boolean }[] = [];
@@ -89,11 +90,14 @@ export default class OwnCard extends Vue {
   @User.State("user")
   private currentUser!: User;
 
+  
+  @OwnSpacework.State("workSpacesList")
+  private workSpacesList!: Workspace[];
+
   @OwnSpacework.Action
   private fetchWorkspaces!: (uid: string) => void;
 
-  @OwnSpacework.State("workSpacesList")
-  private workSpacesList!: Array<Workspace>;
+
 
   async mounted(): Promise<void> {
     this.currentUser;
