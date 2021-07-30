@@ -5,6 +5,7 @@
     </v-row>
     <own-card></own-card>
     <invitation-card></invitation-card>
+    <floating-button></floating-button>
   </v-container>
   <div v-else class="coll">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
@@ -18,6 +19,7 @@ import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import AppBar from "@/components/modules/AppBar.vue";
 import OwnCard from "@/components/modules/OwnCard.vue";
+import FloatingButton from "@/components/modules/FloatingButton.vue";
 import CollaborationCard from "@/components/modules/CollaborationCard.vue";
 import InvitationCard from "@/components/modules/InvitationCard.vue";
 import AddCard from "@/components/modules/AddCard.vue";
@@ -31,6 +33,7 @@ const User = namespace("UserModule");
     CollaborationCard,
     InvitationCard,
     AddCard,
+    FloatingButton,
   },
 })
 export default class DashboardView extends Vue {

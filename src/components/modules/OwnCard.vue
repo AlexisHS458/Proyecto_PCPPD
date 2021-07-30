@@ -4,7 +4,6 @@
       <workspace-card :workspace="item"></workspace-card>
     </v-col>
     <collaboration-card></collaboration-card>
-    <add-card></add-card>
   </v-row>
 </template>
 
@@ -15,7 +14,7 @@ import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import CollaborationCard from "@/components/modules/CollaborationCard.vue";
-import AddCard from "@/components/modules/AddCard.vue";
+
 import WorkspaceCard from "@/components/modules/WorkspaceCard.vue";
 
 const User = namespace("UserModule");
@@ -24,8 +23,8 @@ const OwnSpacework = namespace("WorkSpaceModule");
 @Component({
   components: {
     CollaborationCard,
-    AddCard,
-    WorkspaceCard
+
+    WorkspaceCard,
   },
 })
 export default class OwnCard extends Vue {
@@ -34,14 +33,11 @@ export default class OwnCard extends Vue {
   @User.State("user")
   private currentUser!: User;
 
-  
   @OwnSpacework.State("workSpacesList")
   private workSpacesList!: Workspace[];
 
   @OwnSpacework.Action
   private fetchWorkspaces!: (uid: string) => void;
-
-
 
   mounted(): void {
     this.fetchWorkspaces(this.currentUser.uid);
