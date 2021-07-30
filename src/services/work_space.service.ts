@@ -1,4 +1,4 @@
-import { db, firebase } from "@/utils/firebase";
+import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 
@@ -18,7 +18,7 @@ class WorkSpaceService {
 
   /**
    * Eliminar un espacio de trabajo existente
-   * @param id
+   * @param id ID del documento a eliminar
    */
   async deleteWorkSpace(id: string): Promise<void> {
     const delWorkSpace = await db
@@ -33,9 +33,15 @@ class WorkSpaceService {
    */
   getWorkspaces(uid: string, onSnapshot: (workspaces: Workspace[]) => void): void {
     db.collection(Collection.WORK_SPACE)
-      .where("uid", "==", uid)
+      .where("uid_usuario", "==", uid)
       .onSnapshot(snapshot => {
-        onSnapshot(snapshot.docs.map<Workspace>(doc => <Workspace>doc.data()));
+        onSnapshot(snapshot.docs.map<Workspace>((doc) => {
+          const workspace = {
+            ...doc.data(),
+            uid: doc.id
+          }
+          return <Workspace>workspace;
+        }));
       });
   }
 }

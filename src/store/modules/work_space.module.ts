@@ -81,8 +81,14 @@ class WorkSpaceModule extends VuexModule {
       });
   }
 
+
+  /**
+   * Elimina un espacio de trabajo
+   * @param id ID de documento del Workspace (Workspace.uid)
+   * @returns
+   */
   @Action
-  async deletedWorkSpaces(id: string) {
+  async deletedWorkSpaces(id: string): Promise<void> {
     return await WorkSpaceService.deleteWorkSpace(id)
       .then(() => {
         this.context.commit("deleteWorkSpaceSuccess");
@@ -110,6 +116,10 @@ class WorkSpaceModule extends VuexModule {
 
   get isCreatedWorkSpace(): boolean {
     return this.status.createdWorkSpace;
+  }
+
+  get workspacesList(): Workspace[]{
+    return this.workSpacesList;
   }
 }
 
