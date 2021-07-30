@@ -73,7 +73,7 @@ export default class AddCard extends Vue {
 
   handleAddSpace(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
-      this.workspace.uid = this.currentUser.uid;
+      this.workspace.uid_usuario = this.currentUser.uid;
       this.addWorkSpace(this.workspace);
       this.form.reset();
       this.dialog = false;

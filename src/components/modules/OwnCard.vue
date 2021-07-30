@@ -41,13 +41,6 @@ export default class OwnCard extends Vue {
 
   mounted(): void {
     this.fetchWorkspaces(this.currentUser.uid);
-    // for (let i = 0; i < this.workSpacesList.length; i++) {
-    //   this.space.push({ visible: false });
-    // }
-  }
-
-  toggle(key: number) {
-    this.space[key].visible = !this.space[key].visible;
   }
 }
 </script>

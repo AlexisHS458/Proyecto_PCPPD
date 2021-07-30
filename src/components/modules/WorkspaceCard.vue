@@ -3,13 +3,15 @@
     <v-card-title class="card-title">
       {{ getInitials(workspace.nombre) }}
     </v-card-title>
-    <v-card-subtitle class="card-subtitle">{{ workspace.nombre }}</v-card-subtitle>
+    <v-card-subtitle class="card-subtitle">{{
+      workspace.nombre
+    }}</v-card-subtitle>
     <v-card-actions class="card-actions">
       <v-spacer></v-spacer>
 
       <v-btn icon @click="show = !show">
         <v-icon color="white">
-          {{show ? "mdi-chevron-up" : "mdi-chevron-down"}}
+          {{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}
         </v-icon>
       </v-btn>
     </v-card-actions>
@@ -36,7 +38,9 @@
                       <p>SE ELIMINARÁN TODOS LOS ARCHIVOS ENVIADOS.</p>
                     </div>
                     <v-row align="center" justify="center">
-                      <v-btn color="error"> SI, QUIERO ELIMINARLO </v-btn>
+                      <v-btn color="error" @click="deleteSpacework">
+                        SI, QUIERO ELIMINARLO
+                      </v-btn>
                     </v-row>
                   </v-card-text>
                   <v-card-actions class="justify-end">
@@ -56,14 +60,24 @@
 import { Workspace } from "@/models/workspace";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { StringUtils } from "@/utils/stringsUtils";
+import { namespace } from "vuex-class";
+const Workspace = namespace("WorkSpaceModule");
+
 @Component
 export default class WorkspaceCard extends Vue {
   public show = false;
   public getInitials = StringUtils.getInitials;
   @Prop({
-    required: true
+    required: true,
   })
   public workspace!: Workspace;
+
+  @Workspace.Action
+  private deletedWorkSpaces!: (id: string) => void;
+
+  deleteSpacework() {
+    this.deletedWorkSpaces(this.workspace.uid);
+  }
 }
 </script>
 
