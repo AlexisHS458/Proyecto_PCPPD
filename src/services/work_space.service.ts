@@ -39,6 +39,14 @@ class WorkSpaceService {
         });   */
         return ((await db.collection(Collection.WORK_SPACE).where('uid', '==', uid).get()).docs).map((snapshot) => <Workspace>snapshot.data());
     }
+
+    /**
+     * Eliminar un espacio de trabajo existente
+     * @param id 
+     */
+     async deleteWorkSpace(id: string): Promise<void> {
+        const delWorkSpace  = await db.collection(Collection.WORK_SPACE).doc(id).delete();
+    }
 }
 
 export default new WorkSpaceService();

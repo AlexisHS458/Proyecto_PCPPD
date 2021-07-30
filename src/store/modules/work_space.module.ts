@@ -19,10 +19,12 @@ class WorkSpaceModule extends VuexModule {
    * Status de los espacios de trabajo
    * @param loadingList T: Si la lista esta cargando, F: si ya está cargada
    * @param createdWorkSpace T: Si se creó un nuevo WS, F: Si no se creó
+   * @param deletedWorkSpace T: Si se elimino el WS, F: Si no se elimino
    */
   public status = {
     loadingList: true, 
-    createdWorkSpace: false
+    createdWorkSpace: false,
+    deletedWorkSpace: false
   };
 
   @Mutation
@@ -51,6 +53,15 @@ class WorkSpaceModule extends VuexModule {
     this.status.createdWorkSpace = false;
   }
 
+  @Mutation
+  public deleteWorkSpaceSuccess(): void {
+    this.status.deletedWorkSpace = true;
+  }
+
+  @Mutation
+  public deleteWorkSpaceFailure(): void {
+    this.status.deletedWorkSpace = false;
+  }
 
   /**
    * Agrega un espacio de trabajo a la db
@@ -76,6 +87,16 @@ class WorkSpaceModule extends VuexModule {
     this.context.commit('setLoadingStatus', false);
   }
 
+  @Action
+  async deletedWorkSpaces(id: string){
+    return await WorkSpaceService.deleteWorkSpace(id)
+      .then(() => {
+        this.context.commit("deleteWorkSpaceSuccess")
+      })
+      .catch(() => {
+        this.context.commit("deleteWorkSpaceFailure")
+      })
+  }
 }
 
 export default WorkSpaceModule;
