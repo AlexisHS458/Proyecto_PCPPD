@@ -1,15 +1,15 @@
 import { auth } from '@/utils/firebase';
 
-
+/**
+ * Clase que conecta con el Firebase Authentication 
+ */
 class AuthService {
-    private auth = auth;
-
-    get authChanges(){
-        return this.auth.onAuthStateChanged;
-    }
-
-    logout() {
-        return this.auth.signOut();
+    /**
+     * Funcion para cerrar sesión.
+     * @returns [Promise] de la sesión cerrada
+     */
+    async logout(): Promise<void>{
+        return await auth.signOut();
     }
 }
 

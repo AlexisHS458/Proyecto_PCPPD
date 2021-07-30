@@ -1,16 +1,16 @@
 <template>
-  <login-form />
+  <space-work />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import LoginForm from "@/components/modules/LoginForm.vue";
+import SpaceWork from "@/components/modules/SpaceWork.vue";
 
 export default Vue.extend({
-  name: "Home",
+  name: "Space",
 
   components: {
-    LoginForm,
+    SpaceWork,
   },
 });
 </script>

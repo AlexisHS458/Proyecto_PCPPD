@@ -1,16 +1,16 @@
 <template>
-  <login-form />
+  <list />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import LoginForm from "@/components/modules/LoginForm.vue";
+import list from "@/components/modules/List.vue";
 
 export default Vue.extend({
-  name: "Home",
+  name: "Dashboard",
 
   components: {
-    LoginForm,
+    list,
   },
 });
 </script>
