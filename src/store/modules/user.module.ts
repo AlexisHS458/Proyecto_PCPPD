@@ -1,7 +1,7 @@
-import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
-import {User} from '@/models/user';
-import UserService from '@/services/user.service';
-import AuthService from '@/services/auth.service';
+import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
+import { User } from "@/models/user";
+import UserService from "@/services/user.service";
+import AuthService from "@/services/auth.service";
 
 /**
  * Clase para el manejo de la información de usuario.
@@ -11,23 +11,21 @@ class UserModule extends VuexModule {
   /**
    * Usuario actual autenticado
    */
-  public user? : User = undefined;
+  public user?: User = undefined;
 
   /**
    * Status del usuario
    */
-  public status = { logged: false, loading: true};
-
+  public status = { logged: false, loading: true };
 
   @Mutation
   public setUser(user: User): void {
     this.user = user;
-    if(user.boleta != '')
-      this.status.logged = true;
+    if (user.boleta != "") this.status.logged = true;
   }
 
   @Mutation
-  public setLoadingStatus(status: boolean): void{
+  public setLoadingStatus(status: boolean): void {
     this.status.loading = status;
   }
 
@@ -54,11 +52,11 @@ class UserModule extends VuexModule {
    * Obtiene información de usuario.
    */
   @Action
-  async fetchCurrentUser(): Promise<void>  {
-    this.context.commit('setLoadingStatus',true);
+  async fetchCurrentUser(): Promise<void> {
+    this.context.commit("setLoadingStatus", true);
     const user = await UserService.getUserAuthInfo();
-    this.context.commit('setUser', user);
-    this.context.commit('setLoadingStatus', false);
+    this.context.commit("setUser", user);
+    this.context.commit("setLoadingStatus", false);
   }
 
   /**
@@ -69,11 +67,11 @@ class UserModule extends VuexModule {
   async saveUser(user: User): Promise<void> {
     return await UserService.saveUser(user)
       .then(() => {
-        this.context.commit('saveUserSuccess');
+        this.context.commit("saveUserSuccess");
       })
       .catch(() => {
-        this.context.commit('saveUserFailure');
-      })
+        this.context.commit("saveUserFailure");
+      });
   }
 
   @Action
@@ -82,16 +80,16 @@ class UserModule extends VuexModule {
       .then(() => {
         this.context.commit("logoutSuccess");
       })
-      .catch(() =>{
+      .catch(() => {
         this.context.commit("logoutFailure");
-      })
+      });
   }
 
-  get isLoggedIn(): boolean{
+  get isLoggedIn(): boolean {
     return this.status.logged;
   }
 
-  get isLoading(): boolean{
+  get isLoading(): boolean {
     return this.status.loading;
   }
 }

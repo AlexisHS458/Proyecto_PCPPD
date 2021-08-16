@@ -15,8 +15,6 @@
                   <v-img
                     class="img mb-12"
                     :src="require('@/assets/logo.png')"
-                    height="50%"
-                    width="25%"
                   />
                   <v-col cols="8">
                     <v-text-field
@@ -180,7 +178,9 @@ export default class EditInformation extends Vue {
 
 <style scoped >
 .img {
-  border-radius: 25px;
+  border-radius: 1rem;
+  width: 14rem;
+  height: 14rem;
 }
 .pa {
   margin-top: 300px;

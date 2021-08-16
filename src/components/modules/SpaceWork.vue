@@ -1,46 +1,39 @@
 <template>
   <v-row class="row" no-gutters>
     <v-col class="flex-grow-0 flex-shrink-1">
-      <v-card class="mx-auto cardd" color="primaryLight">
-        <v-navigation-drawer class="primaryDark accent-4" dark>
-          <v-list>
-            <v-list-item v-for="item in items" :key="item.title" link>
-              <v-list-item-icon>
-                <v-icon>{{ item.icon }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-navigation-drawer>
-      </v-card>
+      <div class="mx-auto cardd">
+        <toolbar></toolbar>
+        <channels class="flex-grow-1"></channels>
+        <userinfo></userinfo>
+      </div>
     </v-col>
     <v-col class="flex-grow-1 flex-shrink-0">
-      <v-card color="primaryLight" class="card-center"> </v-card>
+      <div class="mx-auto card-center">
+        <toolbardata></toolbardata>
+        <message class="flex-grow-1"></message>
+        <inputmessage></inputmessage>
+      </div>
     </v-col>
-    <!-- <div class="container-div"></div> -->
     <v-col class="flex-grow-0 flex-shrink-1">
-      <v-card class="mx-auto cardd" color="primaryLight">
-        <v-navigation-drawer class="primaryDark accent-4" dark>
-          <v-list>
-            <v-list-item v-for="item in items" :key="item.title" link>
-              <v-list-item-icon>
-                <v-icon>{{ item.icon }}</v-icon>
-              </v-list-item-icon>
+      <div class="mx-auto cardd">
+        <listusers></listusers>
 
-              <v-list-item-content>
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-navigation-drawer>
-      </v-card>
+        <!--  <v-navigation-drawer class="primaryDark accent-4" dark> -->
+
+        <!-- </v-navigation-drawer> -->
+      </div>
     </v-col>
   </v-row>
 </template>
 
 <script>
+import toolbar from "@/components/modules/spacework/toolbar.vue";
+import userinfo from "@/components/modules/spacework/userinfo.vue";
+import channels from "@/components/modules/spacework/channels.vue";
+import toolbardata from "@/components/modules/spacework/toolbardata.vue";
+import inputmessage from "@/components/modules/spacework/inputmessage.vue";
+import message from "@/components/modules/spacework/message.vue";
+import listusers from "@/components/modules/spacework/listusers.vue";
 export default {
   data() {
     return {
@@ -51,15 +44,32 @@ export default {
       ],
     };
   },
+  components: {
+    toolbar,
+    userinfo,
+    channels,
+    toolbardata,
+    inputmessage,
+    message,
+    listusers,
+  },
 };
 </script>
 
 <style scoped>
 .cardd {
   height: 100vh;
+  width: 40vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #000029;
 }
 .card-center {
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #3e527e;
 }
 
 .container-div {
