@@ -68,10 +68,11 @@ export default class AddCard extends Vue {
   @User.State("user")
   private currentUser!: User;
 
-  async handleAddSpace(): Promise<void> {
+  handleAddSpace(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.workspace.uid = this.currentUser.uid;
-      await this.addWorkSpace(this.workspace);
+      this.addWorkSpace(this.workspace);
+      this.workspace.nombre = "";
       this.dialog = false;
     }
   }

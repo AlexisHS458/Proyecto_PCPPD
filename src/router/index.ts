@@ -1,60 +1,71 @@
-import Vue from 'vue';
-import VueRouter, { RouteConfig } from 'vue-router';
-import Home from '../views/Home.vue';
-import Register from '../views/Register.vue';
-import Dashboard from '../views/Dashboard.vue';
-import EditInformation from '../views/Edit.vue';
-import SpaceWork from '../views/Space.vue';
+import Vue from "vue";
+import VueRouter, { RouteConfig } from "vue-router";
+import Home from "../views/Home.vue";
+import Register from "../views/Register.vue";
+import Dashboard from "../views/Dashboard.vue";
+import EditInformation from "../views/Edit.vue";
+import SpaceWork from "../views/Space.vue";
+import List from "../views/List.vue";
+import NotFound from "../views/PageNotFound.vue";
 /* import { firebase } from "@/utils/firebase"; */
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home,
+    path: "/",
+    name: "Home",
+    component: Home
     /* meta: {
       guest: true
     } */
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: Register,
-   /*  meta: {
+    path: "/register",
+    name: "Register",
+    component: Register
+    /*  meta: {
       auth: true
     } */
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard,
-  /*   meta: {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: Dashboard
+    /*   meta: {
       auth: true
     } */
   },
   {
-    path: '/edit',
-    name: 'Edit',
-    component: EditInformation,
+    path: "/edit",
+    name: "Edit",
+    component: EditInformation
     /* meta: {
       auth: true
     } */
   },
   {
-    path: '/space',
-    name: 'Sapce',
-    component: SpaceWork,
+    path: "/space",
+    name: "Sapce",
+    component: SpaceWork
     /* meta: {
       auth: true
     } */
   },
-  
+  {
+    path: "/list",
+    name: "List",
+    component: List
+  },
+  {
+    path: "*",
+    name: "notFound",
+    component: NotFound
+  }
 ];
 
 const router = new VueRouter({
-  mode: 'history',
-  routes,
+  mode: "history",
+  routes
 });
 
 /* router.beforeEach((to, from, next) => {

@@ -3,8 +3,10 @@ import { TextChannel } from "./textChannel";
 import { VoiceChannel } from "./voiceChannel";
 import { User } from "./user";
 
-export interface Workspace {
+
+export interface Workspace  {
   uid: string;
+  uid_usuario: string
   nombre: string;
   canales_codigo?: CodeChannel;
   canales_texto?: TextChannel;
