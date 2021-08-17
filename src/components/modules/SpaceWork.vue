@@ -17,10 +17,7 @@
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto cardd">
         <listusers></listusers>
-
-        <!--  <v-navigation-drawer class="primaryDark accent-4" dark> -->
-
-        <!-- </v-navigation-drawer> -->
+        <userlist></userlist>
       </div>
     </v-col>
   </v-row>
@@ -34,6 +31,7 @@ import toolbardata from "@/components/modules/spacework/toolbardata.vue";
 import inputmessage from "@/components/modules/spacework/inputmessage.vue";
 import message from "@/components/modules/spacework/message.vue";
 import listusers from "@/components/modules/spacework/listusers.vue";
+import userlist from "@/components/modules/spacework/userlist.vue";
 export default {
   data() {
     return {
@@ -52,6 +50,7 @@ export default {
     inputmessage,
     message,
     listusers,
+    userlist,
   },
 };
 </script>
@@ -69,7 +68,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: #3e527e;
+  background-color: #0c2a52;
 }
 
 .container-div {
