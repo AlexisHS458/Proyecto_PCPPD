@@ -1,5 +1,6 @@
 export enum Collection{
     USERS = "usuarios",
     WORK_SPACE = "espacios_de_trabajo",
-    CHANNELS = "canales"
+    CHANNELS = "canales",
+    MESSAGES = "mensajes"
 }
