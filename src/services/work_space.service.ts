@@ -21,7 +21,7 @@ class WorkSpaceService {
    * @param id ID del documento a eliminar
    */
   async deleteWorkSpace(id: string): Promise<void> {
-    const delWorkSpace = await db
+    await db
       .collection(Collection.WORK_SPACE)
       .doc(id)
       .delete();

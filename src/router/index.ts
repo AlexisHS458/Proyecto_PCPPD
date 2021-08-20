@@ -5,7 +5,6 @@ import Register from "../views/Register.vue";
 import Dashboard from "../views/Dashboard.vue";
 import EditInformation from "../views/Edit.vue";
 import SpaceWork from "../views/Space.vue";
-import List from "../views/List.vue";
 import NotFound from "../views/PageNotFound.vue";
 /* import { firebase } from "@/utils/firebase"; */
 Vue.use(VueRouter);
@@ -50,11 +49,6 @@ const routes: Array<RouteConfig> = [
     /* meta: {
       auth: true
     } */
-  },
-  {
-    path: "/list",
-    name: "List",
-    component: List
   },
   {
     path: "*",
