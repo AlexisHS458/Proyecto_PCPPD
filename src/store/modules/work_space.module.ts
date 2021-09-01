@@ -17,6 +17,7 @@ class WorkSpaceModule extends VuexModule {
    * Status de los espacios de trabajo
    * @param loadingList T: Si la lista esta cargando, F: si ya está cargada
    * @param createdWorkSpace T: Si se creó un nuevo WS, F: Si no se creó
+   * @param deletedWorkSpace T: Si se elimino el WS, F: Si no se elimino
    */
   public status = {
     loadingList: true,
