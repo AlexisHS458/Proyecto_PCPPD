@@ -174,6 +174,21 @@ class ChannelModule extends VuexModule {
       });
   }
 
+
+  /**
+   * Recupera los canales de texto de un espacio de trabajo
+   * @param workSpaceID ID del espacio de trabajo
+   */
+  @Action
+  fetchTextChannels(workSpaceID: string): void {
+    this.context.commit("setLoadingStatus", true);
+    ChannelService.getTextChannels(workSpaceID, textChannels => {
+      this.context.commit("setTextChannels", textChannels);
+      this.context.commit("setLoadingStatus", false);
+    });
+
+  }
+
   /**
    * Recupera los canales de un espacio de trabajo
    * @param id ID del espacio de trabajo

@@ -69,11 +69,10 @@ class ChannelService {
 
   /**
    * Recupera los canales de texto de un espacio de trabajo
-   * @param uid ID del espacio de trabajo a recuperar sus canales
+   * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
    */
-   getTextChannels(uid: string, onSnapshot: (textChannels: TextChannel[]) => void): void {
-    db.collection(Collection.CHANNELS)
-      .where("uid_usuario", "==", uid)
+   getTextChannels(workSpaceID : string, onSnapshot: (textChannels: TextChannel[]) => void): void {
+    db.collection(Collection.WORK_SPACE).doc(workSpaceID).collection(Collection.TEXT_CHANNEL)
       .onSnapshot(snapshot => {
         onSnapshot(snapshot.docs.map<TextChannel>((doc) => {
           const textChannel = {
