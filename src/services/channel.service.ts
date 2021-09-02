@@ -20,11 +20,16 @@ class ChannelService {
 
   /**
    * Agrega un nuevo canal de texto
-   * @param textChannel
-   * @returns CodeChannel. Referencia del canal de texto creado.
+   * @param textChannel Canal de texto a agregar a la DB
+   * @param workSpaceID ID del espacio de trabajo
+   * @returns TextChannel. Referencia del canal de texto creado.
    */
-   async createTextChannel(textChannel: TextChannel): Promise<TextChannel> {
-    const textChannelRef = (await db.collection(Collection.CHANNELS).add(textChannel)).get();
+   async createTextChannel(workSpaceID: string, textChannel: TextChannel): Promise<TextChannel> {
+    const textChannelRef = (await db.collection(Collection.CHANNELS)
+      .doc(workSpaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .add(textChannel))
+      .get();
     return <TextChannel>(await textChannelRef).data();
   }
 
@@ -86,11 +91,10 @@ class ChannelService {
 
   /**
    * Recupera los canales de voz de un espacio de trabajo
-   * @param uid ID del espacio de trabajo a recuperar sus canales
+   * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
    */
-   getVoiceChannels(uid: string, onSnapshot: (voiceChannels: VoiceChannel[]) => void): void {
-    db.collection(Collection.CHANNELS)
-      .where("uid_usuario", "==", uid)
+   getVoiceChannels(workSpaceID : string, onSnapshot: (voiceChannels: VoiceChannel[]) => void): void {
+    db.collection(Collection.CHANNELS).doc(workSpaceID).collection(Collection.VOICE_CHANNEL)
       .onSnapshot(snapshot => {
         onSnapshot(snapshot.docs.map<VoiceChannel>((doc) => {
           const voiceChannel = {

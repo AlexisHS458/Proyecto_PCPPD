@@ -131,7 +131,7 @@ class ChannelModule extends VuexModule {
   /**
    * Agrega un canal de texto a la db
    * @param textChannel canal de texto a agregar
-   */
+   
    @Action
    async addtextChannel(textChannel: TextChannel) {
      return await ChannelService.createTextChannel(textChannel)
@@ -142,6 +142,7 @@ class ChannelModule extends VuexModule {
          this.context.commit("createChannelFailure");
        });
    }
+   */
   
    /**
    * Agrega un canal de voz a la db
@@ -188,6 +189,19 @@ class ChannelModule extends VuexModule {
     });
 
   }
+
+  /**
+   * Recupera los canales de voz de un espacio de trabajo
+   * @param workSpaceID ID del espacio de trabajo
+   */
+   @Action
+   fetchVoiceChannels(workSpaceID: string): void {
+     this.context.commit("setLoadingStatus", true);
+     ChannelService.getTextChannels(workSpaceID, voiceChannels => {
+       this.context.commit("setVoiceChannels", voiceChannels);
+       this.context.commit("setLoadingStatus", false);
+     });
+   }
 
   /**
    * Recupera los canales de un espacio de trabajo

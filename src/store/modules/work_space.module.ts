@@ -26,11 +26,6 @@ class WorkSpaceModule extends VuexModule {
   };
 
   @Mutation
-  public setWorkspaces(workspaces: Workspace[]): void {
-    this.workSpacesList = workspaces;
-  }
-
-  @Mutation
   public setLoadingStatus(status: boolean): void {
     this.status.loadingList = status;
   }
@@ -40,13 +35,7 @@ class WorkSpaceModule extends VuexModule {
     this.workSpacesList = workspaces;
   }
 
-  @Mutation
-  public addWorkSpaceToList(workspace: Workspace) {
-    const lastState = this.workSpacesList;
-    lastState.push(workspace);
-    this.workSpacesList = lastState;
-  }
-
+ 
   @Mutation
   public createWorkSpaceSuccess(): void {
     this.status.createdWorkSpace = true;
