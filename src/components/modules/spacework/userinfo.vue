@@ -35,7 +35,6 @@ export default class UserInfo extends Vue {
 
   mounted(): void {
     this.currentUser;
-    console.log(this.currentUser);
   }
 
   toggleMicrophone() {

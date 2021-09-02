@@ -50,8 +50,8 @@ import { VForm } from "@/utils/types.js";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
-import {CodeChannel} from "@/models/codeChannel"
-const Add = namespace("WorkSpaceModule");
+import { CodeChannel } from "@/models/codeChannel";
+const Add = namespace("MainScreenModule");
 const User = namespace("UserModule");
 import Vue from "vue";
 

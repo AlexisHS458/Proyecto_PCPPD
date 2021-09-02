@@ -6,7 +6,7 @@
       </v-list-item-icon>
       <v-list-item-content>
         <v-list-item-title class="title">
-          {{ item.title }}
+          {{ item.nombre }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
@@ -156,7 +156,7 @@ export default class NameChannels extends Vue {
   public dialogRenameChanel = false;
   public dialogDelete = false;
   public model = [];
-  /* public model = 1; */
+
   @Prop({
     required: true,
   })

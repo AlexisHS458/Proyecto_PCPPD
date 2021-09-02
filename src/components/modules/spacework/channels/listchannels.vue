@@ -55,8 +55,8 @@
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
         <v-list color="primaryDark">
           <namechannels
-            v-for="child in item.items"
-            :key="child.title"
+            v-for="child in channels"
+            :key="child.id"
             :item="child"
             :icon="item.icon"
             :userList="user"
@@ -85,6 +85,11 @@ export default class ListChannels extends Vue {
     required: true,
   })
   public user!: [];
+
+  @Prop({
+    required: false,
+  })
+  public channels!: [];
 
   public panel = [0, 1];
   public show = false;

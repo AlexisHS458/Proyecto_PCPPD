@@ -5,25 +5,25 @@ import ChannelService from "@/services/channel.service";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 
 /**
-* Modulo de acceso a información de canales de un espacio de trabajo
-*
-*/
+ * Modulo de acceso a información de canales de un espacio de trabajo
+ *
+ */
 @Module({ namespaced: true })
 class ChannelsModule extends VuexModule {
-    /**
-    * Lista de los canales de codigo del espacio de trabajo.
-    */
-    public codeChannelsList: CodeChannel[] = [];
+  /**
+   * Lista de los canales de codigo del espacio de trabajo.
+   */
+  public codeChannelsList: CodeChannel[] = [];
 
-    /**
-    * Lista de los canales de texto del espacio de trabajo.
-    */
-    public textChannelsList: TextChannel[] = [];
+  /**
+   * Lista de los canales de texto del espacio de trabajo.
+   */
+  public textChannelsList: TextChannel[] = [];
 
-    /**
-    * Lista de los canales de voz del espacio de trabajo.
-    */
-    public voiceChannelsList: VoiceChannel[] = [];
+  /**
+   * Lista de los canales de voz del espacio de trabajo.
+   */
+  public voiceChannelsList: VoiceChannel[] = [];
 
   /**
    * Status de los canales
@@ -143,8 +143,8 @@ class ChannelsModule extends VuexModule {
        });
    }
    */
-  
-   /**
+
+  /**
    * Agrega un canal de voz a la db
    * @param voiceChannel canal de voz a agregar
    */
@@ -175,7 +175,6 @@ class ChannelsModule extends VuexModule {
       });
   }
 
-
   /**
    * Recupera los canales de texto de un espacio de trabajo
    * @param workSpaceID ID del espacio de trabajo
@@ -187,21 +186,20 @@ class ChannelsModule extends VuexModule {
       this.context.commit("setTextChannels", textChannels);
       this.context.commit("setLoadingStatus", false);
     });
-
   }
 
   /**
    * Recupera los canales de voz de un espacio de trabajo
    * @param workSpaceID ID del espacio de trabajo
    */
-   @Action
-   fetchVoiceChannels(workSpaceID: string): void {
-     this.context.commit("setLoadingStatus", true);
-     ChannelService.getTextChannels(workSpaceID, voiceChannels => {
-       this.context.commit("setVoiceChannels", voiceChannels);
-       this.context.commit("setLoadingStatus", false);
-     });
-   }
+  @Action
+  fetchVoiceChannels(workSpaceID: string): void {
+    this.context.commit("setLoadingStatus", true);
+    ChannelService.getTextChannels(workSpaceID, voiceChannels => {
+      this.context.commit("setVoiceChannels", voiceChannels);
+      this.context.commit("setLoadingStatus", false);
+    });
+  }
 
   /**
    * Recupera los canales de un espacio de trabajo
@@ -215,12 +213,12 @@ class ChannelsModule extends VuexModule {
       this.context.commit("setLoadingStatus", false);
     });
     ChannelService.getTextChannels(id, textChannels => {
-        this.context.commit("setWorkSpacesList", textChannels);
-        this.context.commit("setLoadingStatus", false);
+      this.context.commit("setWorkSpacesList", textChannels);
+      this.context.commit("setLoadingStatus", false);
     });
     ChannelService.getVoiceChannels(id, voiceChannels => {
-        this.context.commit("setWorkSpacesList", voiceChannels);
-        this.context.commit("setLoadingStatus", false);
+      this.context.commit("setWorkSpacesList", voiceChannels);
+      this.context.commit("setLoadingStatus", false);
     });
   }
 
@@ -232,15 +230,15 @@ class ChannelsModule extends VuexModule {
     return this.status.createdChannel;
   }
 
-  get codeChannelList(): CodeChannel[]{
+  get codeChannelList(): CodeChannel[] {
     return this.codeChannelsList;
   }
 
-  get textChannelList(): TextChannel[]{
+  get textChannelList(): TextChannel[] {
     return this.textChannelsList;
   }
 
-  get voiceChannelList(): VoiceChannel[]{
+  get voiceChannelList(): VoiceChannel[] {
     return this.voiceChannelsList;
   }
 }

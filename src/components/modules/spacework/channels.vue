@@ -1,21 +1,24 @@
 <template>
   <v-list class="hola">
     <list-channels
-      v-for="item in items"
+      v-for="item in ChannelsText"
+      :key="item.title"
+      :item="item"
+      :user="users"
+      :channels="workspace.canales_texto"
+    ></list-channels>
+    <list-channels
+      v-for="item in ChannelsVoice"
       :key="item.title"
       :item="item"
       :user="users"
     ></list-channels>
-    <!--     <list-channels
-      v-for="item in voiceChanels"
-      :key="item.title"
-      :item="item"
-    ></list-channels>
     <list-channels
-      v-for="item in messageChanels"
+      v-for="item in ChannelsCode"
       :key="item.title"
       :item="item"
-    ></list-channels> -->
+      :user="users"
+    ></list-channels>
   </v-list>
 </template>
 
@@ -25,6 +28,7 @@ import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import ListChannels from "@/components/modules/spacework/channels/listchannels.vue";
 import { Prop } from "vue-property-decorator";
+import { Workspace } from "@/models/workspace";
 
 @Component({
   components: {
@@ -37,30 +41,34 @@ export default class Channels extends Vue {
   })
   public users!: [];
 
-  public items = [
+  @Prop({
+    required: true,
+  })
+  public workspace!: Workspace;
+
+  public ChannelsText = [
     {
-      items: [{ title: "Default" }],
       title: "Canales de texto",
       icon: "mdi-message-text",
       text: "Texto",
     },
+  ];
+
+  public ChannelsVoice = [
     {
-      items: [{ title: "Default" }, { title: "TT" }],
       title: "Canales de voz",
       icon: "mdi-account-voice",
       text: "Voz",
     },
+  ];
+
+  public ChannelsCode = [
     {
-      items: [{ title: "Default" }],
       title: "Canales de código",
       icon: "mdi-code-tags",
       text: "Código",
     },
   ];
-
-  mounted() {
-    console.log(this.users);
-  }
 }
 </script>
 

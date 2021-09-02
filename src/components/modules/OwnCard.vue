@@ -14,11 +14,10 @@ import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import CollaborationCard from "@/components/modules/CollaborationCard.vue";
-
 import WorkspaceCard from "@/components/modules/WorkspaceCard.vue";
 
 const User = namespace("UserModule");
-const OwnSpacework = namespace("WorkSpaceModule");
+const OwnSpacework = namespace("MainScreenModule");
 
 @Component({
   components: {

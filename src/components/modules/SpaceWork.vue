@@ -1,9 +1,13 @@
 <template>
-  <v-row v-if="!isLoading" class="row" no-gutters>
+  <v-row v-if="!isLoading && !isLoadingMyWorkspace" class="row" no-gutters>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto cardd">
-        <toolbar></toolbar>
-        <channels class="flex-grow-1" :users="itemss"></channels>
+        <toolbar :name="workspace.nombre"></toolbar>
+        <channels
+          class="flex-grow-1"
+          :users="itemss"
+          :workspace="workspace"
+        ></channels>
         <userinfo></userinfo>
       </div>
     </v-col>
@@ -53,7 +57,11 @@ import message from "@/components/modules/spacework/message.vue";
 import toolbarusers from "@/components/modules/spacework/toolbarusers.vue";
 import userlist from "@/components/modules/spacework/userlist.vue";
 import { User } from "@/models/user";
+import { TextChannel } from "@/models/textChannel";
+import { Workspace } from "@/models/workspace";
 const User = namespace("UserModule");
+/* const ChannelsModule = namespace("ChannelModule"); */
+const MyWorkSpace = namespace("Workspace");
 
 @Component({
   components: {
@@ -79,6 +87,15 @@ export default class Spacework extends Vue {
 
   @User.Action
   private fetchCurrentUser!: () => void;
+
+  @MyWorkSpace.Action
+  private fetchMyWorkspace!: (id: string) => void;
+
+  @MyWorkSpace.State("workspace")
+  private workspace!: Workspace;
+
+  @MyWorkSpace.Getter
+  private isLoadingMyWorkspace!: boolean;
 
   public itemss = [
     {
@@ -146,14 +163,11 @@ export default class Spacework extends Vue {
     },
   ];
 
-  created(): void {
+  mounted(): void {
     if (!this.isLoggedIn) {
       this.fetchCurrentUser();
     }
-  }
-
-  mounted(): void {
-    this.currentUser;
+    this.fetchMyWorkspace(this.$route.params.id);
   }
 }
 </script>

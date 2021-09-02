@@ -16,10 +16,9 @@
   ></v-text-field> -->
   <v-flex>
     <v-textarea
-      prepend-inner-icon="mdi-paperclip"
       append-icon="mdi-send"
       rounded
-      class="text-input my-text-style form-input"
+      class="text-input"
       placeholder="Escribe tu mensaje"
       autocomplete="off"
       auto-grow
@@ -31,16 +30,20 @@
       counter="500"
       :rules="[rules.lenght]"
       @click:append="() => {}"
-      @click:prepend-inner="onButtonClick"
       background-color="primaryDark"
-    ></v-textarea>
-    <input
+      dark
+    >
+      <template v-slot:prepend-inner>
+        <v-file-input accept="image/*" hide-input></v-file-input>
+      </template>
+    </v-textarea>
+    <!--    <input
       ref="uploader"
       class="d-none"
       type="file"
       accept="image/*"
       @change="onFileChanged"
-    />
+    /> -->
   </v-flex>
 </template>
 
@@ -89,25 +92,29 @@ export default class InputMessage extends Vue {
   flex: none;
 }
 
-.my-text-style >>> .v-text-field__slot input {
+/* .my-text-style >>> .v-text-field__slot input {
   color: white;
 }
 
 .v-text-field ::before,
 ::after {
   color: white;
-}
+} */
 
-#input-55 {
+/* #input-55 {
   color: white;
-}
+} */
 
-.theme--light.v-input.my-text-style input::placeholder {
+/* .theme--light.v-input.my-text-style input::placeholder {
   color: green !important;
 }
 
 .theme--light.v-input input,
 .theme--light.v-input textarea {
   color: white;
+} */
+
+.theme--light.v-input textarea {
+  /* color: red; */
 }
 </style>

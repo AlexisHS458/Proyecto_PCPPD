@@ -43,8 +43,8 @@ const routes: Array<RouteConfig> = [
     } */
   },
   {
-    path: "/space",
-    name: "Sapce",
+    path: "/space/:id",
+    name: "Space",
     component: SpaceWork
     /* meta: {
       auth: true
