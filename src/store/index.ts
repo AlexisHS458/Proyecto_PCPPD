@@ -1,7 +1,9 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import UserModule from "./modules/user.module";
-import WorkSpaceModule from "./modules/work_space.module";
+import MainScreenModule from "./modules/main_screen.module";
+import Workspace from "./modules/workspaces.module";
+import ChannelsModule from "./modules/channels.module";
 
 Vue.use(Vuex);
 
@@ -11,6 +13,8 @@ export default new Vuex.Store({
   actions: {},
   modules: {
     UserModule,
-    WorkSpaceModule
+    MainScreenModule,
+    Workspace,
+    ChannelsModule
   }
 });

@@ -9,7 +9,7 @@ import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 *
 */
 @Module({ namespaced: true })
-class ChannelModule extends VuexModule {
+class ChannelsModule extends VuexModule {
     /**
     * Lista de los canales de codigo del espacio de trabajo.
     */
@@ -245,4 +245,4 @@ class ChannelModule extends VuexModule {
   }
 }
 
-export default ChannelModule;
+export default ChannelsModule;
