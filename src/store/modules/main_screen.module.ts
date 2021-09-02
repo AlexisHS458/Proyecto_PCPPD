@@ -7,7 +7,7 @@ import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
  *
  */
 @Module({ namespaced: true })
-class WorkSpaceModule extends VuexModule {
+class MainScreenModule extends VuexModule {
   /**
    * Lista de los espacios de trabajo del usuario.
    */
@@ -113,4 +113,4 @@ class WorkSpaceModule extends VuexModule {
   }
 }
 
-export default WorkSpaceModule;
+export default MainScreenModule;

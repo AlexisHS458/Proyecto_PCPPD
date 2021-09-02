@@ -12,7 +12,9 @@ class WorkSpaceService {
    * @returns WorkSpace. Referencia del espacio de trabajo creado.
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
-    const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    const workSpaceRef = (
+      await db.collection(Collection.WORK_SPACE).add(workspace)
+    ).get();
     return <Workspace>(await workSpaceRef).data();
   }
 
@@ -31,17 +33,23 @@ class WorkSpaceService {
    * Recupera los espacios de trabajo de un usuario
    * @param uid ID del usuario a recuperar sus espacios de trabajo
    */
-  getWorkspaces(uid: string, onSnapshot: (workspaces: Workspace[]) => void): void {
+  getWorkspaces(
+    uid: string,
+    onSnapshot: (workspaces: Workspace[]) => void
+  ): void {
     db.collection(Collection.WORK_SPACE)
       .where("uid_usuario", "==", uid)
       .onSnapshot(snapshot => {
-        onSnapshot(snapshot.docs.map<Workspace>((doc) => {
-          const workspace = {
-            ...doc.data(),
-            uid: doc.id
-          }
-          return <Workspace>workspace;
-        }));
+        onSnapshot(
+          snapshot.docs.map<Workspace>(doc => {
+            const workspace = {
+              ...doc.data(),
+              uid: doc.id
+              
+            };
+            return <Workspace>workspace;
+          })
+        );
       });
   }
 
@@ -51,14 +59,19 @@ class WorkSpaceService {
    */
   async getWorkspaceInfo(uid: string): Promise<Workspace> {
     return new Promise((resolve, reject) => {
-      db.collection(Collection.WORK_SPACE).doc(uid).onSnapshot((value)=>{
-        const workspaceData = value.data();
-        if(workspaceData){
-          resolve(<Workspace> workspaceData);
-        }
-      }, (error) => {
-        reject(error)
-      });
+      db.collection(Collection.WORK_SPACE)
+        .doc(uid)
+        .onSnapshot(
+          value => {
+            const workspaceData = value.data();
+            if (workspaceData) {
+              resolve(<Workspace>workspaceData);
+            }
+          },
+          error => {
+            reject(error);
+          }
+        );
     });
   }
 }
