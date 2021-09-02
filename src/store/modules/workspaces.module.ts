@@ -44,6 +44,10 @@ class WorkspaceModule extends VuexModule {
       this.context.commit("setMyWorkspace", workspace);
     });
   }
+
+  get isLoadingMyWorkspace(): boolean {
+    return this.status.loadingWorkspace;
+  }
 }
 
 export default WorkspaceModule;
