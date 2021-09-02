@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :to="'/space/' + workspace.uid">
     <v-card-title class="card-title">
       {{ getInitials(workspace.nombre) }}
     </v-card-title>
@@ -9,7 +9,7 @@
     <v-card-actions class="card-actions">
       <v-spacer></v-spacer>
 
-      <v-btn icon @click="show = !show">
+      <v-btn icon @click.prevent="show = !show">
         <v-icon color="white">
           {{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}
         </v-icon>
@@ -61,7 +61,7 @@ import { Workspace } from "@/models/workspace";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { StringUtils } from "@/utils/stringsUtils";
 import { namespace } from "vuex-class";
-const Workspace = namespace("WorkSpaceModule");
+const Workspace = namespace("MainScreenModule");
 
 @Component
 export default class WorkspaceCard extends Vue {
@@ -77,6 +77,10 @@ export default class WorkspaceCard extends Vue {
 
   deleteSpacework() {
     this.deletedWorkSpaces(this.workspace.uid);
+  }
+
+  route(uid: string) {
+    this.$router.push("/space/" + uid);
   }
 }
 </script>

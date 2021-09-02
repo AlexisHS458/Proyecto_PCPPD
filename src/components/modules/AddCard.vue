@@ -48,7 +48,7 @@ import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
-const Add = namespace("WorkSpaceModule");
+const Add = namespace("MainScreenModule");
 const User = namespace("UserModule");
 import Vue from "vue";
 

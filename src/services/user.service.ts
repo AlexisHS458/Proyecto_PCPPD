@@ -34,7 +34,7 @@ class UserService {
      * @returns Promise<void>
      */
     async saveUser(user: User): Promise<void> {
-        return  await db.collection(Collection.USERS).doc(user.uid).update(user);
+        return  await db.collection(Collection.USERS).doc(user.uid).update(user);       
     }
 }
 

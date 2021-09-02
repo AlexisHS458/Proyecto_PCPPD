@@ -7,7 +7,7 @@ import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
  *
  */
 @Module({ namespaced: true })
-class WorkSpaceModule extends VuexModule {
+class MainScreenModule extends VuexModule {
   /**
    * Lista de los espacios de trabajo del usuario.
    */
@@ -17,17 +17,13 @@ class WorkSpaceModule extends VuexModule {
    * Status de los espacios de trabajo
    * @param loadingList T: Si la lista esta cargando, F: si ya está cargada
    * @param createdWorkSpace T: Si se creó un nuevo WS, F: Si no se creó
+   * @param deletedWorkSpace T: Si se elimino el WS, F: Si no se elimino
    */
   public status = {
     loadingList: true,
     createdWorkSpace: false,
     deletedWorkSpace: false
   };
-
-  @Mutation
-  public setWorkspaces(workspaces: Workspace[]): void {
-    this.workSpacesList = workspaces;
-  }
 
   @Mutation
   public setLoadingStatus(status: boolean): void {
@@ -39,13 +35,7 @@ class WorkSpaceModule extends VuexModule {
     this.workSpacesList = workspaces;
   }
 
-  @Mutation
-  public addWorkSpaceToList(workspace: Workspace) {
-    const lastState = this.workSpacesList;
-    lastState.push(workspace);
-    this.workSpacesList = lastState;
-  }
-
+ 
   @Mutation
   public createWorkSpaceSuccess(): void {
     this.status.createdWorkSpace = true;
@@ -123,4 +113,4 @@ class WorkSpaceModule extends VuexModule {
   }
 }
 
-export default WorkSpaceModule;
+export default MainScreenModule;

@@ -21,7 +21,7 @@ class WorkSpaceService {
    * @param id ID del documento a eliminar
    */
   async deleteWorkSpace(id: string): Promise<void> {
-    const delWorkSpace = await db
+    await db
       .collection(Collection.WORK_SPACE)
       .doc(id)
       .delete();
@@ -35,14 +35,38 @@ class WorkSpaceService {
     db.collection(Collection.WORK_SPACE)
       .where("uid_usuario", "==", uid)
       .onSnapshot(snapshot => {
-        onSnapshot(snapshot.docs.map<Workspace>((doc) => {
-          const workspace = {
-            ...doc.data(),
-            uid: doc.id
-          }
-          return <Workspace>workspace;
-        }));
+        onSnapshot(
+          snapshot.docs.map<Workspace>(doc => {
+            const workspace = {
+              ...doc.data(),
+              uid: doc.id
+            };
+            return <Workspace>workspace;
+          })
+        );
       });
+  }
+
+  /**
+   * Recupera un espacio de trabajo
+   * @param uid ID del espacio de trabajo a consultar
+   */
+  async getWorkspaceInfo(uid: string): Promise<Workspace> {
+    return new Promise((resolve, reject) => {
+      db.collection(Collection.WORK_SPACE)
+        .doc(uid)
+        .onSnapshot(
+          value => {
+            const workspaceData = value.data();
+            if (workspaceData) {
+              resolve(<Workspace>workspaceData);
+            }
+          },
+          error => {
+            reject(error);
+          }
+        );
+    });
   }
 }
 

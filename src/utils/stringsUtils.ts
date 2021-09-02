@@ -14,7 +14,8 @@ export class StringUtils {
     if (words.length === 0) return "";
 
     if (words.length === 1) {
-      initials = filteredValue.substring(0, Math.min(this.length, 4));
+      //initials = filteredValue.substring(0, Math.min(this.length, 4));
+      initials = filteredValue.substring(0, Math.min(words[0].length, 4));
     } else {
       const lastWord = words[words.length - 1];
       const matchesInLast = lastWord.match(/[IVX]+/) ?? [];
