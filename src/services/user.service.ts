@@ -34,9 +34,6 @@ class UserService {
      * @returns Promise<void>
      */
     async saveUser(user: User): Promise<void> {
-        const users = (await db.collection(Collection.USERS).get()).docs.map((snapshot)=>{<User>snapshot.data()});
-        //const aux = users.find(e=>(e as unknown as User).boleta===user.boleta);
-        //console.log(aux);
         return  await db.collection(Collection.USERS).doc(user.uid).update(user);       
     }
 }

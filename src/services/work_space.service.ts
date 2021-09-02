@@ -44,6 +44,23 @@ class WorkSpaceService {
         }));
       });
   }
+
+  /**
+   * Recupera un espacio de trabajo
+   * @param uid ID del espacio de trabajo a consultar
+   */
+  async getWorkspaceInfo(uid: string): Promise<Workspace> {
+    return new Promise((resolve, reject) => {
+      db.collection(Collection.WORK_SPACE).doc(uid).onSnapshot((value)=>{
+        const workspaceData = value.data();
+        if(workspaceData){
+          resolve(<Workspace> workspaceData);
+        }
+      }, (error) => {
+        reject(error)
+      });
+    });
+  }
 }
 
 export default new WorkSpaceService();
