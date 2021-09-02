@@ -1,16 +1,16 @@
 <template>
-  <form-register />
+  <register-form />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import FormRegister from "../components/FormRegister.vue";
+import RegisterForm from "@/components/modules/RegisterForm.vue";
 
 export default Vue.extend({
-  name: "Home",
+  name: "Register",
 
   components: {
-    FormRegister,
+    RegisterForm,
   },
 });
 </script>
