@@ -12,7 +12,9 @@ class WorkSpaceService {
    * @returns WorkSpace. Referencia del espacio de trabajo creado.
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
-    const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    const workSpaceRef = (
+      await db.collection(Collection.WORK_SPACE).add(workspace)
+    ).get();
     return <Workspace>(await workSpaceRef).data();
   }
 
@@ -31,7 +33,10 @@ class WorkSpaceService {
    * Recupera los espacios de trabajo de un usuario
    * @param uid ID del usuario a recuperar sus espacios de trabajo
    */
-  getWorkspaces(uid: string, onSnapshot: (workspaces: Workspace[]) => void): void {
+  getWorkspaces(
+    uid: string,
+    onSnapshot: (workspaces: Workspace[]) => void
+  ): void {
     db.collection(Collection.WORK_SPACE)
       .where("uid_usuario", "==", uid)
       .onSnapshot(snapshot => {

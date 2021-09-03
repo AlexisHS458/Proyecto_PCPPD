@@ -68,20 +68,6 @@ class MessageModule extends VuexModule {
     this.status.deletedMessage = false;
   }
 
-  /**
-   * Envia un mensaje
-   * @param message mensaje a enviar
-   */
-    @Action
-  async sendMessage(message: Message){
-    return await MessageService.sendMessage(message)
-    .then(() => {
-      this.context.commit("sentMessageSuccess");
-    })
-    .catch(() => {
-      this.context.commit("sentMessageFailure");
-    });
-  }
 
   /**
    * Elimina un mensaje
@@ -98,18 +84,7 @@ class MessageModule extends VuexModule {
         this.context.commit("deleteWorkSpaceFailure");
       });
   }
-  /**
-   * Recupera los Mensajes de un canal
-   * @param uid id del canal
-   */
-  @Action
-  reciveMessages(uid: string): void {
-    this.context.commit("setLoadingStatus", true);
-    MessageService.reciveMessages(uid, messages => {
-      this.context.commit("setrMessagesList", messages);
-      this.context.commit("setLoadingStatus", false);
-    });
-  }
+
 
   get isLoadingList(): boolean {
     return this.status.loadingList;
