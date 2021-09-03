@@ -118,8 +118,8 @@ class ChannelsModule extends VuexModule {
    * @param codeChannel canal de codigo a agregar
    */
   @Action
-  async addCodeChannel(codeChannel: CodeChannel) {
-    return await ChannelService.createCodeChannel(codeChannel)
+  async addCodeChannel(workSpaceID: string, name: string, codeChannel: CodeChannel) {
+    return await ChannelService.createCodeChannel(workSpaceID, name, codeChannel)
       .then(() => {
         this.context.commit("createChannelSuccess");
       })
@@ -131,10 +131,11 @@ class ChannelsModule extends VuexModule {
   /**
    * Agrega un canal de texto a la db
    * @param textChannel canal de texto a agregar
-   
+   */
+
    @Action
-   async addtextChannel(textChannel: TextChannel) {
-     return await ChannelService.createTextChannel(textChannel)
+   async addtextChannel(workSpaceID: string, name: string, textChannel: TextChannel) {
+     return await ChannelService.createTextChannel(workSpaceID, name, textChannel)
        .then(() => {
          this.context.commit("createChannelSuccess");
        })
@@ -142,15 +143,15 @@ class ChannelsModule extends VuexModule {
          this.context.commit("createChannelFailure");
        });
    }
-   */
+  
 
   /**
    * Agrega un canal de voz a la db
    * @param voiceChannel canal de voz a agregar
    */
   @Action
-  async addVoiceChannel(voiceChannel: VoiceChannel) {
-    return await ChannelService.createVoiceChannel(voiceChannel)
+  async addVoiceChannel(workSpaceID: string, name: string, voiceChannel: VoiceChannel) {
+    return await ChannelService.createVoiceChannel(workSpaceID, name, voiceChannel)
       .then(() => {
         this.context.commit("createChannelSuccess");
       })
