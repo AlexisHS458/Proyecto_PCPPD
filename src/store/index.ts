@@ -4,6 +4,7 @@ import UserModule from "./modules/user.module";
 import MainScreenModule from "./modules/main_screen.module";
 import Workspace from "./modules/workspaces.module";
 import ChannelsModule from "./modules/channels.module";
+import TextChannelModule from "./modules/text_channels.module";
 
 Vue.use(Vuex);
 
@@ -15,6 +16,7 @@ export default new Vuex.Store({
     UserModule,
     MainScreenModule,
     Workspace,
-    ChannelsModule
+    ChannelsModule,
+    TextChannelModule
   }
 });
