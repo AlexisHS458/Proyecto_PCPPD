@@ -9,6 +9,7 @@
           :workspace="workspace"
         ></channels>
         <userinfo></userinfo>
+        {{ workspace.canales_texto }}
       </div>
     </v-col>
     <v-col class="flex-grow-1 flex-shrink-0">
@@ -59,9 +60,11 @@ import userlist from "@/components/modules/spacework/userlist.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
+import { Message } from "@/models/message";
 const User = namespace("UserModule");
 /* const ChannelsModule = namespace("ChannelModule"); */
 const MyWorkSpace = namespace("Workspace");
+const Messages = namespace("TextChannelModule");
 
 @Component({
   components: {
@@ -97,6 +100,15 @@ export default class Spacework extends Vue {
   @MyWorkSpace.Getter
   private isLoadingMyWorkspace!: boolean;
 
+  @Messages.Action
+  private fetchMesages!: (workspaceID: string, textChannelID: string) => void;
+
+  @Messages.Getter
+  private isLoadingMessages!: boolean;
+
+  @Messages.State("workspace")
+  private messages!: Message[];
+
   public itemss = [
     {
       icon: "mdi-circle",
@@ -120,7 +132,7 @@ export default class Spacework extends Vue {
     },
   ];
 
-  public messages = [
+  /* public messages = [
     {
       title: "Brunch this weekend?",
       subtitle:
@@ -161,13 +173,19 @@ export default class Spacework extends Vue {
       subtitle:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dapibus ex ac urna viverra posuere. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla aliquet pulvinar sagittis. Curabitur purus ante, dictum ac metus volutpat, porttitor iaculis sem. Cras iaculis mauris a odio faucibus faucibus. Nam faucibus elit enim, a facilisis ex pulvinar eu. Etiam congue tempus velit, sed iaculis mauris blandit in. Vestibulum eleifend augue quam, et semper nibh molestie semper. Pellentesque pellentesque, risus vitae euismod vulputate, neque tortor interdum mi, porta molestie mauris lorem vel nunc. Donec at justo velit. Nam lobortis urna a dui pharetra posuere at at massa. Sed ipsum neque, pharetra pharetra egestas et, placerat sed sapien. Cras congue ante ante, non tincidunt sapien gravida quis. Maecenas condimentum, leo quis porta pretium, felis lacus cursus orci, ac mattis purus odio a libero. Donec gravida neque felis, a facilisis libero euismod nec. Pellentesque finibus rutrum libero sed pretium. In nisi lectus, sollicitudin eu lectus a, rhoncus porttitor tellus. Duis interdum, nulla feugiat porta convallis, odio dolor ullamcorper orci, quis condimentum dui risus nec metus. Aliquam ut augue malesuada, sagittis justo eget, facilisis odio. Donec sit amet pharetra mi. Maecenas quam sapien, vulputate sit amet lacinia nec, eleifend vel urna. Donec pulvinar condimentum convallis. Suspendisse malesuada libero nec blandit semper. Aenean venenatis ultrices nunc vitae tempus. Donec luctus ornare metus sit amet porta. Integer vehicula felis turpis, at faucibus felis luctus at. Phasellus vehicula leo vel porta imperdiet. Suspendisse potenti. Suspendisse mattis sapien non hendrerit condimentum. Mauris sagittis tincidunt sapien ac venenatis. Donec lacus lorem, vestibulum a lorem commodo, consectetur consequat lacus. In dignissim placerat odio in finibus. Aliquam erat volutpat. Suspendisse non lorem fringilla, hendrerit diam vitae, aliquam purus. Nulla facilisi. Nam pellentesque mollis tempor. Vivamus tincidunt lorem efficitur felis luctus iaculis. Proin quis felis quis dolor maximus congue. Nulla tristique lacus vitae quam volutpat, pretium lacinia nisi elementum. Curabitur tristique lorem ac tincidunt hendrerit. In suscipit suscipit magna, at aliquam dui semper non. Aliquam fermentum velit ut mattis congue. Donec feugiat quis ante ut sodales. Morbi non massa odio. Mauris condimentum, leo nec iaculis scelerisque, risus risus dapibus ex, ut iaculis dolor massa vitae tellus. Aenean quam risus, semper non placerat ac, suscipit vitae quam. Nunc varius vel dui vitae vestibulum. Fusce tincidunt justo eu tincidunt consequat. Aenean fringilla nisi id consequat interdum. Proin erat eros, auctor ac ultrices vel, varius quis nunc. Etiam auctor tempus dolor porta fringilla. Ut quis erat tortor. Integer tortor enim, bibendum vel bibendum et, eleifend et neque. Cras pellentesque lectus vitae congue ultricies. Sed aliquet ex nec purus commodo, at feugiat lorem viverra. Donec volutpat purus eget massa mattis, quis tempus ipsum suscipit. Donec elit tortor, porta quis posuere at, pellentesque quis elit. Etiam urna orci, ultrices sed elit non, blandit malesuada tortor. Sed nisl mauris, sodales vel tellus vel, ullamcorper vestibulum turpis. In eu lectus et enim pellentesque aliquet. Etiam eget maximus mi, convallis porttitor felis. Aliquam sed tellus molestie, fermentum leo eu, efficitur. ",
     },
-  ];
+  ]; */
 
-  mounted(): void {
+  mounted() {
+    console.log(this.workspace);
+    /*  this.fetchMesages(this.workspace.uid, this.workspace.canales_texto[0].uid); */
+  }
+
+  created() {
     if (!this.isLoggedIn) {
       this.fetchCurrentUser();
     }
     this.fetchMyWorkspace(this.$route.params.id);
+    console.log(this.workspace);
   }
 }
 </script>

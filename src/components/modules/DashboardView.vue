@@ -60,6 +60,7 @@ export default class DashboardView extends Vue {
 
   mounted(): void {
     this.currentUser;
+    console.log(this.currentUser);
   }
 }
 </script>

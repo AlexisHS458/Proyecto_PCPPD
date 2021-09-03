@@ -28,7 +28,7 @@
       rows="1"
       row-height="15"
       counter="500"
-      :rules="[rules.lenght]"
+      :rules="[rules.size]"
       @click:append="() => {}"
       background-color="primaryDark"
       dark
@@ -49,6 +49,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { Message } from "@/models/message";
+import { namespace } from "vuex-class";
+const Message = namespace("TextChannelModule");
 
 @Component
 export default class InputMessage extends Vue {
@@ -59,7 +62,7 @@ export default class InputMessage extends Vue {
   public isSelecting = false;
   public selectedFile = "";
   public rules = {
-    lenght: (v: string): string | boolean =>
+    size: (v: string): string | boolean =>
       v.length <= 500 || "Haz alcanzado el límite de caracteres",
   };
 
@@ -80,6 +83,19 @@ export default class InputMessage extends Vue {
 
     // do something
   }
+
+  @Message.Action
+  private sendMessage!: (
+    workspaceID: string,
+    textChannelID: string,
+    message: Message
+  ) => Promise<void>;
+
+  /*   @Message.State("workspace")
+  private messages!: Message[]; */
+
+  @Message.Getter
+  private isLoadingMessages!: boolean;
 }
 </script>
 
