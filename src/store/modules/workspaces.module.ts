@@ -44,8 +44,8 @@ class WorkspaceModule extends VuexModule {
     const workspace = await WorkSpaceService.getWorkspaceInfo(uid);
     ChannelService.getTextChannels(uid, textChannels => {
       workspace.canales_texto = textChannels;
-      this.context.commit("setLoadingStatus", false);
       this.context.commit("setMyWorkspace", workspace);
+      this.context.commit("setLoadingStatus", false);
     });
   }
 

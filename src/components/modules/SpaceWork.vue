@@ -63,7 +63,7 @@ import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 const User = namespace("UserModule");
 /* const ChannelsModule = namespace("ChannelModule"); */
-const MyWorkSpace = namespace("Workspace");
+const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 
 @Component({
@@ -106,7 +106,7 @@ export default class Spacework extends Vue {
   @Messages.Getter
   private isLoadingMessages!: boolean;
 
-  @Messages.State("workspace")
+  @Messages.State("workspaceddd")
   private messages!: Message[];
 
   public itemss = [
@@ -176,6 +176,10 @@ export default class Spacework extends Vue {
   ]; */
 
   mounted() {
+      if(!this.isLoadingMyWorkspace){
+        console.log("worksapcedentro del if:  "+this.workspace);
+    }
+    console.log("worksapce fuera del if:  "+this.workspace);
     console.log(this.workspace);
     /*  this.fetchMesages(this.workspace.uid, this.workspace.canales_texto[0].uid); */
   }
@@ -185,7 +189,6 @@ export default class Spacework extends Vue {
       this.fetchCurrentUser();
     }
     this.fetchMyWorkspace(this.$route.params.id);
-    console.log(this.workspace);
   }
 }
 </script>
