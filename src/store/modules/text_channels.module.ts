@@ -14,6 +14,16 @@ class TextChannelModule extends VuexModule {
   public messages: Message[] = [];
 
   /**
+   * ID del espacio de trabajo a consultar
+   */
+  public workspaceID: string = "";
+
+  /**
+   * ID del canal de texto a consultar
+   */
+  public textChannelID: string = "";
+
+  /**
    * Estatos de consulta del canal de texto
    */
   public status = {
@@ -27,28 +37,56 @@ class TextChannelModule extends VuexModule {
   }
 
   @Mutation
-  public setLoadingStatus(status: boolean) {
+  public setLoadingStatus(status: boolean): void  {
     this.status.loadingMessages = status;
   }
 
   @Mutation
-  public messageSentSuccess() {
+  public messageSentSuccess(): void  {
     this.status.messageSent = true;
   }
+
   @Mutation
-  public messageSentFail() {
+  public messageSentFail(): void  {
     this.status.messageSent = false;
+  }
+  
+  @Mutation
+  public setWorkspaceID(workspaceID: string): void{
+    this.workspaceID = workspaceID;
+  }
+
+  @Mutation
+  public setTextChannelID(textChannelID: string): void{
+    this.textChannelID = textChannelID;
+  }
+
+  /**
+   * Coloca el ID del espacio de trabajo
+   * @param id ID del workspase
+   */
+  @Action
+  setTextChannelIDtoModule(id: string){
+    this.context.commit("setWorkspaceID",id);
+  }
+
+
+  /**
+   * Coloca el ID del canal de texto
+   * @param id ID del workspase
+   */
+  @Action
+  setWorkspaceIDtoModule(id: string){
+    this.context.commit("setTextChannelID",id);
   }
 
   /**
    * Envia un mensaje al espacion de trabajo y canal especificado.
-   * @param workspaceID ID del espacio de trabajo correspondiente
-   * @param textChannelID ID del canal de texto
    * @param message Mensaje a enviar al canal de texto
    */
   @Action
-  async sendMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
-    return await MessageService.sendMessage(workspaceID, textChannelID, message)
+  async sendMessage(message: Message): Promise<void> {
+    return await MessageService.sendMessage(this.workspaceID,this.textChannelID,message)
       .then(() => {
         this.context.commit("messageSentSuccess");
       })
@@ -63,9 +101,9 @@ class TextChannelModule extends VuexModule {
    * @param textChannelID  ID del canal de texto a consultar
    */
   @Action
-  fetchMesages(workspaceID: string, textChannelID: string) {
+  fetchMesages() {
     this.context.commit("setLoadingStatus", true);
-    MessageService.reciveMessages(workspaceID, textChannelID, messages => {
+    MessageService.reciveMessages(this.workspaceID, this.textChannelID, messages => {
       this.context.commit("setMessages", messages);
       this.context.commit("setLoadingStatus", false);
     });
