@@ -23,7 +23,7 @@
             :messages="message"
           ></message>
         </v-list>
-        <inputmessage></inputmessage>
+        <inputmessage :workspace="workspace" :user="currentUser"></inputmessage>
       </div>
     </v-col>
     <v-col class="flex-grow-0 flex-shrink-1">
@@ -176,10 +176,10 @@ export default class Spacework extends Vue {
   ]; */
 
   mounted() {
-      if(!this.isLoadingMyWorkspace){
-        console.log("worksapcedentro del if:  "+this.workspace);
+    if (!this.isLoadingMyWorkspace) {
+      console.log("worksapcedentro del if:  " + this.workspace);
     }
-    console.log("worksapce fuera del if:  "+this.workspace);
+    console.log("worksapce fuera del if:  " + this.workspace);
     console.log(this.workspace);
     /*  this.fetchMesages(this.workspace.uid, this.workspace.canales_texto[0].uid); */
   }

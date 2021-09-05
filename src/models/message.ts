@@ -5,25 +5,25 @@ export interface Message {
   /**
    * ID único del mensaje
    */
-  uid: string,
+  uid?: string;
 
   /**
    * ID único del usuario que envió el mensaje
    */
-  uid_usuario: string,
+  uid_usuario: string;
 
   /**
    * Nombre del usuario que envió el mensaje
    */
-  usuarioNombre: string,
+  usuarioNombre: string;
 
   /**
    * Contendio del mensaje de texto
    */
-  contenido: string,
+  contenido: string;
 
   /**
    * Fecha en la que fue enviada el mensaje
    */
-  fecha: Date,
+  fecha: string;
 }

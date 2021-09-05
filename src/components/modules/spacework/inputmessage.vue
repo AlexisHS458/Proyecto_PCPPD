@@ -16,6 +16,7 @@
   ></v-text-field> -->
   <v-flex>
     <v-textarea
+      v-model="message"
       append-icon="mdi-send"
       rounded
       class="text-input"
@@ -29,7 +30,7 @@
       row-height="15"
       counter="500"
       :rules="[rules.size]"
-      @click:append="() => {}"
+      @click:append="sendMessages"
       background-color="primaryDark"
       dark
     >
@@ -44,6 +45,7 @@
       accept="image/*"
       @change="onFileChanged"
     /> -->
+    {{ workspace }}
   </v-flex>
 </template>
 
@@ -51,10 +53,24 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Message } from "@/models/message";
 import { namespace } from "vuex-class";
+import { Workspace } from "@/models/workspace";
+import { User } from "@/models/user";
 const Message = namespace("TextChannelModule");
 
 @Component
 export default class InputMessage extends Vue {
+  @Prop({
+    required: true,
+  })
+  public workspace!: Workspace;
+
+  @Prop({
+    required: true,
+  })
+  public user!: User;
+
+  public messageModel = {} as Message;
+  public message = "";
   public model = [];
   public imageName = "";
   public imageUrl: any;
@@ -80,8 +96,6 @@ export default class InputMessage extends Vue {
 
   onFileChanged(e: any) {
     this.selectedFile = e.target.files[0];
-
-    // do something
   }
 
   @Message.Action
@@ -91,11 +105,23 @@ export default class InputMessage extends Vue {
     message: Message
   ) => Promise<void>;
 
-  /*   @Message.State("workspace")
-  private messages!: Message[]; */
-
   @Message.Getter
   private isLoadingMessages!: boolean;
+
+  async sendMessages() {
+    this.messageModel = {
+      uid_usuario: this.user.uid,
+      usuarioNombre: this.user.nombre,
+      contenido: this.message,
+      fecha: new Date().toLocaleString(),
+    };
+    console.log(this.messageModel);
+    await this.sendMessage(
+      this.$route.params.id,
+      this.workspace.canales_texto[0].uid,
+      this.messageModel
+    );
+  }
 }
 </script>
 
