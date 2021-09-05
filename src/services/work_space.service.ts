@@ -62,7 +62,11 @@ class WorkSpaceService {
         .doc(uid)
         .onSnapshot(
           value => {
-            const workspaceData = value.data();
+            const workspaceData ={
+             ...value.data(),
+             uid: value.id
+            } 
+              
             if (workspaceData) {
               resolve(<Workspace>workspaceData);
             }
