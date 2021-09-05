@@ -1,6 +1,5 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import MessageService from "@/services/message.service";
-import { TextChannel } from "@/models/textChannel";
 import { Message } from "@/models/message";
 
 /**
