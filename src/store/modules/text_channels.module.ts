@@ -15,12 +15,16 @@ class TextChannelModule extends VuexModule {
   /**
    * ID del espacio de trabajo a consultar
    */
-  public workspaceID: string = "";
+  /**
+   * ID del espacio de trabajo a consultar
+   */
+
+  public workspaceID!: string;
 
   /**
    * ID del canal de texto a consultar
    */
-  public textChannelID: string = "";
+  public textChannelID!: string;
 
   /**
    * Estatos de consulta del canal de texto

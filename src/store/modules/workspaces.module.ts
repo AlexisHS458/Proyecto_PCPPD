@@ -4,7 +4,6 @@ import { CodeChannel } from "@/models/codeChannel";
 import { TextChannel } from "@/models/textChannel";
 import { VoiceChannel } from "@/models/voiceChannel";
 import ChannelService from "@/services/channel.service";
-import { ChannelsTypes } from "@/utils/channelsTypes";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 /**

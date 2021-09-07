@@ -1,6 +1,7 @@
 import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
+import ChannelService from "@/services/channel.service";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -44,9 +45,13 @@ class WorkSpaceService {
           snapshot.docs.map<Workspace>(doc => {
             const workspace = {
               ...doc.data(),
-              uid: doc.id
+              uid: doc.id, 
             };
-            return <Workspace>workspace;
+            const workspaceData = <Workspace>workspace;
+            ChannelService.getTextChannels(doc.id, textChannels => {
+              workspaceData.canales_texto = textChannels;
+            })
+            return workspaceData;
           })
         );
       });
