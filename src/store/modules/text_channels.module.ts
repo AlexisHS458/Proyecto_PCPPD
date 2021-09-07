@@ -40,27 +40,27 @@ class TextChannelModule extends VuexModule {
   }
 
   @Mutation
-  public setLoadingStatus(status: boolean): void  {
+  public setLoadingStatus(status: boolean): void {
     this.status.loadingMessages = status;
   }
 
   @Mutation
-  public messageSentSuccess(): void  {
+  public messageSentSuccess(): void {
     this.status.messageSent = true;
   }
 
   @Mutation
-  public messageSentFail(): void  {
+  public messageSentFail(): void {
     this.status.messageSent = false;
   }
-  
+
   @Mutation
-  public setWorkspaceID(workspaceID: string): void{
+  public setWorkspaceID(workspaceID: string): void {
     this.workspaceID = workspaceID;
   }
 
   @Mutation
-  public setTextChannelID(textChannelID: string): void{
+  public setTextChannelID(textChannelID: string): void {
     this.textChannelID = textChannelID;
   }
 
@@ -69,18 +69,17 @@ class TextChannelModule extends VuexModule {
    * @param id ID del workspase
    */
   @Action
-  setTextChannelIDtoModule(id: string){
-    this.context.commit("setWorkspaceID",id);
+  setTextChannelIDtoModule(id: string) {
+    this.context.commit("setWorkspaceID", id);
   }
-
 
   /**
    * Coloca el ID del canal de texto
    * @param id ID del workspase
    */
   @Action
-  setWorkspaceIDtoModule(id: string){
-    this.context.commit("setTextChannelID",id);
+  setWorkspaceIDtoModule(id: string) {
+    this.context.commit("setTextChannelID", id);
   }
 
   /**
@@ -89,7 +88,7 @@ class TextChannelModule extends VuexModule {
    */
   @Action
   async sendMessage(message: Message): Promise<void> {
-    return await MessageService.sendMessage(this.workspaceID,this.textChannelID,message)
+    return await MessageService.sendMessage(this.workspaceID, this.textChannelID, message)
       .then(() => {
         this.context.commit("messageSentSuccess");
       })

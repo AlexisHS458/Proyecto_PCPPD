@@ -3,9 +3,11 @@
     <v-list-item-content>
       <v-list-item-title class="title">
         <v-row>
-          <v-col class="flex-grow-1 flex-shrink-1"> {{ messages.title }}</v-col>
+          <v-col class="flex-grow-1 flex-shrink-1">
+            {{ messages.usuarioNombre }}</v-col
+          >
           <v-col class="flex-grow-0 flex-shrink-0">
-            <div class="grey--text">11:00 a.m</div>
+            <div class="grey--text">{{ messages.fecha }}</div>
           </v-col>
           <v-col class="flex-grow-0 flex-shrink-1">
             <v-dialog
@@ -74,7 +76,7 @@
         </v-row>
       </v-list-item-title>
       <v-list-item-subtitle
-        v-html="messages.subtitle"
+        v-html="messages.contenido"
         class="subtitle"
       ></v-list-item-subtitle>
     </v-list-item-content>

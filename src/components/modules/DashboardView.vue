@@ -5,7 +5,6 @@
     </v-row>
     <own-card></own-card>
     <invitation-card></invitation-card>
-    {{ hola }}
     <floating-button></floating-button>
   </v-container>
   <div v-else class="coll">

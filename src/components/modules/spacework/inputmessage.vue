@@ -45,7 +45,6 @@
       accept="image/*"
       @change="onFileChanged"
     /> -->
-    {{ workspace }}
   </v-flex>
 </template>
 
@@ -82,7 +81,7 @@ export default class InputMessage extends Vue {
       v.length <= 500 || "Haz alcanzado el límite de caracteres",
   };
 
-  onButtonClick() {
+  /*   onButtonClick() {
     this.isSelecting = true;
     window.addEventListener(
       "focus",
@@ -96,31 +95,37 @@ export default class InputMessage extends Vue {
 
   onFileChanged(e: any) {
     this.selectedFile = e.target.files[0];
-  }
+  } */
 
   @Message.Action
-  private sendMessage!: (
-    workspaceID: string,
-    textChannelID: string,
-    message: Message
-  ) => Promise<void>;
+  private sendMessage!: (message: Message) => Promise<void>;
 
   @Message.Getter
   private isLoadingMessages!: boolean;
 
+  @Message.Action
+  setTextChannelIDtoModule!: (id: string) => void;
+
+  @Message.Action
+  setWorkspaceIDtoModule!: (id: string) => void;
+
   async sendMessages() {
+    console.log(this.user);
     this.messageModel = {
       uid_usuario: this.user.uid,
-      usuarioNombre: this.user.nombre,
+      usuarioNombre: this.user.nombre + " " + this.user.apellido,
       contenido: this.message,
       fecha: new Date().toLocaleString(),
     };
     console.log(this.messageModel);
-    await this.sendMessage(
-      this.$route.params.id,
-      this.workspace.canales_texto[0].uid,
-      this.messageModel
-    );
+    this.setTextChannelIDtoModule(this.$route.params.id);
+    this.setWorkspaceIDtoModule(this.$route.params.idChannel);
+    await this.sendMessage(this.messageModel);
+  }
+
+  mounted() {
+    console.log(this.$route.params.id);
+    console.log(this.$route.params.idChannel);
   }
 }
 </script>

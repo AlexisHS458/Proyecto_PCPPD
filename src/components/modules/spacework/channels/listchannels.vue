@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels v-model="panel" class="expansion-panels">
+  <v-expansion-panels v-model="panel" class="expansion-panels" multiple>
     <v-expansion-panel>
       <v-expansion-panel-header color="primaryDark" class="title">
         <template v-slot:actions>
@@ -60,6 +60,7 @@
             :item="child"
             :icon="item.icon"
             :userList="user"
+            :urll="url"
           ></namechannels>
         </v-list>
       </v-expansion-panel-content>
@@ -91,7 +92,12 @@ export default class ListChannels extends Vue {
   })
   public channels!: [];
 
-  public panel = [0, 1];
+  @Prop({
+    required: false,
+  })
+  public url!: string;
+
+  public panel = [0];
   public show = false;
   public dialog = false;
   public valid = true;
