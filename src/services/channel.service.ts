@@ -13,7 +13,7 @@ class ChannelService {
    * @param codeChannel
    * @returns CodeChannel. Referencia del canal de codigo creado.
    */
-  async createCodeChannel(codeChannel: CodeChannel): Promise<CodeChannel> {
+  async createCodeChannel(workSpaceID: string, name: string, codeChannel: CodeChannel): Promise<CodeChannel> {
     const codeChannelRef = (await db.collection(Collection.CHANNELS).add(codeChannel)).get();
     return <CodeChannel>(await codeChannelRef).data();
   }
@@ -24,7 +24,7 @@ class ChannelService {
    * @param workSpaceID ID del espacio de trabajo
    * @returns TextChannel. Referencia del canal de texto creado.
    */
-   async createTextChannel(workSpaceID: string, textChannel: TextChannel): Promise<TextChannel> {
+   async createTextChannel(workSpaceID: string, name: string, textChannel: TextChannel): Promise<TextChannel> {
     const textChannelRef = (await db.collection(Collection.CHANNELS)
       .doc(workSpaceID)
       .collection(Collection.TEXT_CHANNEL)
@@ -38,7 +38,7 @@ class ChannelService {
    * @param voiceChannel
    * @returns CodeChannel. Referencia del canal de voz creado.
    */
-   async createVoiceChannel(voiceChannel: VoiceChannel): Promise<VoiceChannel> {
+   async createVoiceChannel(workSpaceID: string, name: string, voiceChannel: VoiceChannel): Promise<VoiceChannel> {
     const voiceChannelRef = (await db.collection(Collection.CHANNELS).add(voiceChannel)).get();
     return <VoiceChannel>(await voiceChannelRef).data();
   }
