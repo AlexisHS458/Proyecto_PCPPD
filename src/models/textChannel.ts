@@ -1,11 +1,21 @@
+import { Message } from "./message";
+
 /**
  * Modelo del Espacio de trabajo
- * @property id: ID del canal de texto
- * @property nombre: Nombre del canal de texto
- * @property permisos: Arreglo que contiene los ID de usuario con permiso de acceso al canal
  */
 export interface TextChannel {
-    id: string, //TO-DO: Quitar la nulabilidad
-    nombre: string,
-    permisos: string[]
+  /**
+   * ID del canal de texto
+   */
+  uid: string;
+  /**
+   * Nombre del canal de texto
+   */
+  nombre: string;
+  
+
+  /**
+   * Arreglo que contiene los ID de usuario con permiso de acceso al canal
+   */
+  permisos: string[];
 }

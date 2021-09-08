@@ -16,6 +16,7 @@
   ></v-text-field> -->
   <v-flex>
     <v-textarea
+      v-model="message"
       append-icon="mdi-send"
       rounded
       class="text-input"
@@ -28,8 +29,8 @@
       rows="1"
       row-height="15"
       counter="500"
-      :rules="[rules.lenght]"
-      @click:append="() => {}"
+      :rules="[rules.size]"
+      @click:append="sendMessages"
       background-color="primaryDark"
       dark
     >
@@ -49,9 +50,26 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { Message } from "@/models/message";
+import { namespace } from "vuex-class";
+import { Workspace } from "@/models/workspace";
+import { User } from "@/models/user";
+const Message = namespace("TextChannelModule");
 
 @Component
 export default class InputMessage extends Vue {
+  @Prop({
+    required: true,
+  })
+  public workspace!: Workspace;
+
+  @Prop({
+    required: true,
+  })
+  public user!: User;
+
+  public messageModel = {} as Message;
+  public message = "";
   public model = [];
   public imageName = "";
   public imageUrl: any;
@@ -59,11 +77,11 @@ export default class InputMessage extends Vue {
   public isSelecting = false;
   public selectedFile = "";
   public rules = {
-    lenght: (v: string): string | boolean =>
+    size: (v: string): string | boolean =>
       v.length <= 500 || "Haz alcanzado el límite de caracteres",
   };
 
-  onButtonClick() {
+  /*   onButtonClick() {
     this.isSelecting = true;
     window.addEventListener(
       "focus",
@@ -77,8 +95,37 @@ export default class InputMessage extends Vue {
 
   onFileChanged(e: any) {
     this.selectedFile = e.target.files[0];
+  } */
 
-    // do something
+  @Message.Action
+  private sendMessage!: (message: Message) => Promise<void>;
+
+  @Message.Getter
+  private isLoadingMessages!: boolean;
+
+  @Message.Action
+  setTextChannelIDtoModule!: (id: string) => void;
+
+  @Message.Action
+  setWorkspaceIDtoModule!: (id: string) => void;
+
+  async sendMessages() {
+    console.log(this.user);
+    this.messageModel = {
+      uid_usuario: this.user.uid,
+      usuarioNombre: this.user.nombre + " " + this.user.apellido,
+      contenido: this.message,
+      fecha: new Date().toLocaleString(),
+    };
+    console.log(this.messageModel);
+    this.setTextChannelIDtoModule(this.$route.params.id);
+    this.setWorkspaceIDtoModule(this.$route.params.idChannel);
+    await this.sendMessage(this.messageModel);
+  }
+
+  mounted() {
+    console.log(this.$route.params.id);
+    console.log(this.$route.params.idChannel);
   }
 }
 </script>

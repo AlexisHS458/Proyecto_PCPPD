@@ -82,7 +82,7 @@ class ChannelService {
         onSnapshot(snapshot.docs.map<TextChannel>((doc) => {
           const textChannel = {
             ...doc.data(),
-            id: doc.id
+            uid: doc.id
           }
           return <TextChannel>textChannel;
         }));

@@ -6,6 +6,7 @@
       :item="item"
       :user="users"
       :channels="workspace.canales_texto"
+      :url="workspace.uid"
     ></list-channels>
     <list-channels
       v-for="item in ChannelsVoice"

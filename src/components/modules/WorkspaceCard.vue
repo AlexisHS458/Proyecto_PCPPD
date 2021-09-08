@@ -1,5 +1,7 @@
 <template>
-  <v-card :to="'/space/' + workspace.uid">
+  <v-card
+    :to="'/space/' + workspace.uid + '/' + workspace.canales_texto[0].uid"
+  >
     <v-card-title class="card-title">
       {{ getInitials(workspace.nombre) }}
     </v-card-title>

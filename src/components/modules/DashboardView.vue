@@ -57,10 +57,6 @@ export default class DashboardView extends Vue {
       this.fetchCurrentUser();
     }
   }
-
-  mounted(): void {
-    this.currentUser;
-  }
 }
 </script>
 

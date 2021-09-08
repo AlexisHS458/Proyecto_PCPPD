@@ -1,6 +1,10 @@
 <template>
   <v-hover>
-    <v-list-item slot-scope="{ hover }" @click="() => {}">
+    <v-list-item
+      slot-scope="{ hover }"
+      @click="() => {}"
+      :to="'/space/' + urll + '/' + item.uid"
+    >
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
       </v-list-item-icon>
@@ -171,6 +175,11 @@ export default class NameChannels extends Vue {
     required: true,
   })
   public userList!: [];
+
+  @Prop({
+    required: true,
+  })
+  public urll!: string;
 }
 </script>
 
