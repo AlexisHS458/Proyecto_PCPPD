@@ -39,7 +39,8 @@ class MessageService {
    */
   reciveMessages(workspaceID: string, textChannelID: string, onSnapshot: (messages: Message[]) => void): void {
     db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .collection(Collection.TEXT_CHANNEL).doc(textChannelID).collection(Collection.MESSAGES)
+    .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
+    .collection(Collection.MESSAGES).orderBy("fecha")
       .onSnapshot(snapshot => {
         onSnapshot(snapshot.docs.map<Message>((doc) => {
           const message = {
