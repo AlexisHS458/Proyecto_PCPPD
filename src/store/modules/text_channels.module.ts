@@ -27,11 +27,18 @@ class TextChannelModule extends VuexModule {
   public textChannelID!: string;
 
   /**
+   * ID del mensaje a consultar
+   */
+   public messageID!: string;
+
+  /**
    * Estatos de consulta del canal de texto
    */
   public status = {
     loadingMessages: true,
-    messageSent: false
+    messageSent: false,
+    messageEdited: false,
+    messageDeleted: false
   };
 
   @Mutation
@@ -52,6 +59,26 @@ class TextChannelModule extends VuexModule {
   @Mutation
   public messageSentFail(): void {
     this.status.messageSent = false;
+  }
+
+  @Mutation
+  public messageEditedSuccess(): void {
+    this.status.messageEdited = true;
+  }
+
+  @Mutation
+  public messageEditedFail(): void {
+    this.status.messageEdited = false;
+  }
+
+  @Mutation
+  public messageDeletedSuccess(): void {
+    this.status.messageDeleted = true;
+  }
+
+  @Mutation
+  public messageDeletedFail(): void {
+    this.status.messageDeleted = false;
   }
 
   @Mutation
@@ -98,6 +125,35 @@ class TextChannelModule extends VuexModule {
   }
 
   /**
+   * Editar un mensaje del espacion de trabajo y canal especificado.
+   * @param message Mensaje a editar del canal de texto
+   */
+   @Action
+   async editMessage(message: Message): Promise<void> {
+     return await MessageService.editMessage(this.workspaceID, this.textChannelID, message, this.messageID)
+       .then(() => {
+         this.context.commit("messageEditedSuccess");
+       })
+       .catch(() => {
+         this.context.commit("messageEditedFail");
+       });
+   }
+
+   /**
+   * Eliminar un mensaje del espacion de trabajo y canal especificado.
+   */
+  @Action
+  async deleteMessage(): Promise<void> {
+    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, this.messageID)
+      .then(() => {
+        this.context.commit("messageDeletedSuccess");
+      })
+      .catch(() => {
+        this.context.commit("messageDeletedFail");
+      });
+  }
+
+  /**
    * Recupera los mensajes dentro del canal de texto
    * @param workspaceID ID del espacio de trabajo a consultar
    * @param textChannelID  ID del canal de texto a consultar
@@ -117,6 +173,14 @@ class TextChannelModule extends VuexModule {
 
   get isLoadingMessagesMessageSent(): boolean {
     return this.status.messageSent;
+  }
+
+  get isLoadingMessagesMessageEdited(): boolean {
+    return this.status.messageEdited;
+  }
+
+  get isLoadingMessagesMessageDeleted(): boolean {
+    return this.status.messageDeleted;
   }
 }
 

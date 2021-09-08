@@ -22,14 +22,28 @@ class MessageService {
   }
 
   /**
-   * Eliminar un mensaje existente
-   * @param id ID del documento a eliminar
+   * Editar un mensaje existente
+   * @param workspaceID ID del espacio de trabajo correspondiente
+   * @param textChannelID ID del canal de texto
+   * @param message Mensaje a enviar al canal de texto
+   * @param messageID ID del documento a editar
    */
-  async deleteMessage(id: string): Promise<void> {
-    const delMessage = await db
-      .collection(Collection.MESSAGES)
-      .doc(id)
-      .delete();
+   async editMessage(workspaceID: string, textChannelID: string, message: Message, messageID: string): Promise<void> {
+      await db.collection(Collection.WORK_SPACE).doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
+      .collection(Collection.MESSAGES).doc(messageID).update(message);
+  }
+
+  /**
+   * Eliminar un mensaje existente
+   * @param workspaceID ID del espacio de trabajo correspondiente
+   * @param textChannelID ID del canal de texto
+   * @param messageID ID del documento a eliminar
+   */
+  async deleteMessage(workspaceID: string, textChannelID: string, messageID: string): Promise<void> {
+    await db.collection(Collection.WORK_SPACE).doc(workspaceID)
+    .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
+    .collection(Collection.MESSAGES).doc(messageID).delete();
   }
 
   /**
