@@ -27,11 +27,6 @@ class TextChannelModule extends VuexModule {
   public textChannelID!: string;
 
   /**
-   * ID del mensaje a consultar
-   */
-   public messageID!: string;
-
-  /**
    * Estatos de consulta del canal de texto
    */
   public status = {
@@ -130,7 +125,7 @@ class TextChannelModule extends VuexModule {
    */
    @Action
    async editMessage(message: Message): Promise<void> {
-     return await MessageService.editMessage(this.workspaceID, this.textChannelID, message, this.messageID)
+     return await MessageService.editMessage(this.workspaceID, this.textChannelID, message)
        .then(() => {
          this.context.commit("messageEditedSuccess");
        })
@@ -141,10 +136,11 @@ class TextChannelModule extends VuexModule {
 
    /**
    * Eliminar un mensaje del espacion de trabajo y canal especificado.
+   * @param id  del documento a eliminar
    */
   @Action
-  async deleteMessage(): Promise<void> {
-    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, this.messageID)
+  async deleteMessage(id: string): Promise<void> {
+    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, id)
       .then(() => {
         this.context.commit("messageDeletedSuccess");
       })

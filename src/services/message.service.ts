@@ -26,12 +26,11 @@ class MessageService {
    * @param workspaceID ID del espacio de trabajo correspondiente
    * @param textChannelID ID del canal de texto
    * @param message Mensaje a enviar al canal de texto
-   * @param messageID ID del documento a editar
    */
-   async editMessage(workspaceID: string, textChannelID: string, message: Message, messageID: string): Promise<void> {
+   async editMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
       await db.collection(Collection.WORK_SPACE).doc(workspaceID)
       .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
-      .collection(Collection.MESSAGES).doc(messageID).update(message);
+      .collection(Collection.MESSAGES).doc(message.uid).update(message);
   }
 
   /**
