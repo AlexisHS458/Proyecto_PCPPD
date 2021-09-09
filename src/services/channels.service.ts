@@ -88,7 +88,9 @@ class ChannelsService {
    * Recupera los canales de texto de un espacio de trabajo
    * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
    */
-  getTextChannels(workSpaceID: string, onSnapshot: (textChannels: TextChannel[]) => void): void {
+  getTextChannels(workSpaceID: string,
+     onSnapshot: (textChannels: TextChannel[]) => void
+     ): void {
     db.collection(Collection.WORK_SPACE)
       .doc(workSpaceID)
       .collection(Collection.TEXT_CHANNEL)

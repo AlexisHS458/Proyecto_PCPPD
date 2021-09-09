@@ -39,13 +39,10 @@ class WorkspaceModule extends VuexModule {
     this.status.channelCreated = status;
   }
 
-  // @Mutation
-  // public addTextChannel(textChannel: TextChannel): void{
-  //   this.workspace.canales_texto = [
-  //     ...this.workspace.canales_texto,
-  //     textChannel
-  //   ]
-  // }
+  @Mutation
+  public setTextChannels(textChannels: Array<TextChannel>): void{
+    this.workspace.canales_texto = textChannels;
+  }
 
   /**
    * Consulta la información de un espacio de trabajo.
@@ -55,9 +52,20 @@ class WorkspaceModule extends VuexModule {
   async fetchMyWorkspace(uid: string): Promise<void> {
     this.context.commit("setLoadingStatus", true);
     const workspace = await WorkSpaceService.getWorkspaceInfo(uid);
+    this.context.commit("setWorkspace", workspace);
+    this.context.commit("setLoadingStatus", false);
+    
+  }
+
+  /**
+   * Obtiene los canales de texto del canal de código
+   * @param uid ID único del espacio de trabajo a consultar
+   */
+  @Action
+  async fetchTextChannels(uid: string): Promise<void>{
+    this.context.commit("setLoadingStatus", true);
     ChannelsService.getTextChannels(uid, textChannels => {
-      workspace.canales_texto = textChannels;
-      this.context.commit("setWorkspace", workspace);
+      this.context.commit("setTextChannels", textChannels);
       this.context.commit("setLoadingStatus", false);
     });
   }
@@ -72,6 +80,7 @@ class WorkspaceModule extends VuexModule {
     ChannelsService.createTextChannel(
       this.workspace.uid, textChannel
     ).then( _ => {
+      this.context.commit("addTextChannel", false);
       this.context.commit("setChannelCreatedStatus", true);
     });
   }
