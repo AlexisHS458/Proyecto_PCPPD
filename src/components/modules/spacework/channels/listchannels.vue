@@ -14,7 +14,7 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              @click.stop="() => {}"
+              @click.stop="addChannelText"
               class="add mx-2"
               icon
               color="white"
@@ -40,6 +40,7 @@
                       dense
                       color="primary"
                       prepend-inner-icon="mdi-account"
+                      v-model="nameChannela"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -47,7 +48,7 @@
             </v-card-text>
             <v-card-actions class="justify-end">
               <v-btn color="success">Crear</v-btn>
-              <v-btn text>Cancelar</v-btn>
+              <v-btn text @click="dialog = false">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -71,6 +72,9 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import namechannels from "@/components/modules/spacework/channels/namechannels.vue";
+import { namespace } from "vuex-class";
+import { TextChannel } from "@/models/textChannel";
+const WorkspaceOptions = namespace("WorkspaceModule");
 @Component({
   components: {
     namechannels,
@@ -97,10 +101,21 @@ export default class ListChannels extends Vue {
   })
   public url!: string;
 
+  /*  @WorkspaceOptions.Getter
+  private isChannelCreated!: boolean; */
+
+  @WorkspaceOptions.Action
+  private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
+
   public panel = [0];
   public show = false;
   public dialog = false;
   public valid = true;
+  public nameChannel = "";
+
+  /*  addChannelText() {
+    this.createTextChannel();
+  } */
 }
 </script>
 

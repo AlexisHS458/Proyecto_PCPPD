@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="!isLoading && !isLoadingMyWorkspace" class="row" no-gutters>
+  <v-row v-if="!isLoading && !isLoadingWorkspace" class="row" no-gutters>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto cardd">
         <toolbar :name="workspace.nombre"></toolbar>
@@ -98,7 +98,7 @@ export default class Spacework extends Vue {
   private workspace!: Workspace;
 
   @MyWorkSpace.Getter
-  private isLoadingMyWorkspace!: boolean;
+  private isLoadingWorkspace!: boolean;
 
   @Messages.Action
   private fetchMesages!: () => void;

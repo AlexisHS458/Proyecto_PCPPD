@@ -7,7 +7,9 @@
             {{ messages.usuarioNombre }}</v-col
           >
           <v-col class="flex-grow-0 flex-shrink-0">
-            <div class="grey--text">{{ messages.fecha }}</div>
+            <div class="grey--text">
+              {{ toLocalDate(messages.fecha) }}
+            </div>
           </v-col>
           <v-col class="flex-grow-0 flex-shrink-1">
             <v-dialog
@@ -27,20 +29,28 @@
                     <v-row align="center" justify="center" class="mt-6">
                       <v-col cols="9">
                         <v-text-field
+                          v-model="text"
                           label="Mensaje"
-                          :placeholder="messages.subtitle"
+                          :placeholder="messages.contenido"
                           outlined
                           dense
                           color="primary"
-                          prepend-inner-icon="mdi-account"
+                          prepend-inner-icon="mdi-message"
+                          :rules="[rules.required]"
                         ></v-text-field>
                       </v-col>
                     </v-row>
                   </v-form>
                 </v-card-text>
                 <v-card-actions class="justify-end">
-                  <v-btn color="success">Guardar cambios</v-btn>
-                  <v-btn text>Cancelar</v-btn>
+                  <v-btn
+                    color="success"
+                    @click="editMessages"
+                    :loading="loadingEdit"
+                  >
+                    Guardar cambios
+                  </v-btn>
+                  <v-btn text @click="closeDialogEdit()">Cancelar</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -64,11 +74,17 @@
                     <p>ESTA ACCION NO SE PUEDE DESAHACER</p>
                   </div>
                   <v-row align="center" justify="center">
-                    <v-btn color="error"> SI, QUIERO ELIMINARLO </v-btn>
+                    <v-btn
+                      color="error"
+                      @click="deleteMessages"
+                      :loading="loadingDelete"
+                    >
+                      SI, QUIERO ELIMINARLO
+                    </v-btn>
                   </v-row>
                 </v-card-text>
                 <v-card-actions class="justify-end">
-                  <v-btn text @click="dialog.value = false">Cerrar</v-btn>
+                  <v-btn text @click="dialog = false">Cerrar</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -87,18 +103,65 @@
 
 <script lang="ts">
 import { Component, Prop, Ref } from "vue-property-decorator";
-
 import Vue from "vue";
+import { namespace } from "vuex-class";
+import { Message } from "@/models/message";
+import { VForm } from "@/utils/types.js";
+const optionsMessage = namespace("TextChannelModule");
 
 @Component
 export default class Messages extends Vue {
   public dialog = false;
   public dialogEdit = false;
+  public text = "";
+  public loadingEdit = false;
+  public loadingDelete = false;
+  public valid = false;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+  };
+  /* @Ref("form") readonly form!: VForm; */
 
   @Prop({
     required: true,
   })
-  public messages!: [];
+  public messages!: Message;
+
+  @Ref("form") readonly form!: VForm;
+
+  @optionsMessage.Action
+  private editMessage!: (message: Message) => Promise<void>;
+
+  @optionsMessage.Action
+  private deleteMessage!: (id: string | undefined) => Promise<void>;
+
+  toLocalDate(date: number): string {
+    return new Date(date).toLocaleString();
+  }
+
+  async editMessages() {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loadingEdit = true;
+      this.messages.contenido = this.text;
+      await this.editMessage(this.messages);
+      this.loadingEdit = false;
+      this.form.reset();
+      this.dialogEdit = false;
+    }
+  }
+
+  async deleteMessages() {
+    this.loadingDelete = true;
+    await this.deleteMessage(this.messages.uid);
+    this.loadingDelete = false;
+    this.dialog = false;
+  }
+
+  closeDialogEdit() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialogEdit = false;
+  }
 }
 </script>
 

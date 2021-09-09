@@ -115,7 +115,7 @@ export default class InputMessage extends Vue {
       uid_usuario: this.user.uid,
       usuarioNombre: this.user.nombre + " " + this.user.apellido,
       contenido: this.message,
-      fecha: new Date().toLocaleString(),
+      fecha: Date.now(),
     };
     console.log(this.messageModel);
     this.setTextChannelIDtoModule(this.$route.params.id);

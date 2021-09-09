@@ -1,7 +1,5 @@
 <template>
-  <v-card
-    :to="'/space/' + workspace.uid + '/' + workspace.canales_texto[0].uid"
-  >
+  <v-card @click="toSpaceWork">
     <v-card-title class="card-title">
       {{ getInitials(workspace.nombre) }}
     </v-card-title>
@@ -11,7 +9,7 @@
     <v-card-actions class="card-actions">
       <v-spacer></v-spacer>
 
-      <v-btn icon @click.prevent="show = !show">
+      <v-btn icon @click.stop="show = !show">
         <v-icon color="white">
           {{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}
         </v-icon>
@@ -81,9 +79,16 @@ export default class WorkspaceCard extends Vue {
     this.deletedWorkSpaces(this.workspace.uid);
   }
 
-  route(uid: string) {
-    this.$router.push("/space/" + uid);
+  toSpaceWork() {
+    console.log(this.workspace);
+    this.$router.push(
+      "/space/" + this.workspace.uid + "/" + this.workspace.canales_texto[0].uid
+    );
   }
+
+  /* mounted() {
+    console.log(this.workspace.canales_texto[0].uid);
+  } */
 }
 </script>
 

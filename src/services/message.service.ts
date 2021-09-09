@@ -13,10 +13,20 @@ class MessageService {
    * @param message Mensaje a enviar al canal de texto
    * @returns Message. Referencia del mensaje creado.
    */
-  async sendMessage(workspaceID: string, textChannelID: string, message: Message): Promise<Message> {
-    const messageRef = (await db.collection(Collection.WORK_SPACE).doc(workspaceID)
-      .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
-      .collection(Collection.MESSAGES).add(message)).get();
+  async sendMessage(
+    workspaceID: string,
+    textChannelID: string,
+    message: Message
+  ): Promise<Message> {
+    const messageRef = (
+      await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceID)
+        .collection(Collection.TEXT_CHANNEL)
+        .doc(textChannelID)
+        .collection(Collection.MESSAGES)
+        .add(message)
+    ).get();
 
     return <Message>(await messageRef).data();
   }
@@ -27,10 +37,15 @@ class MessageService {
    * @param textChannelID ID del canal de texto
    * @param message Mensaje a enviar al canal de texto
    */
-   async editMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
-      await db.collection(Collection.WORK_SPACE).doc(workspaceID)
-      .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
-      .collection(Collection.MESSAGES).doc(message.uid).update(message);
+  async editMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannelID)
+      .collection(Collection.MESSAGES)
+      .doc(message.uid)
+      .update(message);
   }
 
   /**
@@ -39,10 +54,19 @@ class MessageService {
    * @param textChannelID ID del canal de texto
    * @param messageID ID del documento a eliminar
    */
-  async deleteMessage(workspaceID: string, textChannelID: string, messageID: string): Promise<void> {
-    await db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
-    .collection(Collection.MESSAGES).doc(messageID).delete();
+  async deleteMessage(
+    workspaceID: string,
+    textChannelID: string,
+    messageID: string | undefined
+  ): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannelID)
+      .collection(Collection.MESSAGES)
+      .doc(messageID)
+      .delete();
   }
 
   /**
@@ -50,18 +74,27 @@ class MessageService {
    * @param workspaceID ID del espacio de trabajo correspondiente
    * @param textChannelID ID del canal de texto
    */
-  reciveMessages(workspaceID: string, textChannelID: string, onSnapshot: (messages: Message[]) => void): void {
-    db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
-    .collection(Collection.MESSAGES).orderBy("fecha")
+  reciveMessages(
+    workspaceID: string,
+    textChannelID: string,
+    onSnapshot: (messages: Message[]) => void
+  ): void {
+    db.collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannelID)
+      .collection(Collection.MESSAGES)
+      .orderBy("fecha")
       .onSnapshot(snapshot => {
-        onSnapshot(snapshot.docs.map<Message>((doc) => {
-          const message = {
-            ...doc.data(),
-            uid: doc.id
-          }
-          return <Message>message;
-        }));
+        onSnapshot(
+          snapshot.docs.map<Message>(doc => {
+            const message = {
+              ...doc.data(),
+              uid: doc.id
+            };
+            return <Message>message;
+          })
+        );
       });
   }
 }

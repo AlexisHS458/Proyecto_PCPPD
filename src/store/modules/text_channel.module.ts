@@ -120,23 +120,23 @@ class TextChannelModule extends VuexModule {
    * Editar un mensaje del espacion de trabajo y canal especificado.
    * @param message Mensaje a editar del canal de texto
    */
-   @Action
-   async editMessage(message: Message): Promise<void> {
-     return await MessageService.editMessage(this.workspaceID, this.textChannelID, message)
-       .then(() => {
-         this.context.commit("messageEditedSuccess");
-       })
-       .catch(() => {
-         this.context.commit("messageEditedFail");
-       });
-   }
+  @Action
+  async editMessage(message: Message): Promise<void> {
+    return await MessageService.editMessage(this.workspaceID, this.textChannelID, message)
+      .then(() => {
+        this.context.commit("messageEditedSuccess");
+      })
+      .catch(() => {
+        this.context.commit("messageEditedFail");
+      });
+  }
 
-   /**
+  /**
    * Eliminar un mensaje del espacion de trabajo y canal especificado.
    * @param id  del documento a eliminar
    */
   @Action
-  async deleteMessage(id: string): Promise<void> {
+  async deleteMessage(id: string | undefined): Promise<void> {
     return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, id)
       .then(() => {
         this.context.commit("messageDeletedSuccess");
