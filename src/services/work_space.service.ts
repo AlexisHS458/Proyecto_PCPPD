@@ -1,7 +1,8 @@
 import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
-import ChannelService from "@/services/channel.service";
+import ChannelsService from "@/services/channels.service";
+import channelsService from "@/services/channels.service";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -48,7 +49,7 @@ class WorkSpaceService {
               uid: doc.id, 
             };
             const workspaceData = <Workspace>workspace;
-            ChannelService.getTextChannels(doc.id, textChannels => {
+            ChannelsService.getTextChannels(doc.id, textChannels => {
               workspaceData.canales_texto = textChannels;
             })
             return workspaceData;
@@ -71,9 +72,17 @@ class WorkSpaceService {
              ...value.data(),
              uid: value.id
             } 
-              
             if (workspaceData) {
-              resolve(<Workspace>workspaceData);
+              const workspace = <Workspace>workspaceData;
+              
+              ChannelsService.getTextChannels(workspace.uid, textChannels => {
+                workspace.canales_texto = textChannels;
+              })
+              ChannelsService.getVoiceChannels(workspace.uid, voiceChannels => {
+                workspace.canales_voz = voiceChannels;
+              })
+
+              resolve(workspace);
             }
           },
           error => {

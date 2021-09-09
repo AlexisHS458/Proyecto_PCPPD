@@ -7,7 +7,7 @@ import { Collection } from "@/utils/collections";
 /**
  * Conexión a servicios de información de los canales.
  */
-class ChannelService {
+class ChannelsService {
   /**
    * Agrega un nuevo canal de codigo
    * @param codeChannel
@@ -20,16 +20,13 @@ class ChannelService {
 
   /**
    * Agrega un nuevo canal de texto
-   * @param textChannel Canal de texto a agregar a la DB
    * @param workSpaceID ID del espacio de trabajo
+   * @param textChannel Canal de texto a agregar a la DB
    * @returns TextChannel. Referencia del canal de texto creado.
    */
    async createTextChannel(workSpaceID: string, textChannel: TextChannel): Promise<TextChannel> {
-    const textChannelRef = (await db.collection(Collection.CHANNELS)
-      .doc(workSpaceID)
-      .collection(Collection.TEXT_CHANNEL)
-      .add(textChannel))
-      .get();
+    const textChannelRef = (await db.collection(Collection.WORK_SPACE).doc(workSpaceID)
+      .collection(Collection.TEXT_CHANNEL).add(textChannel)).get();
     return <TextChannel>(await textChannelRef).data();
   }
 
@@ -107,4 +104,4 @@ class ChannelService {
   }
 }
 
-export default new ChannelService();
+export default new ChannelsService();
