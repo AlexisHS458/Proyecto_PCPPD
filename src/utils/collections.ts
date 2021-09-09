@@ -12,6 +12,7 @@ export enum Collection{
     WORK_SPACE = "espacios_de_trabajo",
     CHANNELS = "canales",
     MESSAGES = "mensajes",
+    INVITATIOS = "invitaciones",
     /**
      * Colección de canales de texto
      */
