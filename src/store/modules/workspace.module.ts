@@ -15,6 +15,7 @@ class WorkspaceModule extends VuexModule {
    * Espacio de trabajo
    */
   public workspace!: Workspace;
+  public textChannels: TextChannel[] = []
 
   /**
    * Status de la consulta del espacio de trabajo
@@ -41,7 +42,7 @@ class WorkspaceModule extends VuexModule {
 
   @Mutation
   public setTextChannels(textChannels: Array<TextChannel>): void{
-    this.workspace.canales_texto = textChannels;
+    this.textChannels = textChannels;
   }
 
   /**
@@ -80,7 +81,6 @@ class WorkspaceModule extends VuexModule {
     ChannelsService.createTextChannel(
       this.workspace.uid, textChannel
     ).then( _ => {
-      this.context.commit("addTextChannel", false);
       this.context.commit("setChannelCreatedStatus", true);
     });
   }
