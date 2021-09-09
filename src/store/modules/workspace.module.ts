@@ -62,8 +62,12 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
+  /**
+   * Crea un canal de texto en el espacio de trabajo
+   * @param textChannel Canal de texto a agregar al espacio de trabajo
+   */
   @Action
-  async createTextChannel(textChannel: TextChannel){
+  async createTextChannel(textChannel: TextChannel): Promise<void>{
     this.context.commit("setChannelCreatedStatus", false);
     ChannelsService.createTextChannel(
       this.workspace.uid, textChannel
