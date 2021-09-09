@@ -83,6 +83,7 @@ class WorkspaceModule extends VuexModule {
     return this.status.channelCreated;
   }
 
+  
 }
 
 export default WorkspaceModule;

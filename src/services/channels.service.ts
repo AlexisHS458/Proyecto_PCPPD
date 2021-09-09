@@ -27,7 +27,7 @@ class ChannelsService {
    async createTextChannel(workSpaceID: string, textChannel: TextChannel): Promise<TextChannel> {
     const textChannelRef = (await db.collection(Collection.WORK_SPACE).doc(workSpaceID)
       .collection(Collection.TEXT_CHANNEL).add(textChannel)).get();
-    return <TextChannel>(await textChannelRef).data();
+    return <TextChannel>(await textChannelRef).data(); 
   }
 
   /**
