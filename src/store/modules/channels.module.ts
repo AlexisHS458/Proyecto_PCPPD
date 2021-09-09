@@ -1,7 +1,7 @@
 import { CodeChannel } from "@/models/codeChannel";
 import { TextChannel } from "@/models/textChannel";
 import { VoiceChannel } from "@/models/voiceChannel";
-import ChannelService from "@/services/channel.service";
+import ChannelsService from "@/services/channels.service";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 
 /**
@@ -119,7 +119,7 @@ class ChannelsModule extends VuexModule {
    */
   @Action
   async addCodeChannel(workSpaceID: string, name: string, codeChannel: CodeChannel) {
-    return await ChannelService.createCodeChannel(workSpaceID, name, codeChannel)
+    return await ChannelsService.createCodeChannel(workSpaceID, name, codeChannel)
       .then(() => {
         this.context.commit("createChannelSuccess");
       })
@@ -135,7 +135,7 @@ class ChannelsModule extends VuexModule {
 
    @Action
    async addtextChannel(workSpaceID: string, name: string, textChannel: TextChannel) {
-     return await ChannelService.createTextChannel(workSpaceID, name, textChannel)
+     return await ChannelsService.createTextChannel(workSpaceID, name, textChannel)
        .then(() => {
          this.context.commit("createChannelSuccess");
        })
@@ -151,7 +151,7 @@ class ChannelsModule extends VuexModule {
    */
   @Action
   async addVoiceChannel(workSpaceID: string, name: string, voiceChannel: VoiceChannel) {
-    return await ChannelService.createVoiceChannel(workSpaceID, name, voiceChannel)
+    return await ChannelsService.createVoiceChannel(workSpaceID, name, voiceChannel)
       .then(() => {
         this.context.commit("createChannelSuccess");
       })
@@ -167,7 +167,7 @@ class ChannelsModule extends VuexModule {
    */
   @Action
   async deletedChannel(id: string): Promise<void> {
-    return await ChannelService.deleteChannel(id)
+    return await ChannelsService.deleteChannel(id)
       .then(() => {
         this.context.commit("deleteChannelSuccess");
       })
@@ -183,7 +183,7 @@ class ChannelsModule extends VuexModule {
   @Action
   fetchTextChannels(workSpaceID: string): void {
     this.context.commit("setLoadingStatus", true);
-    ChannelService.getTextChannels(workSpaceID, textChannels => {
+    ChannelsService.getTextChannels(workSpaceID, textChannels => {
       this.context.commit("setTextChannels", textChannels);
       this.context.commit("setLoadingStatus", false);
     });
@@ -196,7 +196,7 @@ class ChannelsModule extends VuexModule {
   @Action
   fetchVoiceChannels(workSpaceID: string): void {
     this.context.commit("setLoadingStatus", true);
-    ChannelService.getTextChannels(workSpaceID, voiceChannels => {
+    ChannelsService.getTextChannels(workSpaceID, voiceChannels => {
       this.context.commit("setVoiceChannels", voiceChannels);
       this.context.commit("setLoadingStatus", false);
     });
@@ -209,15 +209,15 @@ class ChannelsModule extends VuexModule {
   @Action
   fetchChannels(id: string): void {
     this.context.commit("setLoadingStatus", true);
-    ChannelService.getCodeChannels(id, codeChannels => {
+    ChannelsService.getCodeChannels(id, codeChannels => {
       this.context.commit("setWorkSpacesList", codeChannels);
       this.context.commit("setLoadingStatus", false);
     });
-    ChannelService.getTextChannels(id, textChannels => {
+    ChannelsService.getTextChannels(id, textChannels => {
       this.context.commit("setWorkSpacesList", textChannels);
       this.context.commit("setLoadingStatus", false);
     });
-    ChannelService.getVoiceChannels(id, voiceChannels => {
+    ChannelsService.getVoiceChannels(id, voiceChannels => {
       this.context.commit("setWorkSpacesList", voiceChannels);
       this.context.commit("setLoadingStatus", false);
     });
