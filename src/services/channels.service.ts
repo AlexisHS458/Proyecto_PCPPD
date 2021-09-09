@@ -28,14 +28,10 @@ class ChannelsService {
    * @param textChannel Canal de texto a agregar a la DB
    * @returns TextChannel. Referencia del canal de texto creado.
    */
-  async createTextChannel(
-    workSpaceID: string,
-    name: string,
-    textChannel: TextChannel
-  ): Promise<TextChannel> {
+  async createTextChannel(workSpaceID: string, textChannel: TextChannel): Promise<TextChannel> {
     const textChannelRef = (
       await db
-        .collection(Collection.CHANNELS)
+        .collection(Collection.WORK_SPACE)
         .doc(workSpaceID)
         .collection(Collection.TEXT_CHANNEL)
         .add(textChannel)
