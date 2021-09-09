@@ -25,5 +25,5 @@ export interface Message {
   /**
    * Fecha en la que fue enviada el mensaje
    */
-  fecha: string;
+  fecha: number;
 }
