@@ -43,9 +43,10 @@ const routes: Array<RouteConfig> = [
     } */
   },
   {
-    path: "/space/:id",
+    path: "/space/:id/:idChannel",
     name: "Space",
     component: SpaceWork
+    /* children: [{ path: ":idChannel", component: SpaceWork }] */
     /* meta: {
       auth: true
     } */
