@@ -22,12 +22,19 @@ class WorkspaceModule extends VuexModule {
    */
   public status = {
     loadingWorkspace: true,
-    channelCreated: false
+    channelCreated: false,
+    channelEdited: false,
+    channelDeleted: false,
   };
 
   @Mutation
   public setWorkspace(workspace: Workspace): void {
     this.workspace = workspace;
+  }
+
+  @Mutation
+  public setTextChannels(textChannels: Array<TextChannel>): void{
+    this.textChannels = textChannels;
   }
 
   @Mutation
@@ -40,9 +47,14 @@ class WorkspaceModule extends VuexModule {
     this.status.channelCreated = status;
   }
 
-  @Mutation
-  public setTextChannels(textChannels: Array<TextChannel>): void{
-    this.textChannels = textChannels;
+  @Mutation 
+  public setChannelEditedStatus(status: boolean): void{
+    this.status.channelCreated = status;
+  }
+
+  @Mutation 
+  public setChannelDeletedStatus(status: boolean): void{
+    this.status.channelCreated = status;
   }
 
   /**
@@ -85,14 +97,24 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
+  async editTextChannel(textChannel: TextChannel): Promise<void>{
+    this.context.commit("setChannelEditedStatus", false);
+    ChannelsService.editTextChannel(this.workspace.uid,textChannel)
+    .then( _ => {
+      this.context.commit("setChannelEditedStatus", true);
+    });
+  }
+
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
   }
   get isChannelCreated(): boolean {
     return this.status.channelCreated;
   }
+  get isChannelEdited():boolean {
+    return this.status.channelEdited
+  }
 
-  
 }
 
 export default WorkspaceModule;

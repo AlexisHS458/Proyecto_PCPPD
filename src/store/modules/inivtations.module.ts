@@ -72,4 +72,4 @@ class InivtationsModule extends VuexModule{
 
 }
 
-export default InivtationsModule
+export default InivtationsModule;

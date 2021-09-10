@@ -40,6 +40,28 @@ class ChannelsService {
   }
 
   /**
+   * Edita un canal de texto
+   * @param workspaceID ID del espacio de trabajo
+   * @param textChannel TextChannel del canal a editar
+   */
+  async editTextChannel(workspaceID: string, textChannel: TextChannel): Promise<void>{
+    await  db.collection(Collection.WORK_SPACE).doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL).doc(textChannel.uid)
+      .update(textChannel);
+  }
+
+  /**
+   * Elimina un canal de texto
+   * @param workspaceID ID del espacio de trabajo
+   * @param textChannelID ID del canal de texto a eliminar
+   */
+  async deleteTextChannel(workspaceID: string, textChannelID: string): Promise<void>{
+    await db.collection(Collection.WORK_SPACE).doc(workspaceID)
+    .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
+    .delete();
+  }
+
+  /**
    * Agrega un nuevo canal de voz
    * @param voiceChannel
    * @returns CodeChannel. Referencia del canal de voz creado.
