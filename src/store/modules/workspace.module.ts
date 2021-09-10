@@ -97,6 +97,10 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
+  /**
+   * Editar un canal de texto
+   * @param textChannel Información del nuevo canal de texto
+   */
   async editTextChannel(textChannel: TextChannel): Promise<void>{
     this.context.commit("setChannelEditedStatus", false);
     ChannelsService.editTextChannel(this.workspace.uid,textChannel)
@@ -105,14 +109,30 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
+  /**
+   * Elimina un canal de texto del espacio de trabajo
+   * @param textChannelID ID del canal de texto a eliminar
+   */
+  async deleteTextChannel(textChannelID: string): Promise<void>{
+    this.context.commit("etChannelDeletedStatus",false);
+    ChannelsService.deleteTextChannel(this.workspace.uid,textChannelID)
+    .then( _ => {
+      this.context.commit("etChannelDeletedStatus",true);
+    });
+
+  }
+
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
   }
   get isChannelCreated(): boolean {
     return this.status.channelCreated;
   }
-  get isChannelEdited():boolean {
+  get isChannelEdited(): boolean {
     return this.status.channelEdited
+  }
+  get isChannelDeleted(): boolean {
+    return this.status.channelDeleted
   }
 
 }
