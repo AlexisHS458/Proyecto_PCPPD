@@ -22,12 +22,19 @@ class WorkspaceModule extends VuexModule {
    */
   public status = {
     loadingWorkspace: true,
-    channelCreated: false
+    channelCreated: false,
+    channelEdited: false,
+    channelDeleted: false,
   };
 
   @Mutation
   public setWorkspace(workspace: Workspace): void {
     this.workspace = workspace;
+  }
+
+  @Mutation
+  public setTextChannels(textChannels: Array<TextChannel>): void{
+    this.textChannels = textChannels;
   }
 
   @Mutation
@@ -40,9 +47,14 @@ class WorkspaceModule extends VuexModule {
     this.status.channelCreated = status;
   }
 
-  @Mutation
-  public setTextChannels(textChannels: Array<TextChannel>): void{
-    this.textChannels = textChannels;
+  @Mutation 
+  public setChannelEditedStatus(status: boolean): void{
+    this.status.channelCreated = status;
+  }
+
+  @Mutation 
+  public setChannelDeletedStatus(status: boolean): void{
+    this.status.channelCreated = status;
   }
 
   /**
@@ -85,14 +97,44 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
+  /**
+   * Editar un canal de texto
+   * @param textChannel Información del nuevo canal de texto
+   */
+  async editTextChannel(textChannel: TextChannel): Promise<void>{
+    this.context.commit("setChannelEditedStatus", false);
+    ChannelsService.editTextChannel(this.workspace.uid,textChannel)
+    .then( _ => {
+      this.context.commit("setChannelEditedStatus", true);
+    });
+  }
+
+  /**
+   * Elimina un canal de texto del espacio de trabajo
+   * @param textChannelID ID del canal de texto a eliminar
+   */
+  async deleteTextChannel(textChannelID: string): Promise<void>{
+    this.context.commit("etChannelDeletedStatus",false);
+    ChannelsService.deleteTextChannel(this.workspace.uid,textChannelID)
+    .then( _ => {
+      this.context.commit("etChannelDeletedStatus",true);
+    });
+
+  }
+
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
   }
   get isChannelCreated(): boolean {
     return this.status.channelCreated;
   }
+  get isChannelEdited(): boolean {
+    return this.status.channelEdited
+  }
+  get isChannelDeleted(): boolean {
+    return this.status.channelDeleted
+  }
 
-  
 }
 
 export default WorkspaceModule;

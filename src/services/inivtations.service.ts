@@ -1,3 +1,4 @@
+import { Invitation } from "@/models/invitation";
 import { Collection } from "@/utils/collections";
 import { db } from "@/utils/firebase";
 
@@ -7,9 +8,9 @@ import { db } from "@/utils/firebase";
  */
 class InivitationsService{
 
-     async sendInivitation(uidUsuario: string){
-         db.collection(Collection.USERS).doc(uidUsuario)
-         .collection(Collection.INVITATIOS) // add(invitacion)
+     async sendInivitation(uidUsuario: string, invitation: Invitation): Promise<void>{
+         await db.collection(Collection.USERS).doc(uidUsuario)
+         .collection(Collection.INVITATIONS).add(invitation);
     }
 }
 
