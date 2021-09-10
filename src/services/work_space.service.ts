@@ -1,6 +1,8 @@
 import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
+import ChannelsService from "@/services/channels.service";
+import channelsService from "@/services/channels.service";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -12,7 +14,9 @@ class WorkSpaceService {
    * @returns WorkSpace. Referencia del espacio de trabajo creado.
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
-    const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    const workSpaceRef = (
+      await db.collection(Collection.WORK_SPACE).add(workspace)
+    ).get();
     return <Workspace>(await workSpaceRef).data();
   }
 
@@ -31,7 +35,10 @@ class WorkSpaceService {
    * Recupera los espacios de trabajo de un usuario
    * @param uid ID del usuario a recuperar sus espacios de trabajo
    */
-  getWorkspaces(uid: string, onSnapshot: (workspaces: Workspace[]) => void): void {
+  getWorkspaces(
+    uid: string,
+    onSnapshot: (workspaces: Workspace[]) => void
+  ): void {
     db.collection(Collection.WORK_SPACE)
       .where("uid_usuario", "==", uid)
       .onSnapshot(snapshot => {
@@ -39,9 +46,13 @@ class WorkSpaceService {
           snapshot.docs.map<Workspace>(doc => {
             const workspace = {
               ...doc.data(),
-              uid: doc.id
+              uid: doc.id, 
             };
-            return <Workspace>workspace;
+            const workspaceData = <Workspace>workspace;
+            ChannelsService.getTextChannels(doc.id, textChannels => {
+              workspaceData.canales_texto = textChannels;
+            })
+            return workspaceData;
           })
         );
       });
@@ -57,9 +68,21 @@ class WorkSpaceService {
         .doc(uid)
         .onSnapshot(
           value => {
-            const workspaceData = value.data();
+            const workspaceData ={
+             ...value.data(),
+             uid: value.id
+            } 
             if (workspaceData) {
-              resolve(<Workspace>workspaceData);
+              const workspace = <Workspace>workspaceData;
+              
+              ChannelsService.getTextChannels(workspace.uid, textChannels => {
+                workspace.canales_texto = textChannels;
+              })
+              ChannelsService.getVoiceChannels(workspace.uid, voiceChannels => {
+                workspace.canales_voz = voiceChannels;
+              })
+
+              resolve(workspace);
             }
           },
           error => {

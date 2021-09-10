@@ -83,7 +83,7 @@ export default class AppBar extends Vue {
 
   mounted(): void {
     this.currentUser;
-    console.log(this.currentUser);
+    /*  console.log(this.currentUser); */
   }
 
   async handleLogout(): Promise<void> {

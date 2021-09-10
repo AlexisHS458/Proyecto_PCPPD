@@ -61,7 +61,7 @@ class MainScreenModule extends VuexModule {
    * @param workspace Espacio de trabajo a agregar
    */
   @Action
-  async addWorkSpace(workspace: Workspace) {
+  async addWorkSpace(workspace: Workspace): Promise<void> {
     return await WorkSpaceService.createWorkSpace(workspace)
       .then(() => {
         this.context.commit("createWorkSpaceSuccess");

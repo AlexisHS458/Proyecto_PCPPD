@@ -8,40 +8,93 @@ import { Collection } from "@/utils/collections";
 class MessageService {
   /**
    * Agrega un nuevo mensaje
-   * @param message
+   * @param workspaceID ID del espacio de trabajo correspondiente
+   * @param textChannelID ID del canal de texto
+   * @param message Mensaje a enviar al canal de texto
    * @returns Message. Referencia del mensaje creado.
    */
-  async sendMessage(message: Message): Promise<Message> {
-    const messageRef = (await db.collection(Collection.MESSAGES).add(message)).get();
+  async sendMessage(
+    workspaceID: string,
+    textChannelID: string,
+    message: Message
+  ): Promise<Message> {
+    const messageRef = (
+      await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceID)
+        .collection(Collection.TEXT_CHANNEL)
+        .doc(textChannelID)
+        .collection(Collection.MESSAGES)
+        .add(message)
+    ).get();
+
     return <Message>(await messageRef).data();
   }
 
   /**
-   * Eliminar un mensaje existente
-   * @param id ID del documento a eliminar
+   * Editar un mensaje existente
+   * @param workspaceID ID del espacio de trabajo correspondiente
+   * @param textChannelID ID del canal de texto
+   * @param message Mensaje a enviar al canal de texto
    */
-  async deleteMessage(id: string): Promise<void> {
-    const delMessage = await db
+  async editMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannelID)
       .collection(Collection.MESSAGES)
-      .doc(id)
+      .doc(message.uid)
+      .update(message);
+  }
+
+  /**
+   * Eliminar un mensaje existente
+   * @param workspaceID ID del espacio de trabajo correspondiente
+   * @param textChannelID ID del canal de texto
+   * @param messageID ID del documento a eliminar
+   */
+  async deleteMessage(
+    workspaceID: string,
+    textChannelID: string,
+    messageID: string | undefined
+  ): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannelID)
+      .collection(Collection.MESSAGES)
+      .doc(messageID)
       .delete();
   }
 
   /**
    * Recupera los mensajes de un canal
-   * @param id ID del canal a recuperar sus mensajes
+   * @param workspaceID ID del espacio de trabajo correspondiente
+   * @param textChannelID ID del canal de texto
    */
-  reciveMessages(id: string, onSnapshot: (messages: Message[]) => void): void {
-    db.collection(Collection.MESSAGES)
-      .where("uid_usuario", "==", id)
+  reciveMessages(
+    workspaceID: string,
+    textChannelID: string,
+    onSnapshot: (messages: Message[]) => void
+  ): void {
+    db.collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannelID)
+      .collection(Collection.MESSAGES)
+      .orderBy("fecha")
       .onSnapshot(snapshot => {
-        onSnapshot(snapshot.docs.map<Message>((doc) => {
-          const message = {
-            ...doc.data(),
-            id: doc.id
-          }
-          return <Message>message;
-        }));
+        onSnapshot(
+          snapshot.docs.map<Message>(doc => {
+            const message = {
+              ...doc.data(),
+              uid: doc.id
+            };
+            return <Message>message;
+          })
+        );
       });
   }
 }
