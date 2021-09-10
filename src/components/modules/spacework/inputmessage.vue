@@ -110,23 +110,22 @@ export default class InputMessage extends Vue {
   setWorkspaceIDtoModule!: (id: string) => void;
 
   async sendMessages() {
-    console.log(this.user);
     this.messageModel = {
       uid_usuario: this.user.uid,
       usuarioNombre: this.user.nombre + " " + this.user.apellido,
       contenido: this.message,
       fecha: Date.now(),
     };
-    console.log(this.messageModel);
+
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
     await this.sendMessage(this.messageModel);
   }
 
-  mounted() {
+  /*  mounted() {
     console.log(this.$route.params.id);
     console.log(this.$route.params.idChannel);
-  }
+  } */
 }
 </script>
 

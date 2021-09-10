@@ -14,7 +14,6 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              @click.stop="addChannelText"
               class="add mx-2"
               icon
               color="white"
@@ -39,15 +38,18 @@
                       outlined
                       dense
                       color="primary"
-                      prepend-inner-icon="mdi-account"
-                      v-model="nameChannela"
+                      prepend-inner-icon="mdi-forum"
+                      :rules="[rules.required]"
+                      v-model="nameChannel"
                     ></v-text-field>
                   </v-col>
                 </v-row>
               </v-form>
             </v-card-text>
             <v-card-actions class="justify-end">
-              <v-btn color="success">Crear</v-btn>
+              <v-btn color="success" :loading="loading" @click="addChannelText"
+                >Crear</v-btn
+              >
               <v-btn text @click="dialog = false">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
@@ -57,7 +59,7 @@
         <v-list color="primaryDark">
           <namechannels
             v-for="child in channels"
-            :key="child.id"
+            :key="child.uid"
             :item="child"
             :icon="item.icon"
             :userList="user"
@@ -70,10 +72,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import namechannels from "@/components/modules/spacework/channels/namechannels.vue";
 import { namespace } from "vuex-class";
 import { TextChannel } from "@/models/textChannel";
+import { VForm } from "@/utils/types";
 const WorkspaceOptions = namespace("WorkspaceModule");
 @Component({
   components: {
@@ -81,6 +84,8 @@ const WorkspaceOptions = namespace("WorkspaceModule");
   },
 })
 export default class ListChannels extends Vue {
+  @Ref("form") readonly form!: VForm;
+
   @Prop({
     required: true,
   })
@@ -101,20 +106,42 @@ export default class ListChannels extends Vue {
   })
   public url!: string;
 
-  /*  @WorkspaceOptions.Getter
-  private isChannelCreated!: boolean; */
+  @WorkspaceOptions.Getter
+  private isChannelCreated!: boolean;
 
   @WorkspaceOptions.Action
   private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
 
+  @WorkspaceOptions.Action
+  private fetchTextChannels!: (id: string) => void;
+
   public panel = [0];
   public show = false;
   public dialog = false;
+  public loading = false;
   public valid = true;
   public nameChannel = "";
+  public textChannel = {} as TextChannel;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+  };
 
-  /*  addChannelText() {
-    this.createTextChannel();
+  async addChannelText() {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loading = true;
+      this.textChannel = {
+        nombre: this.nameChannel,
+        permisos: [],
+      };
+      await this.createTextChannel(this.textChannel);
+      this.loading = false;
+      this.form.reset();
+      this.dialog = false;
+      /*  } */
+    }
+  }
+  /*  mounted() {
+    console.log(this.channels);
   } */
 }
 </script>

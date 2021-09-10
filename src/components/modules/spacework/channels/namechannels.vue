@@ -1,16 +1,15 @@
 <template>
   <v-hover>
-    <v-list-item
-      slot-scope="{ hover }"
-      @click="() => {}"
-      :to="'/space/' + urll + '/' + item.uid"
-    >
+    <v-list-item slot-scope="{ hover }" @click="toRouterSpace">
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
       </v-list-item-icon>
       <v-list-item-content>
         <v-list-item-title class="title">
+          <!--  <router-link :to="'/space/' + '/' + this.item.uid"> -->
+
           {{ item.nombre }}
+          <!--  </router-link> -->
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
@@ -150,6 +149,7 @@
 </template>
 
 <script lang="ts">
+import { TextChannel } from "@/models/textChannel";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
@@ -160,11 +160,12 @@ export default class NameChannels extends Vue {
   public dialogRenameChanel = false;
   public dialogDelete = false;
   public model = [];
+  public valid = true;
 
   @Prop({
     required: true,
   })
-  public item!: [];
+  public item!: TextChannel;
 
   @Prop({
     required: true,
@@ -180,6 +181,14 @@ export default class NameChannels extends Vue {
     required: true,
   })
   public urll!: string;
+
+  toRouterSpace() {
+    console.log("Entro");
+    console.log("/space/" + this.urll + "/" + this.item.uid);
+    if (this.$route.path != "/space/" + this.urll + "/" + this.item.uid) {
+      this.$router.replace("/space/" + this.urll + "/" + this.item.uid);
+    }
+  }
 }
 </script>
 

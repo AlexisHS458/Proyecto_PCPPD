@@ -5,7 +5,7 @@
       :key="item.title"
       :item="item"
       :user="users"
-      :channels="workspace.canales_texto"
+      :channels="textChannels"
       :url="workspace.uid"
     ></list-channels>
     <list-channels
@@ -30,6 +30,7 @@ import { namespace } from "vuex-class";
 import ListChannels from "@/components/modules/spacework/channels/listchannels.vue";
 import { Prop } from "vue-property-decorator";
 import { Workspace } from "@/models/workspace";
+import { TextChannel } from "@/models/textChannel";
 
 @Component({
   components: {
@@ -46,6 +47,11 @@ export default class Channels extends Vue {
     required: true,
   })
   public workspace!: Workspace;
+
+  @Prop({
+    required: true,
+  })
+  public textChannels!: TextChannel[];
 
   public ChannelsText = [
     {

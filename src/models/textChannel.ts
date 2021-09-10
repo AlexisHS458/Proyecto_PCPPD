@@ -7,12 +7,11 @@ export interface TextChannel {
   /**
    * ID del canal de texto
    */
-  uid: string;
+  uid?: string;
   /**
    * Nombre del canal de texto
    */
   nombre: string;
-  
 
   /**
    * Arreglo que contiene los ID de usuario con permiso de acceso al canal
