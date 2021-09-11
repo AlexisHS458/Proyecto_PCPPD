@@ -7,12 +7,6 @@ import { Invitation } from "@/models/invitation";
  */
 @Module({ namespaced: true })
 class InivtationsModule extends VuexModule{
-
-    /**
-    * Lista de invitaciones
-    */
-    public invitations: Invitation[] = [];
-
     /**
     * ID del usuario a invitar
     */
@@ -26,10 +20,7 @@ class InivtationsModule extends VuexModule{
         invitationSent: false,
     };
 
-    @Mutation
-    public setInvitations(messages: Array<Invitation>): void {
-        this.invitations = messages;
-    }
+   
 
     @Mutation
     public setLoadingStatus(status: boolean): void {
