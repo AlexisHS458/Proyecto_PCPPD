@@ -1,4 +1,6 @@
+import { Invitation } from "@/models/invitation";
 import { Workspace } from "@/models/workspace";
+import InivtationsService from "@/services/inivtations.service";
 import WorkSpaceService from "@/services/work_space.service";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 
@@ -14,6 +16,11 @@ class MainScreenModule extends VuexModule {
   public workSpacesList: Workspace[] = [];
 
   /**
+    * Lista de invitaciones
+    */
+   public invitations: Invitation[] = [];
+
+  /**
    * Status de los espacios de trabajo
    * @param loadingList T: Si la lista esta cargando, F: si ya está cargada
    * @param createdWorkSpace T: Si se creó un nuevo WS, F: Si no se creó
@@ -21,6 +28,7 @@ class MainScreenModule extends VuexModule {
    */
   public status = {
     loadingList: true,
+    loadingInvitationsList: true,
     createdWorkSpace: false,
     deletedWorkSpace: false
   };
@@ -31,8 +39,18 @@ class MainScreenModule extends VuexModule {
   }
 
   @Mutation
-  public setWorkSpacesList(workspaces: Array<Workspace>) {
+  public setWorkSpacesList(workspaces: Array<Workspace>): void {
     this.workSpacesList = workspaces;
+  }
+
+  @Mutation
+  public setInvitationsList(invitations: Array<Invitation>): void {
+    this.invitations = invitations;
+  }
+
+  @Mutation
+  public setLoadingInvitationStatus(status: boolean): void {
+    this.status.loadingInvitationsList = status;
   }
 
  
@@ -87,6 +105,7 @@ class MainScreenModule extends VuexModule {
         this.context.commit("deleteWorkSpaceFailure");
       });
   }
+
   /**
    * Recupera los espacios de trabajo de un usuario
    * @param uid id del usuario
@@ -100,6 +119,19 @@ class MainScreenModule extends VuexModule {
     });
   }
 
+  /**
+   * Recupera las invitaciones del usuario
+   * @param uid id del usuario
+   */
+  @Action
+  fetchInvitations(uid: string): void{
+    this.context.commit("setLoadingInvitationStatus",true);
+    InivtationsService.getInvitations(uid, invitations => {
+      this.context.commit("setInvitationsList", invitations);
+      this.context.commit("setLoadingInvitationStatus",true);
+    });
+  }
+
   get isLoadingList(): boolean {
     return this.status.loadingList;
   }
@@ -110,6 +142,10 @@ class MainScreenModule extends VuexModule {
 
   get workspacesList(): Workspace[]{
     return this.workSpacesList;
+  }
+
+  get isLoadingInvitations(): boolean {
+    return this.status.loadingInvitationsList;
   }
 }
 

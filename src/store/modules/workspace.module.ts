@@ -1,10 +1,10 @@
 import { Workspace } from "@/models/workspace";
 import WorkSpaceService from "@/services/work_space.service";
-import { CodeChannel } from "@/models/codeChannel";
+import InvitationsService from "@/services/inivtations.service";
 import { TextChannel } from "@/models/textChannel";
-import { VoiceChannel } from "@/models/voiceChannel";
 import ChannelsService from "@/services/channels.service";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { Invitation } from "@/models/invitation";
 
 /**
  * Modulo de acceso a información de un solo espacio de trabajo
@@ -101,6 +101,7 @@ class WorkspaceModule extends VuexModule {
    * Editar un canal de texto
    * @param textChannel Información del nuevo canal de texto
    */
+  @Action
   async editTextChannel(textChannel: TextChannel): Promise<void>{
     this.context.commit("setChannelEditedStatus", false);
     ChannelsService.editTextChannel(this.workspace.uid,textChannel)
@@ -113,13 +114,13 @@ class WorkspaceModule extends VuexModule {
    * Elimina un canal de texto del espacio de trabajo
    * @param textChannelID ID del canal de texto a eliminar
    */
+  @Action
   async deleteTextChannel(textChannelID: string): Promise<void>{
     this.context.commit("etChannelDeletedStatus",false);
     ChannelsService.deleteTextChannel(this.workspace.uid,textChannelID)
     .then( _ => {
       this.context.commit("etChannelDeletedStatus",true);
     });
-
   }
 
   get isLoadingWorkspace(): boolean {
@@ -134,7 +135,6 @@ class WorkspaceModule extends VuexModule {
   get isChannelDeleted(): boolean {
     return this.status.channelDeleted
   }
-
 }
 
 export default WorkspaceModule;

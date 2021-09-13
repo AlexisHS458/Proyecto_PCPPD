@@ -1,39 +1,48 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import InvitationsService from "@/services/inivtations.service";
 import { Invitation } from "@/models/invitation";
+import inivtationsService from "@/services/inivtations.service";
+import { User } from "@/models/user";
 
 /**
  * Modulo de invitaciones a espacios de trabajo
  */
 @Module({ namespaced: true })
 class InivtationsModule extends VuexModule{
-
-    /**
-    * Lista de invitaciones
-    */
-    public invitations: Invitation[] = [];
-
     /**
     * ID del usuario a invitar
     */
     public userID!: string;
 
     /**
+    * Lista de usuarios
+    */
+    public users: User[] = [];
+
+    /**
     * Estatos de consulta de la invitacion
     */
     public status = {
         loadingInvitations: true,
+        loadingUserNamesList: true,
         invitationSent: false,
     };
 
-    @Mutation
-    public setInvitations(messages: Array<Invitation>): void {
-        this.invitations = messages;
-    }
+   
 
     @Mutation
     public setLoadingStatus(status: boolean): void {
         this.status.loadingInvitations = status;
+    }
+
+    @Mutation
+    public setUserNamesList(users: Array<User>): void {
+        this.users = users;
+    }
+
+    @Mutation
+    public setLoadingUserNamesStatus(status: boolean): void {
+        this.status.loadingUserNamesList = status;
     }
 
     @Mutation
@@ -62,6 +71,19 @@ class InivtationsModule extends VuexModule{
         });
     }
 
+    /**
+    * Recupera las invitaciones del usuario
+    * @param name nombre del usuario
+    */
+    @Action
+    fetchUserNames(name: string): void{
+        this.context.commit("setLoadingUserNamesStatus",true);
+        inivtationsService.getUserNames(name, users => {
+            this.context.commit("setUserNamesList", users);
+            this.context.commit("setLoadingUserNamesStatus",true);
+        });
+    }
+
     get isLoadingInvitations(): boolean {
         return this.status.loadingInvitations;
     }
@@ -69,6 +91,10 @@ class InivtationsModule extends VuexModule{
     get isLoadingInvitationsInvitationSent(): boolean {
         return this.status.invitationSent;
     }
+
+    get isLoadingUserNames(): boolean {
+        return this.status.loadingUserNamesList;
+      }
 
 }
 
