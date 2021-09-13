@@ -1,4 +1,5 @@
 import { Invitation } from "@/models/invitation";
+import { User } from "@/models/user";
 import { Collection } from "@/utils/collections";
 import { db } from "@/utils/firebase";
 
@@ -36,6 +37,24 @@ class InivitationsService{
                         uid: doc.id
                     }
                     return <Invitation>invitation;
+                })
+            );
+        });
+    }
+
+    /**
+    * Recupera los nombres de los usuarios
+    * @param name nombre del usuario a buscar
+    */
+    getUserNames(name: string, onSnapshot: (user: User[]) => void): void {
+        db.collection(Collection.USERS).where("nombre", "array-contains", name).onSnapshot(snapshot => {
+            onSnapshot(
+                snapshot.docs.map<User>(doc => {
+                    const user = {
+                        ...doc.data(),
+                        uid: doc.id
+                    };
+                    return <User>user;
                 })
             );
         });
