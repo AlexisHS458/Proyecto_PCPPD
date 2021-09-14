@@ -43,6 +43,25 @@ class UserService {
       .doc(user.uid)
       .update(user);
   }
+
+
+  /**
+   * Recupera los usuarios en la base de datos
+   * @param onSnapshot Snapshot de la colección de usuarios
+   */
+  getUsers(onSnapshot: (user: User[]) => void): void {
+    db.collection(Collection.USERS).onSnapshot(snapshot => {
+        onSnapshot(
+            snapshot.docs.map<User>(doc => {
+                const user = {
+                    ...doc.data(),
+                    uid: doc.id
+                };
+                return <User>user;
+            })
+        );
+    });
+  }
 }
 
 export default new UserService();
