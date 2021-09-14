@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import InvitationsService from "@/services/inivtations.service";
+import UserService from "@/services/user.service";
 import { Invitation } from "@/models/invitation";
-import inivtationsService from "@/services/inivtations.service";
 import { User } from "@/models/user";
 
 /**
@@ -72,20 +72,14 @@ class InivtationsModule extends VuexModule {
 
   /**
    * Recupera las invitaciones del usuario
-   * @param name nombre del usuario
    */
   @Action
-  fetchUserNames(name: string): void {
-    console.log("Nombre desde modulo" + name);
+  fetchUserNames(): void {
     this.context.commit("setLoadingUserNamesStatus", true);
-    inivtationsService.getUserNames(name, users => {
+    UserService.getUsers(users => {
       this.context.commit("setUserNamesList", users);
-      this.context.commit("setLoadingUserNamesStatus", false);
+      this.context.commit("setLoadingUserNamesStatus", true);
     });
-  }
-
-  get isLoadingInvitations(): boolean {
-    return this.status.loadingInvitations;
   }
 
   get isLoadingInvitationsInvitationSent(): boolean {
