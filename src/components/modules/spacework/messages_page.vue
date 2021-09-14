@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto card-center">
     <p>hola</p>
-    {{ messages }}
+
     <toolbardata></toolbardata>
     <v-list three-line class="holaaaa scrooll">
       <message

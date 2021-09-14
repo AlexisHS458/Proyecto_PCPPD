@@ -50,7 +50,7 @@
                   >
                     Guardar cambios
                   </v-btn>
-                  <v-btn text @click="closeDialogEdit()">Cancelar</v-btn>
+                  <v-btn text @click="closeDialogEdit">Cancelar</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
