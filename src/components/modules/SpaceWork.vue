@@ -17,7 +17,7 @@
     </v-col>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto cardd">
-        <toolbarusers></toolbarusers>
+        <toolbarusers :user="currentUser" :workspace="workspace"></toolbarusers>
         <v-list color="primaryDark">
           <userlist
             v-for="(item, i) in itemss"

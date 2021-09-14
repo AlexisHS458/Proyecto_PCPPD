@@ -78,7 +78,7 @@ class InivtationsModule extends VuexModule {
     this.context.commit("setLoadingUserNamesStatus", true);
     UserService.getUsers(users => {
       this.context.commit("setUserNamesList", users);
-      this.context.commit("setLoadingUserNamesStatus", true);
+      this.context.commit("setLoadingUserNamesStatus", false);
     });
   }
 
