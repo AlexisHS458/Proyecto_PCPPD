@@ -5,6 +5,7 @@ import { TextChannel } from "@/models/textChannel";
 import ChannelsService from "@/services/channels.service";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { Invitation } from "@/models/invitation";
+import work_spaceService from "@/services/work_space.service";
 
 /**
  * Modulo de acceso a información de un solo espacio de trabajo
@@ -122,6 +123,15 @@ class WorkspaceModule extends VuexModule {
       this.context.commit("etChannelDeletedStatus",true);
     });
   }
+
+  /**
+  * Elimina un usuario de la coleccion ONLINE
+  * @param userID ID del usuario a eliminar
+  */
+  @Action
+  async deleteUserOnline(userID: string): Promise<void>{
+    work_spaceService.deleteUserOnline(userID, this.workspace.uid);
+    }
 
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
