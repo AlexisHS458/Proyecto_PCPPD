@@ -1,36 +1,18 @@
 <template>
-  <v-row v-if="!isLoading && !isLoadingWorkspace" class="row" no-gutters>
-    <v-col class="flex-grow-0 flex-shrink-1">
-      <div class="mx-auto cardd">
-        <toolbar :name="workspace.nombre"></toolbar>
-        <channels
-          class="flex-grow-1"
-          :users="itemss"
-          :workspace="workspace"
-          :textChannels="textChannel"
-        ></channels>
-        <userinfo></userinfo>
-      </div>
-    </v-col>
-    <v-col class="flex-grow-1 flex-shrink-0">
-      <router-view> </router-view>
-    </v-col>
-    <v-col class="flex-grow-0 flex-shrink-1">
-      <div class="mx-auto cardd">
-        <toolbarusers :user="currentUser" :workspace="workspace"></toolbarusers>
-        <v-list color="primaryDark">
-          <userlist
-            v-for="(item, i) in itemss"
-            :item="item"
-            :key="i"
-          ></userlist>
-        </v-list>
-      </div>
-    </v-col>
-  </v-row>
-  <div v-else class="coll">
-    <v-progress-circular indeterminate :size="120" :width="4" color="primary">
-    </v-progress-circular>
+  <div class="mx-auto card-center">
+    <p>hola</p>
+
+    <toolbardata></toolbardata>
+    <v-list three-line class="holaaaa scrooll">
+      <message
+        class="flex-grow-1"
+        v-for="(message, index) in messages"
+        :key="index"
+        :messages="message"
+        :uidWorkspace="workspace.uid"
+      ></message>
+    </v-list>
+    <inputmessage :workspace="workspace" :user="currentUser"></inputmessage>
   </div>
 </template>
 
@@ -51,26 +33,17 @@ import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 const User = namespace("UserModule");
-/* const ChannelsModule = namespace("ChannelModule"); */
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 
 @Component({
   components: {
-    toolbar,
-    userinfo,
-    channels,
     toolbardata,
     inputmessage,
     message,
-    toolbarusers,
-    userlist,
   },
 })
-export default class Spacework extends Vue {
-  @User.Getter
-  private isLoading!: boolean;
-
+export default class MessagesPage extends Vue {
   @User.State("user")
   private currentUser!: User;
 
@@ -132,50 +105,16 @@ export default class Spacework extends Vue {
       status: false,
     },
   ];
-
-  mounted() {
-    if (!this.isLoggedIn) {
-      this.fetchCurrentUser();
-    }
-    console.log(this.$route.params.id);
-    console.log(this.$route.params.idChannel);
-    this.fetchMyWorkspace(this.$route.params.id);
-    this.fetchTextChannels(this.$route.params.id);
-    this.setTextChannelIDtoModule(this.$route.params.id);
-    this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    this.fetchMesages();
-  }
 }
 </script>
 
 <style scoped>
-.cardd {
-  height: 100vh;
-  width: 40vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #000029;
-}
 .card-center {
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background-color: #0c2a52;
-}
-
-.container-div {
-  width: 100%;
-  display: flex;
-}
-
-.coll {
-  margin: auto;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .scrooll::-webkit-scrollbar {
@@ -197,3 +136,5 @@ export default class Spacework extends Vue {
   overflow-x: auto;
 }
 </style>
+
+

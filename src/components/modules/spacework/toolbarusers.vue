@@ -21,14 +21,36 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row align="center" justify="center" class="mt-6">
               <v-col cols="9">
-                <v-text-field
+                <v-autocomplete
+                  v-model="invitation"
                   label="Boleta o nombre de usuario"
                   placeholder="Boleta o nombre de usuario"
                   outlined
                   dense
                   color="primary"
                   prepend-inner-icon="mdi-account"
-                ></v-text-field>
+                  :loading="isLoading"
+                  :search-input.sync="search"
+                  :items="items"
+                  :item-text="nombre"
+                  :filter="costumFilter"
+                  hide-no-data
+                >
+                  <template v-slot:item="{ item }">
+                    <v-list-item-avatar>
+                      <v-img :src="item.fotoURL"></v-img>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="item.nombre + ' ' + item.apellido"
+                      ></v-list-item-title>
+                      <v-list-item-subtitle
+                        v-text="item.boleta"
+                      ></v-list-item-subtitle>
+                    </v-list-item-content>
+                  </template>
+                </v-autocomplete>
+                <!-- <v-text-field v-model="nombre"> </v-text-field> -->
               </v-col>
             </v-row>
           </v-form>
@@ -43,17 +65,84 @@
 </template>
 
 <script lang="ts">
-import { Component, Ref } from "vue-property-decorator";
+import { Component, Prop, Ref, Watch } from "vue-property-decorator";
 import { VForm } from "@/utils/types.js";
-import { namespace } from "vuex-class";
+import { Action, namespace } from "vuex-class";
 import Vue from "vue";
-
+import { User } from "@/models/user";
+import { Invitation } from "@/models/invitation";
+import { Workspace } from "@/models/workspace";
+const Invitations = namespace("InvitationsModule");
 @Component
 export default class ToolbarUsers extends Vue {
+  @Prop({
+    required: true,
+  })
+  public workspace!: Workspace;
+
+  @Prop({
+    required: true,
+  })
+  public user!: User;
+
   @Ref("form") readonly form!: VForm;
   public show = false;
   public dialog = false;
   public valid = true;
+  public invitation = "";
+  public isLoading = false;
+  public items: User[] = [];
+  public search = null;
+  public tab: any = null;
+  public select = null;
+  public invitationModel = {} as Invitation;
+  public loading = false;
+
+  @Invitations.Action
+  private fetchUserNames!: () => void;
+
+  @Invitations.State("users")
+  private users!: User[];
+
+  @Invitations.Action
+  private sendInvitation!: (invitation: Invitation) => Promise<void>;
+
+  @Watch("invitation")
+  onChildChanged(val: string) {
+    if (val != null) this.tab = 0;
+    else this.tab = null;
+  }
+
+  @Watch("search")
+  onChildChangedSearch(val: string) {
+    if (this.items.length > 0) return;
+    this.isLoading = true;
+    this.fetchUserNames();
+    this.items = this.users;
+    this.isLoading = false;
+  }
+
+  costumFilter(item: User, queryText: string, itemText: string) {
+    console.log(item, queryText, item);
+    const textOne =
+      item.nombre.toLowerCase() + " " + item.apellido.toLowerCase();
+    const textTree = item.boleta.toLowerCase();
+    const searchText = queryText.toLowerCase();
+    return (
+      textOne.indexOf(searchText) > -1 || textTree.indexOf(searchText) > -1
+    );
+  }
+
+  async sendInvitationUser() {
+    this.loading = false;
+    this.invitationModel = {
+      nombreRemitente: this.user.nombre,
+      nombreEspacioTrabajo: this.workspace.nombre,
+      IdEspacioTrabajo: this.workspace.uid,
+    };
+    await this.sendInvitation(this.invitationModel);
+    this.loading = true;
+  }
 }
 </script>
 

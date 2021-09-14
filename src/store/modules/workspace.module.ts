@@ -16,7 +16,7 @@ class WorkspaceModule extends VuexModule {
    * Espacio de trabajo
    */
   public workspace!: Workspace;
-  public textChannels: TextChannel[] = []
+  public textChannels: TextChannel[] = [];
 
   /**
    * Status de la consulta del espacio de trabajo
@@ -25,7 +25,7 @@ class WorkspaceModule extends VuexModule {
     loadingWorkspace: true,
     channelCreated: false,
     channelEdited: false,
-    channelDeleted: false,
+    channelDeleted: false
   };
 
   @Mutation
@@ -34,7 +34,7 @@ class WorkspaceModule extends VuexModule {
   }
 
   @Mutation
-  public setTextChannels(textChannels: Array<TextChannel>): void{
+  public setTextChannels(textChannels: Array<TextChannel>): void {
     this.textChannels = textChannels;
   }
 
@@ -43,18 +43,18 @@ class WorkspaceModule extends VuexModule {
     this.status.loadingWorkspace = status;
   }
 
-  @Mutation 
-  public setChannelCreatedStatus(status: boolean): void{
+  @Mutation
+  public setChannelCreatedStatus(status: boolean): void {
     this.status.channelCreated = status;
   }
 
-  @Mutation 
-  public setChannelEditedStatus(status: boolean): void{
+  @Mutation
+  public setChannelEditedStatus(status: boolean): void {
     this.status.channelCreated = status;
   }
 
-  @Mutation 
-  public setChannelDeletedStatus(status: boolean): void{
+  @Mutation
+  public setChannelDeletedStatus(status: boolean): void {
     this.status.channelCreated = status;
   }
 
@@ -68,7 +68,6 @@ class WorkspaceModule extends VuexModule {
     const workspace = await WorkSpaceService.getWorkspaceInfo(uid);
     this.context.commit("setWorkspace", workspace);
     this.context.commit("setLoadingStatus", false);
-    
   }
 
   /**
@@ -76,7 +75,7 @@ class WorkspaceModule extends VuexModule {
    * @param uid ID único del espacio de trabajo a consultar
    */
   @Action
-  async fetchTextChannels(uid: string): Promise<void>{
+  async fetchTextChannels(uid: string): Promise<void> {
     this.context.commit("setLoadingStatus", true);
     ChannelsService.getTextChannels(uid, textChannels => {
       this.context.commit("setTextChannels", textChannels);
@@ -89,11 +88,9 @@ class WorkspaceModule extends VuexModule {
    * @param textChannel Canal de texto a agregar al espacio de trabajo
    */
   @Action
-  async createTextChannel(textChannel: TextChannel): Promise<void>{
+  async createTextChannel(textChannel: TextChannel): Promise<void> {
     this.context.commit("setChannelCreatedStatus", false);
-    ChannelsService.createTextChannel(
-      this.workspace.uid, textChannel
-    ).then( _ => {
+    ChannelsService.createTextChannel(this.workspace.uid, textChannel).then(_ => {
       this.context.commit("setChannelCreatedStatus", true);
     });
   }
@@ -103,10 +100,9 @@ class WorkspaceModule extends VuexModule {
    * @param textChannel Información del nuevo canal de texto
    */
   @Action
-  async editTextChannel(textChannel: TextChannel): Promise<void>{
+  async editTextChannel(textChannel: TextChannel): Promise<void> {
     this.context.commit("setChannelEditedStatus", false);
-    ChannelsService.editTextChannel(this.workspace.uid,textChannel)
-    .then( _ => {
+    ChannelsService.editTextChannel(this.workspace.uid, textChannel).then(_ => {
       this.context.commit("setChannelEditedStatus", true);
     });
   }
@@ -116,11 +112,10 @@ class WorkspaceModule extends VuexModule {
    * @param textChannelID ID del canal de texto a eliminar
    */
   @Action
-  async deleteTextChannel(textChannelID: string): Promise<void>{
-    this.context.commit("etChannelDeletedStatus",false);
-    ChannelsService.deleteTextChannel(this.workspace.uid,textChannelID)
-    .then( _ => {
-      this.context.commit("etChannelDeletedStatus",true);
+  async deleteTextChannel(textChannelID: string): Promise<void> {
+    this.context.commit("setChannelDeletedStatus", false);
+    ChannelsService.deleteTextChannel(this.workspace.uid, textChannelID).then(_ => {
+      this.context.commit("setChannelDeletedStatus", true);
     });
   }
 
@@ -140,10 +135,10 @@ class WorkspaceModule extends VuexModule {
     return this.status.channelCreated;
   }
   get isChannelEdited(): boolean {
-    return this.status.channelEdited
+    return this.status.channelEdited;
   }
   get isChannelDeleted(): boolean {
-    return this.status.channelDeleted
+    return this.status.channelDeleted;
   }
 }
 

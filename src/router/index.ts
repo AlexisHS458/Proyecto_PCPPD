@@ -5,6 +5,7 @@ import Register from "../views/Register.vue";
 import Dashboard from "../views/Dashboard.vue";
 import EditInformation from "../views/Edit.vue";
 import SpaceWork from "../views/Space.vue";
+import messagesPage from "../components/modules/spacework/messages_page.vue";
 import NotFound from "../views/PageNotFound.vue";
 /* import { firebase } from "@/utils/firebase"; */
 Vue.use(VueRouter);
@@ -43,10 +44,10 @@ const routes: Array<RouteConfig> = [
     } */
   },
   {
-    path: "/space/:id/:idChannel",
+    path: "/space/:id",
     name: "Space",
-    component: SpaceWork
-    /* children: [{ path: ":idChannel", component: SpaceWork }] */
+    component: SpaceWork,
+    children: [{ path: ":idChannel", component: messagesPage }]
     /* meta: {
       auth: true
     } */

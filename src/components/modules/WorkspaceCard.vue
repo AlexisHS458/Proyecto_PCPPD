@@ -80,9 +80,9 @@ export default class WorkspaceCard extends Vue {
   }
 
   toSpaceWork() {
-    console.log(this.workspace);
     this.$router.push(
-      "/space/" + this.workspace.uid + "/" + this.workspace.canales_texto[0].uid
+      "/space/" +
+        this.workspace.uid /* + "/" + this.workspace.canales_texto[0].uid */
     );
   }
 

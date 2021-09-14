@@ -1,16 +1,15 @@
 <template>
   <v-hover>
-    <v-list-item
-      slot-scope="{ hover }"
-      @click="() => {}"
-      :to="'/space/' + urll + '/' + item.uid"
-    >
+    <v-list-item slot-scope="{ hover }" @click="toRouterSpace">
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
       </v-list-item-icon>
       <v-list-item-content>
         <v-list-item-title class="title">
+          <!--  <router-link :to="'/space/' + '/' + this.item.uid"> -->
+
           {{ item.nombre }}
+          <!--  </router-link> -->
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
@@ -86,18 +85,25 @@
                           <v-col cols="9">
                             <v-text-field
                               label="Nuevo nombre del canal"
-                              placeholder="Nuevo nombre del canal"
+                              :placeholder="item.nombre"
                               outlined
                               dense
                               color="primary"
                               prepend-inner-icon="mdi-account"
+                              v-model="newNameChannel"
+                              :rules="[rules.required]"
                             ></v-text-field>
                           </v-col>
                         </v-row>
                       </v-form>
                     </v-card-text>
                     <v-card-actions class="justify-end">
-                      <v-btn color="success">Aceptar</v-btn>
+                      <v-btn
+                        color="success"
+                        :loading="loadingRenameChanel"
+                        @click="editChannel"
+                        >Aceptar</v-btn
+                      >
                       <v-btn text @click="dialogRenameChanel = false"
                         >Cancelar</v-btn
                       >
@@ -132,11 +138,17 @@
                         <p>ESTA ACCIÓN NO SE PUEDE DESAHACER</p>
                       </div>
                       <v-row align="center" justify="center">
-                        <v-btn color="error"> SI, QUIERO ELIMINARLO </v-btn>
+                        <v-btn
+                          color="error"
+                          @click="deleteChannel"
+                          :loading="loadingDelete"
+                        >
+                          SI, QUIERO ELIMINARLO
+                        </v-btn>
                       </v-row>
                     </v-card-text>
                     <v-card-actions class="justify-end">
-                      <v-btn text @click="dialogDelete = false">Cancelar</v-btn>
+                      <v-btn text>Cancelar</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -150,7 +162,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { TextChannel } from "@/models/textChannel";
+import { VForm } from "@/utils/types";
+import { Component, Prop, Ref, Vue } from "vue-property-decorator";
+import { namespace } from "vuex-class";
+const WorkspaceOptions = namespace("WorkspaceModule");
 
 @Component
 export default class NameChannels extends Vue {
@@ -159,12 +175,19 @@ export default class NameChannels extends Vue {
   public dialog = false;
   public dialogRenameChanel = false;
   public dialogDelete = false;
+  public loadingDelete = false;
+  public loadingRenameChanel = false;
   public model = [];
+  public valid = true;
+  public newNameChannel = "";
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+  };
 
   @Prop({
     required: true,
   })
-  public item!: [];
+  public item!: TextChannel;
 
   @Prop({
     required: true,
@@ -180,6 +203,38 @@ export default class NameChannels extends Vue {
     required: true,
   })
   public urll!: string;
+
+  @WorkspaceOptions.Action
+  private editTextChannel!: (textChannel: TextChannel) => Promise<void>;
+
+  @WorkspaceOptions.Action
+  private deleteTextChannel!: (textChannelID: string) => Promise<void>;
+
+  @Ref("form") readonly form!: VForm;
+
+  toRouterSpace() {
+    if (this.$route.path != "/space/" + this.urll + "/" + this.item.uid) {
+      this.$router.replace("/space/" + this.urll + "/" + this.item.uid);
+    }
+  }
+
+  editChannel() {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loadingRenameChanel = true;
+      this.item.nombre = this.newNameChannel;
+      this.editTextChannel(this.item);
+      this.loadingRenameChanel = false;
+      this.form.reset();
+      this.dialogRenameChanel = false;
+    }
+  }
+
+  async deleteChannel() {
+    this.loadingDelete = true;
+    await this.deleteTextChannel(this.item.uid!);
+    this.loadingDelete = false;
+    this.dialogDelete = false;
+  }
 }
 </script>
 
