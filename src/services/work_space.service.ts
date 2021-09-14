@@ -2,7 +2,7 @@ import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 import ChannelsService from "@/services/channels.service";
-import channelsService from "@/services/channels.service";
+import { User } from "@/models/user";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -59,9 +59,9 @@ class WorkSpaceService {
   }
 
   /**
-   * Recupera un espacio de trabajo
-   * @param uid ID del espacio de trabajo a consultar
-   */
+  * Recupera un espacio de trabajo
+  * @param uid ID del espacio de trabajo a consultar
+  */
   async getWorkspaceInfo(uid: string): Promise<Workspace> {
     return new Promise((resolve, reject) => {
       db.collection(Collection.WORK_SPACE)
@@ -91,6 +91,28 @@ class WorkSpaceService {
         );
     });
   }
+
+  /**
+  * Agrega un usuario a la coleccion ONLINE
+  * @param user
+  * @returns User. Referencia del usuario agregado.
+  */
+  async AddUserOnline(user: User, workSpaceID:string): Promise<User> {
+    const userRef = (await db.collection(Collection.WORK_SPACE).doc(workSpaceID)
+    .collection(Collection.ONLINE).add(user)).get();
+    return <User>(await userRef).data();
+  }
+
+  /**
+   * Eliminar un usuario de la coleccion ONLINE
+   * @param userID ID del usuario a eliminar
+   */
+   async deleteUserOnline(userID: string, workSpaceID:string): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE).doc(workSpaceID)
+      .collection(Collection.ONLINE).doc(userID).delete();
+  }
+
 }
 
 export default new WorkSpaceService();
