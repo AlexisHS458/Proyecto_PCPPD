@@ -1,6 +1,6 @@
 import { Workspace } from "@/models/workspace";
 import WorkSpaceService from "@/services/work_space.service";
-import InvitationsService from "@/services/inivtations.service";
+import InvitationsService from "@/services/invitations.service";
 import { TextChannel } from "@/models/textChannel";
 import ChannelsService from "@/services/channels.service";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";

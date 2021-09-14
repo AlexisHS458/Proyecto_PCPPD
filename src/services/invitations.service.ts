@@ -7,15 +7,15 @@ import { db } from "@/utils/firebase";
 /**
  * Servicio de invitaciones de espacios de trabajo.
  */
-class InivitationsService{
+class InvitationsService{
 
     /**
      * Enviar una invitación al espacio de trabajo 
      * @param IdUsuario ID del usuario que recibirá la invitación
      * @param invitation Invitación al espacio de trabajo
      */
-    async sendInivitation(uidUsuario: string, invitation: Invitation): Promise<void>{
-        await db.collection(Collection.USERS).doc(uidUsuario)
+    async sendInivitation(invitation: Invitation): Promise<void>{
+        await db.collection(Collection.USERS).doc(invitation.idUsuarioInvitado)
         .collection(Collection.INVITATIONS).add(invitation);
     }
 
@@ -61,4 +61,4 @@ class InivitationsService{
     }
 }
 
-export default new InivitationsService();
+export default new InvitationsService();

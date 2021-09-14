@@ -1,7 +1,7 @@
 import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
-import InivtationsService from "@/services/inivtations.service";
+import InivtationsService from "@/services/invitations.service";
 import WorkSpaceService from "@/services/work_space.service";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 

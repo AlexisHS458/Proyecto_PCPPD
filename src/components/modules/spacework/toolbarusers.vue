@@ -138,7 +138,7 @@ export default class ToolbarUsers extends Vue {
     this.invitationModel = {
       nombreRemitente: this.user.nombre,
       nombreEspacioTrabajo: this.workspace.nombre,
-      IdEspacioTrabajo: this.workspace.uid,
+      idEspacioTrabajo: this.workspace.uid,
     };
     await this.sendInvitation(this.invitationModel);
     this.loading = true;

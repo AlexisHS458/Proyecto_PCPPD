@@ -1,5 +1,5 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import InvitationsService from "@/services/inivtations.service";
+import InvitationsService from "@/services/invitations.service";
 import UserService from "@/services/user.service";
 import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
@@ -9,11 +9,6 @@ import { User } from "@/models/user";
  */
 @Module({ namespaced: true })
 class InivtationsModule extends VuexModule {
-  /**
-   * ID del usuario a invitar
-   */
-  public userID!: string;
-
   /**
    * Lista de usuarios
    */
@@ -61,7 +56,7 @@ class InivtationsModule extends VuexModule {
    */
   @Action
   async sendInvitation(invitation: Invitation): Promise<void> {
-    return await InvitationsService.sendInivitation(this.userID, invitation)
+    return await InvitationsService.sendInivitation(invitation)
       .then(() => {
         this.context.commit("invitationSentSuccess");
       })

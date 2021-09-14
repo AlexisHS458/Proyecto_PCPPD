@@ -19,5 +19,10 @@ export interface Invitation {
   /**
    * ID del espacio de trabajo
    */
-  IdEspacioTrabajo: string;
+  idEspacioTrabajo: string;
+
+  /**
+   * ID del usuario a invitar al espacio de trabajo
+   */
+  idUsuarioInvitado: string
 }
