@@ -6,6 +6,7 @@ import ChannelsService from "@/services/channels.service";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { Invitation } from "@/models/invitation";
 import work_spaceService from "@/services/work_space.service";
+import { User } from "@/models/user";
 
 /**
  * Modulo de acceso a información de un solo espacio de trabajo
@@ -13,9 +14,18 @@ import work_spaceService from "@/services/work_space.service";
 @Module({ namespaced: true })
 class WorkspaceModule extends VuexModule {
   /**
-   * Espacio de trabajo
+   * Datos del espacio de trabajo
    */
   public workspace!: Workspace;
+
+  /**
+   * Muestra los usuarios que estan el linea dentro del espacio de trabajo
+   */
+  public usersOnline: User[] = [];
+
+  /**
+   * Canales de texto del espacio de trabajo
+   */
   public textChannels: TextChannel[] = [];
 
   /**
@@ -23,6 +33,7 @@ class WorkspaceModule extends VuexModule {
    */
   public status = {
     loadingWorkspace: true,
+    loadingUsersOnline: true,
     channelCreated: false,
     channelEdited: false,
     channelDeleted: false
@@ -57,6 +68,17 @@ class WorkspaceModule extends VuexModule {
   public setChannelDeletedStatus(status: boolean): void {
     this.status.channelCreated = status;
   }
+  
+  @Mutation
+  public setLoadingUsersOnlineStatus(status: boolean): void{
+    this.status.loadingUsersOnline = status;
+  }
+
+  @Mutation
+  public setUsersOnline(users: Array<User>): void {
+    this.usersOnline = users;
+  }
+
 
   /**
    * Consulta la información de un espacio de trabajo.
@@ -120,13 +142,25 @@ class WorkspaceModule extends VuexModule {
   }
 
   /**
+   * Se muestran los usuarios que estan en linea dentro del espacio de trabajo
+   */
+  @Action
+  fetchUsersOnline(): void{
+    this.context.commit("setLoadingUsersOnlineStatus", true);
+    WorkSpaceService.getUsersOnline(this.workspace.uid, users => {
+      this.context.commit("setUsersOnline",users);
+      this.context.commit("setLoadingUsersOnlineStatus", false);
+    });
+  }
+
+  /**
   * Elimina un usuario de la coleccion ONLINE
   * @param userID ID del usuario a eliminar
   */
   @Action
   async deleteUserOnline(userID: string): Promise<void>{
     work_spaceService.deleteUserOnline(userID, this.workspace.uid);
-    }
+  }
 
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
@@ -139,6 +173,9 @@ class WorkspaceModule extends VuexModule {
   }
   get isChannelDeleted(): boolean {
     return this.status.channelDeleted;
+  }
+  get isLoadingUsersOnline(): boolean{
+    return this.status.loadingUsersOnline;
   }
 }
 

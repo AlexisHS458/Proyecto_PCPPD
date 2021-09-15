@@ -107,10 +107,31 @@ class WorkSpaceService {
    * Eliminar un usuario de la coleccion ONLINE
    * @param userID ID del usuario a eliminar
    */
-   async deleteUserOnline(userID: string, workSpaceID:string): Promise<void> {
+  async deleteUserOnline(userID: string, workSpaceID:string): Promise<void> {
     await db
       .collection(Collection.WORK_SPACE).doc(workSpaceID)
       .collection(Collection.ONLINE).doc(userID).delete();
+  }
+
+
+  /**
+   * Recupera los usuarios que estan en linea dentro de un espacio de trabajo
+   * @param workspaceID ID del espacio de trabajo a consultar
+   * @param onSnapshot suscripción a la lista de usuarios online
+   */
+  getUsersOnline(workspaceID: string, onSnapshot: (usersOnline: User[]) => void): void{
+    db.collection(Collection.WORK_SPACE).doc(workspaceID)
+    .collection(Collection.ONLINE).onSnapshot(snapshot => {
+      onSnapshot(
+        snapshot.docs.map<User>(doc => {
+          const user = {
+            ...doc.data(),
+          }
+          return <User> user;
+        })
+      );
+    });
+
   }
 
 }
