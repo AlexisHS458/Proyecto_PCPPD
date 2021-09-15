@@ -7,6 +7,7 @@ import EditInformation from "../views/Edit.vue";
 import SpaceWork from "../views/Space.vue";
 import messagesPage from "../components/modules/spacework/messages_page.vue";
 import NotFound from "../views/PageNotFound.vue";
+import NotChannels from "../components/modules/notChannels.vue";
 /* import { firebase } from "@/utils/firebase"; */
 Vue.use(VueRouter);
 
@@ -47,7 +48,13 @@ const routes: Array<RouteConfig> = [
     path: "/space/:id",
     name: "Space",
     component: SpaceWork,
-    children: [{ path: ":idChannel", component: messagesPage }]
+    children: [
+      { name: "messages", path: ":idChannel", component: messagesPage, props: true },
+      {
+        path: "",
+        component: NotChannels
+      }
+    ]
     /* meta: {
       auth: true
     } */

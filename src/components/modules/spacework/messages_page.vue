@@ -1,7 +1,5 @@
 <template>
   <div class="mx-auto card-center">
-    <p>hola</p>
-
     <toolbardata></toolbardata>
     <v-list three-line class="holaaaa scrooll">
       <message
@@ -20,18 +18,14 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
-import toolbar from "@/components/modules/spacework/toolbar.vue";
-import userinfo from "@/components/modules/spacework/userinfo.vue";
-import channels from "@/components/modules/spacework/channels.vue";
 import toolbardata from "@/components/modules/spacework/toolbardata.vue";
 import inputmessage from "@/components/modules/spacework/inputmessage.vue";
 import message from "@/components/modules/spacework/message.vue";
-import toolbarusers from "@/components/modules/spacework/toolbarusers.vue";
-import userlist from "@/components/modules/spacework/userlist.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
+import { Prop, Watch } from "vue-property-decorator";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
@@ -44,6 +38,16 @@ const Messages = namespace("TextChannelModule");
   },
 })
 export default class MessagesPage extends Vue {
+  @Prop({
+    required: true,
+  })
+  public idChannel!: string;
+
+  @Watch("idChannel")
+  onChildChanged() {
+    this.getMessages();
+  }
+
   @User.State("user")
   private currentUser!: User;
 
@@ -65,9 +69,6 @@ export default class MessagesPage extends Vue {
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
 
-  @MyWorkSpace.Getter
-  private isLoadingWorkspace!: boolean;
-
   @Messages.Action
   private fetchMesages!: () => void;
 
@@ -83,28 +84,15 @@ export default class MessagesPage extends Vue {
   @Messages.Action
   setWorkspaceIDtoModule!: (id: string) => void;
 
-  public itemss = [
-    {
-      icon: "mdi-circle",
-      text: "Pablo",
-      status: true,
-    },
-    {
-      icon: "mdi-circle",
-      text: "Zamudio",
-      status: true,
-    },
-    {
-      icon: "mdi-circle",
-      text: "Hector",
-      status: false,
-    },
-    {
-      icon: "mdi-circle",
-      text: "Juanito",
-      status: false,
-    },
-  ];
+  mounted() {
+    this.getMessages();
+  }
+
+  getMessages() {
+    this.setTextChannelIDtoModule(this.$route.params.id);
+    this.setWorkspaceIDtoModule(this.$route.params.idChannel);
+    this.fetchMesages();
+  }
 }
 </script>
 

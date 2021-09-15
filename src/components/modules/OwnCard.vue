@@ -39,7 +39,7 @@ export default class OwnCard extends Vue {
   private fetchWorkspaces!: (uid: string) => void;
 
   mounted(): void {
-    this.fetchWorkspaces(this.currentUser.uid);
+    this.fetchWorkspaces(this.currentUser.uid!);
   }
 }
 </script>

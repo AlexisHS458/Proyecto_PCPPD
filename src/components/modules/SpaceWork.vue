@@ -137,13 +137,8 @@ export default class Spacework extends Vue {
     if (!this.isLoggedIn) {
       this.fetchCurrentUser();
     }
-    console.log(this.$route.params.id);
-    console.log(this.$route.params.idChannel);
     this.fetchMyWorkspace(this.$route.params.id);
     this.fetchTextChannels(this.$route.params.id);
-    this.setTextChannelIDtoModule(this.$route.params.id);
-    this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    this.fetchMesages();
   }
 }
 </script>

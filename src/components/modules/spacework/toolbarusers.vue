@@ -32,8 +32,10 @@
                   :loading="isLoading"
                   :search-input.sync="search"
                   :items="items"
-                  :item-text="nombre"
+                  item-text="nombre"
+                  item-value="uid"
                   :filter="costumFilter"
+                  :rules="[rules.required]"
                   hide-no-data
                 >
                   <template v-slot:item="{ item }">
@@ -49,15 +51,19 @@
                       ></v-list-item-subtitle>
                     </v-list-item-content>
                   </template>
+                  <template slot="selection" slot-scope="{ item }">
+                    {{ item.nombre }} {{ item.apellido }}
+                  </template>
                 </v-autocomplete>
-                <!-- <v-text-field v-model="nombre"> </v-text-field> -->
               </v-col>
             </v-row>
           </v-form>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn color="success">Invitar</v-btn>
-          <v-btn text>Cancelar</v-btn>
+          <v-btn color="success" @click="sendInvitationUser" :loading="loading"
+            >Invitar</v-btn
+          >
+          <v-btn text @click="closeDialog">Cancelar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -86,6 +92,7 @@ export default class ToolbarUsers extends Vue {
   public user!: User;
 
   @Ref("form") readonly form!: VForm;
+
   public show = false;
   public dialog = false;
   public valid = true;
@@ -97,6 +104,9 @@ export default class ToolbarUsers extends Vue {
   public select = null;
   public invitationModel = {} as Invitation;
   public loading = false;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+  };
 
   @Invitations.Action
   private fetchUserNames!: () => void;
@@ -123,7 +133,6 @@ export default class ToolbarUsers extends Vue {
   }
 
   costumFilter(item: User, queryText: string, itemText: string) {
-    console.log(item, queryText, item);
     const textOne =
       item.nombre.toLowerCase() + " " + item.apellido.toLowerCase();
     const textTree = item.boleta.toLowerCase();
@@ -134,14 +143,25 @@ export default class ToolbarUsers extends Vue {
   }
 
   async sendInvitationUser() {
-    this.loading = false;
-    this.invitationModel = {
-      nombreRemitente: this.user.nombre,
-      nombreEspacioTrabajo: this.workspace.nombre,
-      idEspacioTrabajo: this.workspace.uid,
-    };
-    await this.sendInvitation(this.invitationModel);
-    this.loading = true;
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loading = true;
+      this.invitationModel = {
+        nombreRemitente: this.user.nombre + " " + this.user.apellido,
+        nombreEspacioTrabajo: this.workspace.nombre,
+        idEspacioTrabajo: this.workspace.uid,
+        idUsuarioInvitado: this.invitation,
+      };
+      await this.sendInvitation(this.invitationModel);
+      this.form.reset();
+      this.loading = false;
+      this.dialog = false;
+    }
+  }
+
+  closeDialog() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialog = false;
   }
 }
 </script>

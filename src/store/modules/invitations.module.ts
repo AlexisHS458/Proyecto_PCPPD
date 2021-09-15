@@ -56,6 +56,7 @@ class InivtationsModule extends VuexModule {
    */
   @Action
   async sendInvitation(invitation: Invitation): Promise<void> {
+    console.log(invitation);
     return await InvitationsService.sendInivitation(invitation)
       .then(() => {
         this.context.commit("invitationSentSuccess");

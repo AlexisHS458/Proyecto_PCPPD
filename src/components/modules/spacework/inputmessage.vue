@@ -111,7 +111,7 @@ export default class InputMessage extends Vue {
 
   async sendMessages() {
     this.messageModel = {
-      uid_usuario: this.user.uid,
+      uid_usuario: this.user.uid!,
       usuarioNombre: this.user.nombre + " " + this.user.apellido,
       contenido: this.message,
       fecha: Date.now(),

@@ -1,17 +1,22 @@
 <template>
   <v-hover>
-    <v-list-item slot-scope="{ hover }" @click="toRouterSpace">
+    <v-list-item
+      slot-scope="{ hover }"
+      :to="{
+        name: 'messages',
+        params: { idChannel: item.uid },
+      }"
+    >
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
       </v-list-item-icon>
+
       <v-list-item-content>
         <v-list-item-title class="title">
-          <!--  <router-link :to="'/space/' + '/' + this.item.uid"> -->
-
           {{ item.nombre }}
-          <!--  </router-link> -->
         </v-list-item-title>
       </v-list-item-content>
+
       <v-list-item-action>
         <v-menu v-model="menu" offset-y>
           <template #activator="{ on }">
@@ -30,7 +35,7 @@
                       block
                       class="btn"
                       v-bind="attrs"
-                      v-on="on"
+                      v-on.stop="on"
                     >
                       <v-icon color="info" class="mr-6">
                         mdi-account-multiple-outline
@@ -212,11 +217,11 @@ export default class NameChannels extends Vue {
 
   @Ref("form") readonly form!: VForm;
 
-  toRouterSpace() {
+  /*  toRouterSpace() {
     if (this.$route.path != "/space/" + this.urll + "/" + this.item.uid) {
       this.$router.replace("/space/" + this.urll + "/" + this.item.uid);
     }
-  }
+  } */
 
   editChannel() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
