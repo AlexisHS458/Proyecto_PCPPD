@@ -108,9 +108,13 @@ class WorkSpaceService {
    * @param userID ID del usuario a eliminar
    */
   async deleteUserOnline(userID: string, workSpaceID:string): Promise<void> {
-    await db
-      .collection(Collection.WORK_SPACE).doc(workSpaceID)
-      .collection(Collection.ONLINE).doc(userID).delete();
+    const usersOnlineRef = db.collection(Collection.WORK_SPACE).doc(workSpaceID)
+        .collection(Collection.ONLINE);
+    const snapshot = await usersOnlineRef.where('uid', '==', userID ).get();
+
+    snapshot.forEach(doc => {
+      usersOnlineRef.doc(doc.id).delete();
+    });
   }
 
 
