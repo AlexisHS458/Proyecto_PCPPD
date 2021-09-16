@@ -3,12 +3,23 @@
     <v-list-item class="mb-0" slot-scope="{ hover }" @click="() => {}">
       <v-list-item-avatar class="mr-1">
         <v-icon
-          v-if="item.status"
+          v-if="status == 'Online'"
           v-text="item.icon"
           size="15"
           color="success"
         ></v-icon>
-        <v-icon v-else v-text="item.icon" size="15" color="grey"></v-icon>
+        <v-icon
+          v-else-if="status == 'Offline'"
+          v-text="item.icon"
+          size="15"
+          color="grey"
+        ></v-icon>
+        <v-icon
+          v-else-if="status == 'Away'"
+          v-text="item.icon"
+          size="15"
+          color="yellow"
+        ></v-icon>
       </v-list-item-avatar>
       <v-list-item-content>
         <v-list-item-title
@@ -71,6 +82,9 @@
 
 
 <script lang="ts">
+import { Status } from "@/models/status";
+import { User } from "@/models/user";
+import presenceServices from "@/services/presence.services";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
@@ -78,10 +92,19 @@ export default class UserList extends Vue {
   public show = false;
   public menu = false;
   public model = 1;
+  public status = Status.OFFLINE;
   @Prop({
     required: true,
   })
-  public item!: [];
+  public item!: User;
+
+  mounted() {
+    if (this.item.uid) {
+      presenceServices.getPresence(this.item.uid, (status) => {
+        this.status = status;
+      });
+    }
+  }
 }
 </script>
 

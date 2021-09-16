@@ -81,20 +81,11 @@ export default class WorkspaceCard extends Vue {
   @Workspace.Action
   private deletedWorkSpaces!: (id: string) => void;
 
-  @Workspace.Action
-  private setCurrentWorkSpace!: (workSpaceID: string) => void;
-
-  @Workspace.Action
-  private AddUserOnline!: (user: User) => Promise<void>;
-
   deleteSpacework() {
     this.deletedWorkSpaces(this.workspace.uid);
   }
 
-  async toSpaceWork() {
-    this.setCurrentWorkSpace(this.workspace.uid);
-    await this.AddUserOnline(this.user);
-    this.AddUserOnline;
+  toSpaceWork() {
     this.$router.push(
       "/space/" +
         this.workspace.uid /* + "/" + this.workspace.canales_texto[0].uid */

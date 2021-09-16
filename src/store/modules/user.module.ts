@@ -2,6 +2,8 @@ import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import { User } from "@/models/user";
 import UserService from "@/services/user.service";
 import AuthService from "@/services/auth.service";
+import presenceServices from "@/services/presence.services";
+import { Status } from "@/models/status";
 
 /**
  * Clase para el manejo de la información de usuario.
@@ -21,7 +23,19 @@ class UserModule extends VuexModule {
   @Mutation
   public setUser(user: User): void {
     this.user = user;
-    if (user.boleta != "") this.status.logged = true;
+    if (user.boleta != "") {
+      if (user.uid) {
+        presenceServices.waitUntilDisconnect(user.uid);
+      }
+      document.onvisibilitychange = () => {
+        if (document.visibilityState === "hidden") {
+          presenceServices.setPresence(Status.AWAY, user?.uid);
+        } else {
+          presenceServices.setPresence(Status.ONLINE, user?.uid);
+        }
+      };
+      this.status.logged = true;
+    }
   }
 
   @Mutation

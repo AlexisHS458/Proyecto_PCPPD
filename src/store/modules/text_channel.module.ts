@@ -152,11 +152,16 @@ class TextChannelModule extends VuexModule {
    * @param textChannelID  ID del canal de texto a consultar
    */
   @Action
-  fetchMesages() {
+  fetchMesages(callBack: () => void) {
     this.context.commit("setLoadingStatus", true);
+    let isFirst = true;
     MessageService.reciveMessages(this.workspaceID, this.textChannelID, messages => {
       this.context.commit("setMessages", messages);
       this.context.commit("setLoadingStatus", false);
+      if (isFirst) {
+        callBack();
+        isFirst = false;
+      }
     });
   }
 

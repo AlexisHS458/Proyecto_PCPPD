@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto card-center">
     <toolbardata></toolbardata>
-    <v-list three-line class="holaaaa scrooll">
+    <v-list three-line class="holaaaa scrooll" ref="vList">
       <message
         class="flex-grow-1"
         v-for="(message, index) in messages"
@@ -70,7 +70,7 @@ export default class MessagesPage extends Vue {
   private workspace!: Workspace;
 
   @Messages.Action
-  private fetchMesages!: () => void;
+  private fetchMesages!: (callBack: () => void) => void;
 
   @Messages.Getter
   private isLoadingMessages!: boolean;
@@ -91,7 +91,14 @@ export default class MessagesPage extends Vue {
   getMessages() {
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    this.fetchMesages();
+
+    this.fetchMesages(() => {
+      setTimeout(() => {
+        const vList = this.$refs.vList as any;
+        console.log(vList.$el.scrollHeight, vList.$el);
+        vList.$el.scrollTop = vList.$el.scrollHeight;
+      }, 200);
+    });
   }
 }
 </script>
@@ -115,6 +122,12 @@ export default class MessagesPage extends Vue {
 .scrooll::-webkit-scrollbar-thumb {
   background-color: #11171a;
   border-radius: 10px;
+}
+
+.scrooll {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .holaaaa {
