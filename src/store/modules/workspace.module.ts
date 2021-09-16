@@ -152,6 +152,15 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
+ /**
+  * Agrega a un usuario online
+  * @param user usuario a poner con estado de en linea
+  */
+  @Action
+  async AddUserOnline(user: User): Promise<void> {
+    await WorkSpaceService.AddUserOnline(user,this.workspace.uid);
+  }
+
   /**
    * Elimina un usuario de la coleccion ONLINE
    * @param userID ID del usuario a eliminar

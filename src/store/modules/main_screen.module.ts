@@ -21,7 +21,6 @@ class MainScreenModule extends VuexModule {
     */
    public invitations: Invitation[] = [];
 
-  public workSpaceSelected!: string;
 
   /**
    * Status de los espacios de trabajo
@@ -75,10 +74,6 @@ class MainScreenModule extends VuexModule {
   @Mutation
   public deleteWorkSpaceFailure(): void {
     this.status.deletedWorkSpace = false;
-  }
-  @Mutation
-  public setWorkSpaceID(workSpaceID: string): void {
-    this.workSpaceSelected = workSpaceID;
   }
 
   /**
@@ -137,20 +132,6 @@ class MainScreenModule extends VuexModule {
       this.context.commit("setInvitationsList", invitations);
       this.context.commit("setLoadingInvitationStatus",true);
     });
-  }
-
-  @Action
-  setCurrentWorkSpace(workSpaceID: string){
-    this.context.commit("setWorkSpaceID",workSpaceID);
-  }
-
-  /**
-  * Agrega a un usuario online
-  * @param user usuario a agregar
-  */
-  @Action
-  async AddUserOnline(user: User): Promise<void> {
-    await WorkSpaceService.AddUserOnline(user,this.workSpaceSelected)
   }
 
   get isLoadingList(): boolean {
