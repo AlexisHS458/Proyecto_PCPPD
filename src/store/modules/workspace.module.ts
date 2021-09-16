@@ -68,9 +68,9 @@ class WorkspaceModule extends VuexModule {
   public setChannelDeletedStatus(status: boolean): void {
     this.status.channelCreated = status;
   }
-  
+
   @Mutation
-  public setLoadingUsersOnlineStatus(status: boolean): void{
+  public setLoadingUsersOnlineStatus(status: boolean): void {
     this.status.loadingUsersOnline = status;
   }
 
@@ -78,7 +78,6 @@ class WorkspaceModule extends VuexModule {
   public setUsersOnline(users: Array<User>): void {
     this.usersOnline = users;
   }
-
 
   /**
    * Consulta la información de un espacio de trabajo.
@@ -145,20 +144,20 @@ class WorkspaceModule extends VuexModule {
    * Se muestran los usuarios que estan en linea dentro del espacio de trabajo
    */
   @Action
-  fetchUsersOnline(): void{
+  fetchUsersOnline(workspaceID: string): void {
     this.context.commit("setLoadingUsersOnlineStatus", true);
-    WorkSpaceService.getUsersOnline(this.workspace.uid, users => {
-      this.context.commit("setUsersOnline",users);
+    WorkSpaceService.getUsersOnline(workspaceID, users => {
+      this.context.commit("setUsersOnline", users);
       this.context.commit("setLoadingUsersOnlineStatus", false);
     });
   }
 
   /**
-  * Elimina un usuario de la coleccion ONLINE
-  * @param userID ID del usuario a eliminar
-  */
+   * Elimina un usuario de la coleccion ONLINE
+   * @param userID ID del usuario a eliminar
+   */
   @Action
-  async deleteUserOnline(userID: string): Promise<void>{
+  async deleteUserOnline(userID: string): Promise<void> {
     work_spaceService.deleteUserOnline(userID, this.workspace.uid);
   }
 
@@ -174,7 +173,7 @@ class WorkspaceModule extends VuexModule {
   get isChannelDeleted(): boolean {
     return this.status.channelDeleted;
   }
-  get isLoadingUsersOnline(): boolean{
+  get isLoadingUsersOnline(): boolean {
     return this.status.loadingUsersOnline;
   }
 }

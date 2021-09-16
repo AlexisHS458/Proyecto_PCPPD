@@ -48,6 +48,7 @@ const routes: Array<RouteConfig> = [
     path: "/space/:id",
     name: "Space",
     component: SpaceWork,
+
     children: [
       { name: "messages", path: ":idChannel", component: messagesPage, props: true },
       {

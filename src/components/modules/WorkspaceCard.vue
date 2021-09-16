@@ -61,6 +61,7 @@ import { Workspace } from "@/models/workspace";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { StringUtils } from "@/utils/stringsUtils";
 import { namespace } from "vuex-class";
+import { User } from "@/models/user";
 const Workspace = namespace("MainScreenModule");
 
 @Component
@@ -72,14 +73,28 @@ export default class WorkspaceCard extends Vue {
   })
   public workspace!: Workspace;
 
+  @Prop({
+    required: true,
+  })
+  public user!: User;
+
   @Workspace.Action
   private deletedWorkSpaces!: (id: string) => void;
+
+  @Workspace.Action
+  private setCurrentWorkSpace!: (workSpaceID: string) => void;
+
+  @Workspace.Action
+  private AddUserOnline!: (user: User) => Promise<void>;
 
   deleteSpacework() {
     this.deletedWorkSpaces(this.workspace.uid);
   }
 
-  toSpaceWork() {
+  async toSpaceWork() {
+    this.setCurrentWorkSpace(this.workspace.uid);
+    await this.AddUserOnline(this.user);
+    this.AddUserOnline;
     this.$router.push(
       "/space/" +
         this.workspace.uid /* + "/" + this.workspace.canales_texto[0].uid */

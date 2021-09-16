@@ -35,7 +35,7 @@
                       block
                       class="btn"
                       v-bind="attrs"
-                      v-on.stop="on"
+                      @click.passive="on"
                     >
                       <v-icon color="info" class="mr-6">
                         mdi-account-multiple-outline

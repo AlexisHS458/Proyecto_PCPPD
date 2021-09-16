@@ -14,6 +14,7 @@
     </v-col>
     <v-col class="flex-grow-1 flex-shrink-0">
       <router-view> </router-view>
+      {{ usersOnline }}
     </v-col>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto cardd">
@@ -51,7 +52,7 @@ import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 const User = namespace("UserModule");
-/* const ChannelsModule = namespace("ChannelModule"); */
+const Invitations = namespace("InvitationsModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 
@@ -65,6 +66,10 @@ const Messages = namespace("TextChannelModule");
     message,
     toolbarusers,
     userlist,
+  },
+  beforeRouteLeave(to, from, next) {
+    console.log("beforeRouteLeave");
+    next();
   },
 })
 export default class Spacework extends Vue {
@@ -105,10 +110,19 @@ export default class Spacework extends Vue {
   private messages!: Message[];
 
   @Messages.Action
-  setTextChannelIDtoModule!: (id: string) => void;
+  private setTextChannelIDtoModule!: (id: string) => void;
 
   @Messages.Action
-  setWorkspaceIDtoModule!: (id: string) => void;
+  private setWorkspaceIDtoModule!: (id: string) => void;
+
+  @MyWorkSpace.Action
+  private fetchUsersOnline!: (workspaceID: string) => void;
+
+  @MyWorkSpace.Action
+  private deleteUserOnline!: (usrID: string) => Promise<void>;
+
+  @MyWorkSpace.State("usersOnline")
+  private usersOnline!: User[];
 
   public itemss = [
     {
@@ -139,7 +153,31 @@ export default class Spacework extends Vue {
     }
     this.fetchMyWorkspace(this.$route.params.id);
     this.fetchTextChannels(this.$route.params.id);
+    /* document.addEventListener("backbutton", this.yourCallBackFunction, false); */
   }
+
+  created() {
+    this.fetchUsersOnline(this.$route.params.id);
+  }
+
+  async destroyed() {
+    console.log(this.currentUser.uid);
+    await this.deleteUserOnline(this.currentUser.uid!);
+  }
+
+  /*   onBack() {
+    window.onpopstate = function () {
+      alert("Se presiono atrás");
+    };
+  }
+
+  yourCallBackFunction() {
+    alert("Hola");
+  }
+
+  beforeDestroy() {
+    document.removeEventListener("backbutton", this.yourCallBackFunction);
+  } */
 }
 </script>
 

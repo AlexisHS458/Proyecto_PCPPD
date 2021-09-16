@@ -3,7 +3,7 @@
     <v-row>
       <app-bar></app-bar>
     </v-row>
-    <own-card></own-card>
+    <own-card :user="currentUser"></own-card>
     <invitation-card></invitation-card>
     <floating-button></floating-button>
   </v-container>
@@ -48,9 +48,6 @@ export default class DashboardView extends Vue {
 
   @User.Action
   private fetchCurrentUser!: () => void;
-
-  /*   @User.Action
-  private logout!: () => void; */
 
   created(): void {
     if (!this.isLoggedIn) {

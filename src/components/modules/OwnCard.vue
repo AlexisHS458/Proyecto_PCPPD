@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col v-for="(item, index) in workSpacesList" :key="index" cols="4">
-      <workspace-card :workspace="item"></workspace-card>
+      <workspace-card :workspace="item" :user="user"></workspace-card>
     </v-col>
     <collaboration-card></collaboration-card>
   </v-row>
@@ -15,6 +15,7 @@ import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import CollaborationCard from "@/components/modules/CollaborationCard.vue";
 import WorkspaceCard from "@/components/modules/WorkspaceCard.vue";
+import { Prop } from "vue-property-decorator";
 
 const User = namespace("UserModule");
 const OwnSpacework = namespace("MainScreenModule");
@@ -22,11 +23,15 @@ const OwnSpacework = namespace("MainScreenModule");
 @Component({
   components: {
     CollaborationCard,
-
     WorkspaceCard,
   },
 })
 export default class OwnCard extends Vue {
+  @Prop({
+    required: true,
+  })
+  public user!: User;
+
   public space: { visible: boolean }[] = [];
 
   @User.State("user")
