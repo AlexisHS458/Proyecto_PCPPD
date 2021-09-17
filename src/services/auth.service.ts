@@ -1,5 +1,5 @@
 import { auth } from "@/utils/firebase";
-import presence from "@/services/presence.services";
+import presence from "@/services/presence.service";
 import { Status } from "@/models/status";
 /**
  * Clase que conecta con el Firebase Authentication
