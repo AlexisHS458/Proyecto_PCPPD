@@ -50,13 +50,20 @@ import { VForm } from "@/utils/types.js";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
-import { CodeChannel } from "@/models/codeChannel";
-const Add = namespace("MainScreenModule");
+const AddWorkspace = namespace("MainScreenModule");
 const User = namespace("UserModule");
 import Vue from "vue";
 
 @Component
 export default class AddCard extends Vue {
+  @AddWorkspace.Action
+  private addWorkSpace!: (workspace: Workspace) => void;
+
+  @User.State("user")
+  private currentUser!: User;
+
+  @Ref("form") readonly form!: VForm;
+
   public show = false;
   public dialog = false;
   public valid = true;
@@ -64,13 +71,6 @@ export default class AddCard extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
-  @Ref("form") readonly form!: VForm;
-
-  @Add.Action
-  private addWorkSpace!: (workspace: Workspace) => void;
-
-  @User.State("user")
-  private currentUser!: User;
 
   handleAddSpace(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {

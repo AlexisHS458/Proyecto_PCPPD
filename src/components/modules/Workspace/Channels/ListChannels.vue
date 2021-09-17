@@ -73,7 +73,7 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
-import namechannels from "@/components/modules/spacework/channels/namechannels.vue";
+import namechannels from "@/components/modules/Workspace/Channels/NameChannels.vue";
 import { namespace } from "vuex-class";
 import { TextChannel } from "@/models/textChannel";
 import { VForm } from "@/utils/types";

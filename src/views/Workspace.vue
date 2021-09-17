@@ -1,17 +1,16 @@
 <template>
-  <dashboard-view />
+  <space-work />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import DashboardView from "@/components/modules/DashboardView.vue";
+import SpaceWork from "@/components/modules/Workspace/ViewWorkspace.vue";
 
 export default Vue.extend({
-  name: "Dashboard",
+  name: "Space",
 
   components: {
-    DashboardView,
+    SpaceWork,
   },
 });
 </script>
-

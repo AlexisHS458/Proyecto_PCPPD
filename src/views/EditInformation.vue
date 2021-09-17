@@ -1,14 +1,12 @@
 <template>
-  <edit-information />
+  <edit-information></edit-information>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import EditInformation from "@/components/modules/EditInformation.vue";
+import EditInformation from "@/components/modules/MainScreen/ViewEditInformation.vue";
 
 export default Vue.extend({
-  name: "Edit",
-
   components: {
     EditInformation,
   },

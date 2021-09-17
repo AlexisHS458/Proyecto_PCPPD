@@ -15,14 +15,12 @@
           </v-list-item-content>
         </v-list-item>
       </template>
-
       <v-card>
         <v-card-title class="card-title"> Opciones </v-card-title>
-
         <v-list-item-content class="justify-center card-list">
           <div class="mx-auto text-right">
             <v-divider class="my-3"></v-divider>
-            <v-btn depressed text block class="btn" to="/edit">
+            <v-btn depressed text block class="btn" to="/Editinformation">
               <v-icon class="mr-6"> mdi-pencil </v-icon> Editar información
             </v-btn>
             <v-divider class="my-3"></v-divider>
@@ -41,10 +39,6 @@
         </v-list-item-content>
       </v-card>
     </v-menu>
-    <!--   <div v-else>
-      <v-progress-circular indeterminate :size="30" :width="2" color="white">
-      </v-progress-circular>
-    </div>-->
   </v-app-bar>
 </template>
 
@@ -57,34 +51,13 @@ const User = namespace("UserModule");
 
 @Component
 export default class AppBar extends Vue {
-  public loading = false;
-
-  /* public loading = false;
-  @User.Getter
-  private isLoading!: boolean; */
-
   @User.State("user")
   private currentUser!: User;
-
-  /*  @User.Getter
-  private isLoggedIn!: boolean;
-
-  @User.Action
-  private fetchCurrentUser!: () => void;  */
 
   @User.Action
   private logout!: () => void;
 
-  /* created(): void {
-    if (this.isLoading) {
-      this.fetchCurrentUser();
-    }
-  } */
-
-  mounted(): void {
-    this.currentUser;
-    /*  console.log(this.currentUser); */
-  }
+  public loading = false;
 
   async handleLogout(): Promise<void> {
     this.loading = true;

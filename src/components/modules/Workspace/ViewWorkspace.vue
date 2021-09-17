@@ -14,7 +14,6 @@
     </v-col>
     <v-col class="flex-grow-1 flex-shrink-0">
       <router-view> </router-view>
-      {{ usersOnline }}
     </v-col>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto cardd">
@@ -29,7 +28,7 @@
       </div>
     </v-col>
   </v-row>
-  <div v-else class="coll">
+  <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
   </div>
@@ -39,20 +38,17 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
-import toolbar from "@/components/modules/spacework/toolbar.vue";
-import userinfo from "@/components/modules/spacework/userinfo.vue";
-import channels from "@/components/modules/spacework/channels.vue";
-import toolbardata from "@/components/modules/spacework/toolbardata.vue";
-import inputmessage from "@/components/modules/spacework/inputmessage.vue";
-import message from "@/components/modules/spacework/message.vue";
-import toolbarusers from "@/components/modules/spacework/toolbarusers.vue";
-import userlist from "@/components/modules/spacework/userlist.vue";
+import toolbar from "@/components/modules/Workspace/InfoWorkspace.vue";
+import userinfo from "@/components/modules/Workspace/InfoUser.vue";
+import channels from "@/components/modules/Workspace/Channels/ViewChannels.vue";
+import toolbarusers from "@/components/modules/Workspace/InvitationUser.vue";
+import userlist from "@/components/modules/Workspace/ListUsers.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 const User = namespace("UserModule");
-const Invitations = namespace("InvitationsModule");
+
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 
@@ -61,15 +57,8 @@ const Messages = namespace("TextChannelModule");
     toolbar,
     userinfo,
     channels,
-    toolbardata,
-    inputmessage,
-    message,
     toolbarusers,
     userlist,
-  },
-  beforeRouteLeave(to, from, next) {
-    console.log("beforeRouteLeave");
-    next();
   },
 })
 export default class Spacework extends Vue {
@@ -161,13 +150,6 @@ export default class Spacework extends Vue {
     await this.fetchMyWorkspace(this.$route.params.id);
     this.fetchTextChannels(this.$route.params.id);
     this.fetchUsersOnline(this.$route.params.id);
-    /* console.log(this.currentUser);
-    await this.AddUserOnline(this.currentUser); */
-  }
-
-  async destroyed() {
-    console.log(this.currentUser.uid);
-    await this.deleteUserOnline(this.currentUser.uid!);
   }
 }
 </script>
@@ -193,31 +175,12 @@ export default class Spacework extends Vue {
   display: flex;
 }
 
-.coll {
+.div-progress-circular {
   margin: auto;
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.scrooll::-webkit-scrollbar {
-  width: 5px;
-}
-.scrooll::-webkit-scrollbar-track {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-.scrooll::-webkit-scrollbar-thumb {
-  background-color: #11171a;
-  border-radius: 10px;
-}
-
-.holaaaa {
-  background-color: #0c2a52;
-  color: white;
-  max-height: 100vh;
-  overflow-x: auto;
 }
 </style>
