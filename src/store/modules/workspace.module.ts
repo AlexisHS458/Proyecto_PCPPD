@@ -1,11 +1,8 @@
 import { Workspace } from "@/models/workspace";
 import WorkSpaceService from "@/services/work_space.service";
-import InvitationsService from "@/services/invitations.service";
 import { TextChannel } from "@/models/textChannel";
 import ChannelsService from "@/services/channels.service";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { Invitation } from "@/models/invitation";
-import work_spaceService from "@/services/work_space.service";
 import { User } from "@/models/user";
 
 /**
@@ -19,9 +16,9 @@ class WorkspaceModule extends VuexModule {
   public workspace!: Workspace;
 
   /**
-   * Muestra los usuarios que estan el linea dentro del espacio de trabajo
+   * Usuarios pertenecientes al espacio de trabajo
    */
-  public usersOnline: User[] = [];
+  public users: User[] = [];
 
   /**
    * Canales de texto del espacio de trabajo
@@ -33,7 +30,7 @@ class WorkspaceModule extends VuexModule {
    */
   public status = {
     loadingWorkspace: true,
-    loadingUsersOnline: true,
+    loadingUsers: true,
     channelCreated: false,
     channelEdited: false,
     channelDeleted: false
@@ -70,13 +67,13 @@ class WorkspaceModule extends VuexModule {
   }
 
   @Mutation
-  public setLoadingUsersOnlineStatus(status: boolean): void {
-    this.status.loadingUsersOnline = status;
+  public setLoadingUsersStatus(status: boolean): void {
+    this.status.loadingUsers = status;
   }
 
   @Mutation
   public setUsersOnline(users: Array<User>): void {
-    this.usersOnline = users;
+    this.users = users;
   }
 
   /**
@@ -111,7 +108,7 @@ class WorkspaceModule extends VuexModule {
   @Action
   async createTextChannel(textChannel: TextChannel): Promise<void> {
     this.context.commit("setChannelCreatedStatus", false);
-    ChannelsService.createTextChannel(this.workspace.uid, textChannel).then(_ => {
+    ChannelsService.createTextChannel(this.workspace.uid, textChannel).then(() => {
       this.context.commit("setChannelCreatedStatus", true);
     });
   }
@@ -123,7 +120,7 @@ class WorkspaceModule extends VuexModule {
   @Action
   async editTextChannel(textChannel: TextChannel): Promise<void> {
     this.context.commit("setChannelEditedStatus", false);
-    ChannelsService.editTextChannel(this.workspace.uid, textChannel).then(_ => {
+    ChannelsService.editTextChannel(this.workspace.uid, textChannel).then(() => {
       this.context.commit("setChannelEditedStatus", true);
     });
   }
@@ -135,40 +132,11 @@ class WorkspaceModule extends VuexModule {
   @Action
   async deleteTextChannel(textChannelID: string): Promise<void> {
     this.context.commit("setChannelDeletedStatus", false);
-    ChannelsService.deleteTextChannel(this.workspace.uid, textChannelID).then(_ => {
+    ChannelsService.deleteTextChannel(this.workspace.uid, textChannelID).then(() => {
       this.context.commit("setChannelDeletedStatus", true);
     });
   }
 
-  /**
-   * Se muestran los usuarios que estan en linea dentro del espacio de trabajo
-   */
-  @Action
-  fetchUsersOnline(workspaceID: string): void {
-    this.context.commit("setLoadingUsersOnlineStatus", true);
-    WorkSpaceService.getUsersOnline(workspaceID, users => {
-      this.context.commit("setUsersOnline", users);
-      this.context.commit("setLoadingUsersOnlineStatus", false);
-    });
-  }
-
- /**
-  * Agrega a un usuario online
-  * @param user usuario a poner con estado de en linea
-  */
-  @Action
-  async AddUserOnline(user: User): Promise<void> {
-    await WorkSpaceService.AddUserOnline(user,this.workspace.uid);
-  }
-
-  /**
-   * Elimina un usuario de la coleccion ONLINE
-   * @param userID ID del usuario a eliminar
-   */
-  @Action
-  async deleteUserOnline(userID: string): Promise<void> {
-    work_spaceService.deleteUserOnline(userID, this.workspace.uid);
-  }
 
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
@@ -183,7 +151,7 @@ class WorkspaceModule extends VuexModule {
     return this.status.channelDeleted;
   }
   get isLoadingUsersOnline(): boolean {
-    return this.status.loadingUsersOnline;
+    return this.status.loadingUsers;
   }
 }
 

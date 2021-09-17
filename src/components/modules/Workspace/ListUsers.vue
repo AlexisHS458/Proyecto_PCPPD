@@ -84,7 +84,7 @@
 <script lang="ts">
 import { Status } from "@/models/status";
 import { User } from "@/models/user";
-import presenceServices from "@/services/presence.services";
+import presenceServices from "@/services/presence.service";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component

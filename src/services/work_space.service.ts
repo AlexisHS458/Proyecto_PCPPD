@@ -92,52 +92,6 @@ class WorkSpaceService {
     });
   }
 
-  /**
-  * Agrega un usuario a la coleccion ONLINE
-  * @param user
-  * @returns User. Referencia del usuario agregado.
-  */
-  async AddUserOnline(user: User, workSpaceID:string): Promise<User> {
-    const userRef = (await db.collection(Collection.WORK_SPACE).doc(workSpaceID)
-    .collection(Collection.ONLINE).add(user)).get();
-    return <User>(await userRef).data();
-  }
-
-  /**
-   * Eliminar un usuario de la coleccion ONLINE
-   * @param userID ID del usuario a eliminar
-   */
-  async deleteUserOnline(userID: string, workSpaceID:string): Promise<void> {
-    const usersOnlineRef = db.collection(Collection.WORK_SPACE).doc(workSpaceID)
-        .collection(Collection.ONLINE);
-    const snapshot = await usersOnlineRef.where('uid', '==', userID ).get();
-
-    snapshot.forEach(doc => {
-      usersOnlineRef.doc(doc.id).delete();
-    });
-  }
-
-
-  /**
-   * Recupera los usuarios que estan en linea dentro de un espacio de trabajo
-   * @param workspaceID ID del espacio de trabajo a consultar
-   * @param onSnapshot suscripción a la lista de usuarios online
-   */
-  getUsersOnline(workspaceID: string, onSnapshot: (usersOnline: User[]) => void): void{
-    db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .collection(Collection.ONLINE).onSnapshot(snapshot => {
-      onSnapshot(
-        snapshot.docs.map<User>(doc => {
-          const user = {
-            ...doc.data(),
-          }
-          return <User> user;
-        })
-      );
-    });
-
-  }
-
 }
 
 export default new WorkSpaceService();

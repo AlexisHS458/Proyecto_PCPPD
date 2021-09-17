@@ -2,7 +2,7 @@ import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import { User } from "@/models/user";
 import UserService from "@/services/user.service";
 import AuthService from "@/services/auth.service";
-import presenceServices from "@/services/presence.services";
+import presenceServices from "@/services/presence.service";
 import { Status } from "@/models/status";
 
 /**
