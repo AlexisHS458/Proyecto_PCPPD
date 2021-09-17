@@ -6,7 +6,6 @@ export enum Collection{
      * Coleccion de usuarios
      */
     USERS = "usuarios",
-    ONLINE = "usuarios_online",
     /**
      * Colección de espacios de trabajo
      */

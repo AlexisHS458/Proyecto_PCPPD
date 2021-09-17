@@ -1,6 +1,7 @@
 import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
 import { Collection } from "@/utils/collections";
+import UserService from "@/services/user.service";
 import { db } from "@/utils/firebase";
 
 
@@ -58,6 +59,26 @@ class InvitationsService{
                 })
             );
         });
+    }
+
+    /**
+     * Acepta la invitación a un espacio de trabajo
+     * @param invitation 
+     */
+    async acceptInvitation(invitation: Invitation): Promise<void>{
+        const userRef =  await UserService.getUserInfoByID(invitation.idUsuarioInvitado);
+
+        db.collection(Collection.WORK_SPACE).doc(invitation.idEspacioTrabajo)
+        .collection(Collection.USERS).add(userRef);
+    }
+
+    /**
+     * Rechaza e elimina la invitación al espacio de trabajo
+     * @param invitation invitacion a eliminar
+     */
+    async rejectInvitation(invitation: Invitation): Promise<void>{
+        return await db.collection(Collection.USERS).doc(invitation.idUsuarioInvitado)
+        .collection(Collection.INVITATIONS).doc(invitation.uid).delete();
     }
 }
 
