@@ -2,12 +2,12 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
 import Register from "../views/Register.vue";
-import Dashboard from "../views/Dashboard.vue";
-import EditInformation from "../views/Edit.vue";
-import SpaceWork from "../views/Space.vue";
-import messagesPage from "../components/modules/spacework/messages_page.vue";
+import MainScreen from "../views/MainScreen.vue";
+import EditInformation from "../views/EditInformation.vue";
+import Workspace from "../views/Workspace.vue";
+import MessagesPage from "../components/modules/Workspace/ViewMessages.vue";
 import NotFound from "../views/PageNotFound.vue";
-import NotChannels from "../components/modules/notChannels.vue";
+import NotChannels from "../components/modules/Workspace/NotChannels.vue";
 /* import { firebase } from "@/utils/firebase"; */
 Vue.use(VueRouter);
 
@@ -29,15 +29,15 @@ const routes: Array<RouteConfig> = [
     } */
   },
   {
-    path: "/dashboard",
-    name: "Dashboard",
-    component: Dashboard
+    path: "/Mainscreen",
+    name: "MainScreen",
+    component: MainScreen
     /*   meta: {
       auth: true
     } */
   },
   {
-    path: "/edit",
+    path: "/Editinformation",
     name: "Edit",
     component: EditInformation
     /* meta: {
@@ -47,10 +47,10 @@ const routes: Array<RouteConfig> = [
   {
     path: "/space/:id",
     name: "Space",
-    component: SpaceWork,
+    component: Workspace,
 
     children: [
-      { name: "messages", path: ":idChannel", component: messagesPage, props: true },
+      { name: "messages", path: ":idChannel", component: MessagesPage, props: true },
       {
         path: "",
         component: NotChannels

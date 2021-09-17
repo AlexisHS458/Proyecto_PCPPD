@@ -91,10 +91,6 @@ export default class WorkspaceCard extends Vue {
         this.workspace.uid /* + "/" + this.workspace.canales_texto[0].uid */
     );
   }
-
-  /* mounted() {
-    console.log(this.workspace.canales_texto[0].uid);
-  } */
 }
 </script>
 

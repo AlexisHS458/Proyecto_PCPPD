@@ -5,7 +5,7 @@
         <v-card rounded="lg" height="100%" width="100%">
           <v-row no-gutters>
             <v-col cols="7" class="arrow">
-              <v-btn class="ma-2" text icon to="/dashboard">
+              <v-btn class="ma-2" text icon to="/Mainscreen">
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
             </v-col>
@@ -98,7 +98,7 @@
       </v-col>
     </v-row>
   </v-container>
-  <div v-else class="coll">
+  <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
   </div>
@@ -112,7 +112,22 @@ import { User } from "@/models/user";
 const Edit = namespace("UserModule");
 
 @Component
-export default class EditInformation extends Vue {
+export default class ViewEdit extends Vue {
+  @Edit.Action
+  private fetchCurrentUser!: () => void;
+
+  @Edit.Action
+  private saveUser!: (user: User) => Promise<void>;
+
+  @Edit.State("user")
+  private currentUser!: User;
+
+  @Edit.Getter
+  private isLoggedIn!: boolean;
+
+  @Edit.Getter
+  private isLoading!: boolean;
+
   public loading = false;
   public valid = true;
   public snackbar = false;
@@ -133,29 +148,11 @@ export default class EditInformation extends Vue {
     regexBoleta: (v: string): string | boolean =>
       /^[a-zA-Z0-9]+$/.test(v) || "Apellido inválido",
   };
-  @Edit.Action
-  private fetchCurrentUser!: () => void;
-
-  @Edit.Action
-  private saveUser!: (user: User) => Promise<void>;
-
-  @Edit.State("user")
-  private currentUser!: User;
-
-  @Edit.Getter
-  private isLoggedIn!: boolean;
-
-  @Edit.Getter
-  private isLoading!: boolean;
 
   created(): void {
     if (!this.isLoggedIn) {
       this.fetchCurrentUser();
     }
-  }
-
-  mounted(): void {
-    this.currentUser;
   }
 
   async handleEditInfo(): Promise<void> {
@@ -182,14 +179,12 @@ export default class EditInformation extends Vue {
   width: 14rem;
   height: 14rem;
 }
-.pa {
-  margin-top: 300px;
-}
+
 .arrow {
   position: absolute;
 }
 
-.coll {
+.div-progress-circular {
   margin: auto;
   width: 100%;
   height: 100%;

@@ -86,7 +86,7 @@
                 width="100%"
               >
                 <p
-                  class="text-h4 white--text text-center pa"
+                  class="text-h4 white--text text-center margin-p"
                   align="center"
                   justify="center"
                 >
@@ -106,7 +106,7 @@
       </v-col>
     </v-row>
   </v-container>
-  <div v-else class="coll">
+  <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
   </div>
@@ -121,6 +121,21 @@ const Auth = namespace("UserModule");
 
 @Component
 export default class Register extends Vue {
+  @Auth.Action
+  private fetchCurrentUser!: () => void;
+
+  @Auth.Action
+  private saveUser!: (user: User) => Promise<void>;
+
+  @Auth.State("user")
+  private currentUser!: User;
+
+  @Auth.Getter
+  private isLoggedIn!: boolean;
+
+  @Auth.Getter
+  private isLoading!: boolean;
+
   public loading = false;
   public valid = true;
   public snackbar = false;
@@ -139,33 +154,12 @@ export default class Register extends Vue {
     regexBoleta: (v: string): string | boolean =>
       /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido",
   };
-  @Auth.Action
-  private fetchCurrentUser!: () => void;
-
-  @Auth.Action
-  private saveUser!: (user: User) => Promise<void>;
-
-  @Auth.State("user")
-  private currentUser!: User;
-
-  @Auth.Getter
-  private isLoggedIn!: boolean;
-
-  @Auth.Getter
-  private isLoading!: boolean;
 
   async created(): Promise<void> {
     await this.fetchCurrentUser();
     if (this.isLoggedIn) {
-      this.$router.push("/dashboard");
+      this.$router.push("/Mainscreen");
     }
-    /*  if (!this.isLoggedIn) {
-      this.$router.push("/");
-    } */
-  }
-
-  mounted(): void {
-    this.currentUser;
   }
 
   async handleRegister(): Promise<void> {
@@ -175,7 +169,7 @@ export default class Register extends Vue {
       await this.saveUser(this.currentUser);
       if (this.isLoggedIn) {
         this.loading = false;
-        this.$router.push({ path: "/dashboard" });
+        this.$router.push({ path: "/Mainscreen" });
       } else {
         this.loading = false;
         this.snackbar = true;
@@ -189,13 +183,13 @@ export default class Register extends Vue {
 .img {
   border-radius: 25px;
 }
-.pa {
+.margin-p {
   margin-top: 300px;
 }
 .arrow {
   position: absolute;
 }
-.coll {
+.div-progress-circular {
   margin: auto;
   width: 100%;
   height: 100%;

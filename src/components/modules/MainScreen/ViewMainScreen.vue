@@ -7,7 +7,7 @@
     <invitation-card></invitation-card>
     <floating-button></floating-button>
   </v-container>
-  <div v-else class="coll">
+  <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
   </div>
@@ -17,12 +17,11 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
-import AppBar from "@/components/modules/AppBar.vue";
-import OwnCard from "@/components/modules/OwnCard.vue";
-import FloatingButton from "@/components/modules/FloatingButton.vue";
-import CollaborationCard from "@/components/modules/CollaborationCard.vue";
-import InvitationCard from "@/components/modules/InvitationCard.vue";
-import AddCard from "@/components/modules/AddCard.vue";
+import AppBar from "@/components/modules/MainScreen/AppBar.vue";
+import OwnCard from "@/components/modules/MainScreen/CardOwn.vue";
+import FloatingButton from "@/components/modules/MainScreen/AddWorkspace.vue";
+import CollaborationCard from "@/components/modules/MainScreen/CardCollaboration.vue";
+import InvitationCard from "@/components/modules/MainScreen/CardInvitation.vue";
 import { User } from "@/models/user";
 const User = namespace("UserModule");
 
@@ -32,11 +31,10 @@ const User = namespace("UserModule");
     OwnCard,
     CollaborationCard,
     InvitationCard,
-    AddCard,
     FloatingButton,
   },
 })
-export default class DashboardView extends Vue {
+export default class ViewMainScreen extends Vue {
   @User.Getter
   private isLoading!: boolean;
 
@@ -58,7 +56,7 @@ export default class DashboardView extends Vue {
 </script>
 
 <style scoped>
-.coll {
+.div-progress-circular {
   margin: auto;
   width: 100%;
   height: 100%;

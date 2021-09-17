@@ -22,7 +22,7 @@
                 width="100%"
               >
                 <p
-                  class="text-h4 white--text text-center pa"
+                  class="text-h4 white--text text-center margin-p"
                   align="center"
                   justify="center"
                 >
@@ -75,7 +75,7 @@ export default class LoginForm extends Vue {
 .img {
   border-radius: 25px;
 }
-.pa {
+.margin-p {
   margin-top: 300px;
 }
 .firebaseui-card-content {

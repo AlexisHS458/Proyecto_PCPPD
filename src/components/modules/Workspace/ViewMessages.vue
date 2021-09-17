@@ -1,16 +1,16 @@
 <template>
   <div class="mx-auto card-center">
-    <toolbardata></toolbardata>
-    <v-list three-line class="holaaaa scrooll" ref="vList">
-      <message
+    <app-bar-messages></app-bar-messages>
+    <v-list three-line class="list-background scroll" ref="vList">
+      <list-messages
         class="flex-grow-1"
         v-for="(message, index) in messages"
         :key="index"
         :messages="message"
         :uidWorkspace="workspace.uid"
-      ></message>
+      ></list-messages>
     </v-list>
-    <inputmessage :workspace="workspace" :user="currentUser"></inputmessage>
+    <input-message :workspace="workspace" :user="currentUser"></input-message>
   </div>
 </template>
 
@@ -18,9 +18,9 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
-import toolbardata from "@/components/modules/spacework/toolbardata.vue";
-import inputmessage from "@/components/modules/spacework/inputmessage.vue";
-import message from "@/components/modules/spacework/message.vue";
+import AppBarMessages from "@/components/modules/Workspace/Channels/Text/AppBarMessages.vue";
+import InputMessage from "@/components/modules/Workspace/Channels/Text/InputMessage.vue";
+import ListMessages from "@/components/modules/Workspace/Channels/Text/ListMessages.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
@@ -32,9 +32,9 @@ const Messages = namespace("TextChannelModule");
 
 @Component({
   components: {
-    toolbardata,
-    inputmessage,
-    message,
+    AppBarMessages,
+    InputMessage,
+    ListMessages,
   },
 })
 export default class MessagesPage extends Vue {
@@ -48,14 +48,14 @@ export default class MessagesPage extends Vue {
     this.getMessages();
   }
 
+  @User.Action
+  private fetchCurrentUser!: () => void;
+
   @User.State("user")
   private currentUser!: User;
 
   @User.Getter
   private isLoggedIn!: boolean;
-
-  @User.Action
-  private fetchCurrentUser!: () => void;
 
   @MyWorkSpace.Action
   private fetchMyWorkspace!: (id: string) => void;
@@ -72,17 +72,17 @@ export default class MessagesPage extends Vue {
   @Messages.Action
   private fetchMesages!: (callBack: () => void) => void;
 
-  @Messages.Getter
-  private isLoadingMessages!: boolean;
-
-  @Messages.State("messages")
-  private messages!: Message[];
-
   @Messages.Action
   setTextChannelIDtoModule!: (id: string) => void;
 
   @Messages.Action
   setWorkspaceIDtoModule!: (id: string) => void;
+
+  @Messages.State("messages")
+  private messages!: Message[];
+
+  @Messages.Getter
+  private isLoadingMessages!: boolean;
 
   mounted() {
     this.getMessages();
@@ -112,25 +112,25 @@ export default class MessagesPage extends Vue {
   background-color: #0c2a52;
 }
 
-.scrooll::-webkit-scrollbar {
+.scroll::-webkit-scrollbar {
   width: 5px;
 }
-.scrooll::-webkit-scrollbar-track {
+.scroll::-webkit-scrollbar-track {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
-.scrooll::-webkit-scrollbar-thumb {
+.scroll::-webkit-scrollbar-thumb {
   background-color: #11171a;
   border-radius: 10px;
 }
 
-.scrooll {
+.scroll {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
-.holaaaa {
+.list-background {
   background-color: #0c2a52;
   color: white;
   max-height: 100vh;

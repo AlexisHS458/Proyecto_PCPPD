@@ -27,7 +27,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
-import ListChannels from "@/components/modules/spacework/channels/listchannels.vue";
+import ListChannels from "@/components/modules/Workspace/Channels/ListChannels.vue";
 import { Prop } from "vue-property-decorator";
 import { Workspace } from "@/models/workspace";
 import { TextChannel } from "@/models/textChannel";
