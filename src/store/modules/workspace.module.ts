@@ -72,7 +72,7 @@ class WorkspaceModule extends VuexModule {
   }
 
   @Mutation
-  public setUsersOnline(users: Array<User>): void {
+  public setUsers(users: Array<User>): void {
     this.users = users;
   }
 
@@ -98,6 +98,19 @@ class WorkspaceModule extends VuexModule {
     ChannelsService.getTextChannels(uid, textChannels => {
       this.context.commit("setTextChannels", textChannels);
       this.context.commit("setLoadingStatus", false);
+    });
+  }
+
+
+  /**
+   * Obtiene los usuarios dentro del espacio de trabajo.
+   */
+  @Action
+  fetchUsersInWorkspace(): void{
+    this.context.commit("setLoadingUsersStatus",true);
+    WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
+      this.context.commit("setUsers",users);
+      this.context.commit("setLoadingUsersStatus",false);
     });
   }
 

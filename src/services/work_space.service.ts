@@ -92,6 +92,24 @@ class WorkSpaceService {
     });
   }
 
+  /**
+   * Recupera los usuarios dentro del espacio de trabajo.
+   * @param workspaceID ID del espacio de trabajo a consultar.
+   * @param onSnapshot Suscripcion a colección de usuarios.
+   */
+  getUsersInWorkspace(
+    workspaceID: string,
+    onSnapshot: (users: User[]) => void
+    ){
+      db.collection(Collection.WORK_SPACE).doc(workspaceID).collection(Collection.USERS)
+      .onSnapshot(snapshot => {
+        onSnapshot(
+          snapshot.docs.map<User>(doc => {
+            return <User>doc.data();
+          })
+        );
+      });
+  }
 }
 
 export default new WorkSpaceService();
