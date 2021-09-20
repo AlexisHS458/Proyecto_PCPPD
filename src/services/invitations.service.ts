@@ -76,7 +76,7 @@ class InvitationsService{
      * Rechaza e elimina la invitación al espacio de trabajo
      * @param invitation invitacion a eliminar
      */
-    async rejectInvitation(invitation: Invitation): Promise<void>{
+    async declineInvitation(invitation: Invitation): Promise<void>{
         return await db.collection(Collection.USERS).doc(invitation.idUsuarioInvitado)
         .collection(Collection.INVITATIONS).doc(invitation.uid).delete();
     }
