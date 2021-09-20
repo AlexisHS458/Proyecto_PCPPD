@@ -52,6 +52,9 @@ import "firebaseui/dist/firebaseui.css";
 
 @Component
 export default class LoginForm extends Vue {
+  /**
+   * Inicia sesión a la plataforma
+   */
   mounted(): void {
     let ui = firebaseui.auth.AuthUI.getInstance();
     if (!ui) {
@@ -60,11 +63,7 @@ export default class LoginForm extends Vue {
     var uiConfig = {
       signInSuccessUrl: "/register",
 
-      signInOptions: [
-        /* firebase.auth.FacebookAuthProvider.PROVIDER_ID, */
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        /*  firebase.auth.EmailAuthProvider.PROVIDER_ID, */
-      ],
+      signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
     };
     ui.start("#firebaseui-auth-container", uiConfig);
   }

@@ -6,11 +6,13 @@
         class="flex-grow-1"
         v-for="(message, index) in messages"
         :key="index"
-        :messages="message"
-        :uidWorkspace="workspace.uid"
+        :message="message"
       ></list-messages>
     </v-list>
-    <input-message :workspace="workspace" :user="currentUser"></input-message>
+    <input-message
+      :workspace="workspace"
+      :currentUser="currentUser"
+    ></input-message>
   </div>
 </template>
 
@@ -43,32 +45,33 @@ export default class MessagesPage extends Vue {
   })
   public idChannel!: string;
 
-  @Watch("idChannel")
-  onChildChanged() {
-    this.getMessages();
-  }
-
-  @User.Action
-  private fetchCurrentUser!: () => void;
-
+  /**
+   * Estado obtenido del @module User
+   */
   @User.State("user")
   private currentUser!: User;
 
-  @User.Getter
-  private isLoggedIn!: boolean;
-
+  /**
+   * Acciones obtenidas del @module Workspace
+   */
   @MyWorkSpace.Action
   private fetchMyWorkspace!: (id: string) => void;
 
   @MyWorkSpace.Action
   private fetchTextChannels!: (id: string) => void;
 
+  /**
+   * Estados obtenidas del @module Workspace
+   */
   @MyWorkSpace.State("textChannels")
   private textChannel!: TextChannel[];
 
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
 
+  /**
+   * Acciones obtenidas del @module Messages
+   */
   @Messages.Action
   private fetchMesages!: (callBack: () => void) => void;
 
@@ -78,24 +81,43 @@ export default class MessagesPage extends Vue {
   @Messages.Action
   setWorkspaceIDtoModule!: (id: string) => void;
 
+  /**
+   * Estado obtenido del @module Messages
+   */
   @Messages.State("messages")
   private messages!: Message[];
 
+  /**
+   * Getters obtenido del @module Messages
+   */
   @Messages.Getter
   private isLoadingMessages!: boolean;
 
+  /**
+   * Cada que se cambie de canal de texto se mandara a llamar la función de obtener mensajes
+   */
+  @Watch("idChannel")
+  onChildChanged() {
+    this.getMessages();
+  }
+
+  /**
+   * Obtener mensajes
+   */
   mounted() {
     this.getMessages();
   }
 
+  /**
+   * Obtener mensajes
+   */
   getMessages() {
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-
     this.fetchMesages(() => {
       setTimeout(() => {
+        //Mostrar scroll inverso
         const vList = this.$refs.vList as any;
-        console.log(vList.$el.scrollHeight, vList.$el);
         vList.$el.scrollTop = vList.$el.scrollHeight;
       }, 200);
     });

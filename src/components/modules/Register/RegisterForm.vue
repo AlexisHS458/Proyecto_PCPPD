@@ -36,7 +36,6 @@
                       outlined
                       dense
                       color="primary"
-                      class="hola"
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
@@ -121,15 +120,24 @@ const Auth = namespace("UserModule");
 
 @Component
 export default class Register extends Vue {
+  /**
+   * Acciones obtenidas del @module User
+   */
   @Auth.Action
   private fetchCurrentUser!: () => void;
 
   @Auth.Action
   private saveUser!: (user: User) => Promise<void>;
 
+  /**
+   * Estado obtenido del @module User
+   */
   @Auth.State("user")
   private currentUser!: User;
 
+  /**
+   * Getters obtenidos del @module User
+   */
   @Auth.Getter
   private isLoggedIn!: boolean;
 
@@ -156,12 +164,18 @@ export default class Register extends Vue {
   };
 
   async created(): Promise<void> {
+    //Se obtiene información del usuario.
     await this.fetchCurrentUser();
+    //Si el usuario ya esta regsitrado será redireccionado a la pantalla principal
     if (this.isLoggedIn) {
       this.$router.push("/Mainscreen");
     }
   }
 
+  /**
+   * Registra infomación del usuario
+   * @param user información del usuario
+   */
   async handleRegister(): Promise<void> {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;

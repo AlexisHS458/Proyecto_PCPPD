@@ -4,7 +4,7 @@
       <app-bar></app-bar>
     </v-row>
     <own-card :user="currentUser"></own-card>
-    <invitation-card></invitation-card>
+    <invitation-card :user="currentUser"></invitation-card>
     <floating-button></floating-button>
   </v-container>
   <div v-else class="div-progress-circular">
@@ -23,6 +23,7 @@ import FloatingButton from "@/components/modules/MainScreen/AddWorkspace.vue";
 import CollaborationCard from "@/components/modules/MainScreen/CardCollaboration.vue";
 import InvitationCard from "@/components/modules/MainScreen/CardInvitation.vue";
 import { User } from "@/models/user";
+import { Watch } from "vue-property-decorator";
 const User = namespace("UserModule");
 
 @Component({
@@ -35,22 +36,36 @@ const User = namespace("UserModule");
   },
 })
 export default class ViewMainScreen extends Vue {
-  @User.Getter
-  private isLoading!: boolean;
+  /**
+   * Accion obtenida del @module User
+   */
+  @User.Action
+  private fetchCurrentUser!: () => Promise<void>;
 
+  /**
+   * Estado obtenido del @module User
+   */
   @User.State("user")
   private currentUser!: User;
+
+  /**
+   * Getters obtenidos del @module User
+   */
+  @User.Getter
+  private isLoading!: boolean;
 
   @User.Getter
   private isLoggedIn!: boolean;
 
-  @User.Action
-  private fetchCurrentUser!: () => void;
+  /*  @Watch("currentUser")
+  async onChildChanged() {
+    await this.fetchCurrentUser();
+  } */
 
-  created(): void {
-    if (!this.isLoggedIn) {
-      this.fetchCurrentUser();
-    }
+  async created() {
+    /*  if (!this.isLoggedIn) {
+      await this.fetchCurrentUser();
+    } */
   }
 }
 </script>

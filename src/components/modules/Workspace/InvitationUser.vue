@@ -18,7 +18,7 @@
           Ingresa la boleta o el nombre del usuario a invitar
         </v-toolbar>
         <v-card-text>
-          <v-form ref="form" v-model="valid" lazy-validation>
+          <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
             <v-row align="center" justify="center" class="mt-6">
               <v-col cols="9">
                 <v-autocomplete
@@ -31,12 +31,13 @@
                   prepend-inner-icon="mdi-account"
                   :loading="isLoading"
                   :search-input.sync="search"
-                  :items="items"
+                  :items="itemsUsers"
                   item-text="nombre"
                   item-value="uid"
                   :filter="costumFilter"
                   :rules="[rules.required]"
                   hide-no-data
+                  @keyup.enter="sendInvitationUser"
                 >
                   <template v-slot:item="{ item }">
                     <v-list-item-avatar>
@@ -73,7 +74,7 @@
 <script lang="ts">
 import { Component, Prop, Ref, Watch } from "vue-property-decorator";
 import { VForm } from "@/utils/types.js";
-import { Action, namespace } from "vuex-class";
+import { namespace } from "vuex-class";
 import Vue from "vue";
 import { User } from "@/models/user";
 import { Invitation } from "@/models/invitation";
@@ -91,31 +92,20 @@ export default class ToolbarUsers extends Vue {
   })
   public user!: User;
 
-  @Ref("form") readonly form!: VForm;
-
-  public show = false;
-  public dialog = false;
-  public valid = true;
-  public invitation = "";
-  public isLoading = false;
-  public items: User[] = [];
-  public search = null;
-  public tab: any = null;
-  public select = null;
-  public invitationModel = {} as Invitation;
-  public loading = false;
-  public rules = {
-    required: (v: string): string | boolean => !!v || "Campo requerido",
-  };
-
+  /**
+   * Acciones obtenidas del @module Invitations
+   */
   @Invitations.Action
   private fetchUserNames!: () => void;
 
-  @Invitations.State("users")
-  private users!: User[];
-
   @Invitations.Action
   private sendInvitation!: (invitation: Invitation) => Promise<void>;
+
+  /**
+   * Estado obtenido del @module Invitations
+   */
+  @Invitations.State("users")
+  private users!: User[];
 
   @Watch("invitation")
   onChildChanged(val: string) {
@@ -123,25 +113,52 @@ export default class ToolbarUsers extends Vue {
     else this.tab = null;
   }
 
+  /**
+   * Se observa la variable para estar buscando el usuario
+   */
   @Watch("search")
-  onChildChangedSearch(val: string) {
-    if (this.items.length > 0) return;
+  onChildChangedSearch() {
+    if (this.itemsUsers.length > 0) return;
     this.isLoading = true;
     this.fetchUserNames();
-    this.items = this.users;
+    //Se elimina el usuario actual de la lista
+    let index = this.users.findIndex((user) => user.uid === this.user.uid);
+    if (index > -1) {
+      this.users.splice(index, 1);
+    }
+    //Se asigan los usuarios para poder mostrarlos en una lista
+    this.itemsUsers = this.users;
     this.isLoading = false;
   }
 
+  @Ref("form") readonly form!: VForm;
+
+  public dialog = false;
+  public valid = true;
+  public invitation = "";
+  public isLoading = false;
+  public itemsUsers: User[] = [];
+  public search = null;
+  public tab: any = null;
+  public invitationModel = {} as Invitation;
+  public loading = false;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+  };
+
+  /**
+   * Filtro para buscar por nombre, apellido o boleta
+   */
   costumFilter(item: User, queryText: string, itemText: string) {
-    const textOne =
-      item.nombre.toLowerCase() + " " + item.apellido.toLowerCase();
-    const textTree = item.boleta.toLowerCase();
+    const name = item.nombre.toLowerCase() + " " + item.apellido.toLowerCase();
+    const boleta = item.boleta.toLowerCase();
     const searchText = queryText.toLowerCase();
-    return (
-      textOne.indexOf(searchText) > -1 || textTree.indexOf(searchText) > -1
-    );
+    return name.indexOf(searchText) > -1 || boleta.indexOf(searchText) > -1;
   }
 
+  /**
+   * Enviar invitación a un usuario
+   */
   async sendInvitationUser() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
@@ -158,6 +175,9 @@ export default class ToolbarUsers extends Vue {
     }
   }
 
+  /**
+   * Cerrar dialog y resetear el formulario
+   */
   closeDialog() {
     this.form.resetValidation();
     this.form.reset();

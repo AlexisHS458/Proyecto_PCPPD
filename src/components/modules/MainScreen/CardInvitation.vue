@@ -1,87 +1,50 @@
 <template>
   <v-row>
-    <v-col cols="4">
-      <v-card>
-        <v-card-title> TT-II </v-card-title>
-        <v-card-subtitle>Trabajo Terminal II</v-card-subtitle>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn icon @click="show = !show">
-            <v-icon color="white">{{
-              show ? "mdi-chevron-up" : "mdi-chevron-down"
-            }}</v-icon>
-          </v-btn>
-        </v-card-actions>
-
-        <v-expand-transition>
-          <div v-show="show" color="primary">
-            <v-divider></v-divider>
-
-            <v-card-text>
-              <v-row align="center" justify="space-around">
-                <v-btn color="success">
-                  Aceptar
-                  <v-icon class="ml-6"> mdi-check </v-icon>
-                </v-btn>
-                <v-btn color="error">
-                  Rechazar <v-icon class="ml-6"> mdi-close </v-icon>
-                </v-btn>
-              </v-row>
-            </v-card-text>
-          </div>
-        </v-expand-transition>
-      </v-card>
+    <v-col v-for="(invitation, index) in invitations" :key="index" cols="4">
+      <invitations :invitation="invitation"></invitations>
     </v-col>
   </v-row>
 </template>
 
- <script >
+<script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop } from "vue-property-decorator";
+import { namespace } from "vuex-class";
+import { User } from "@/models/user";
+import { Invitation } from "@/models/invitation";
+import Invitations from "@/components/modules/MainScreen/MyWorkspaces/Invitations.vue";
+const InvitationSpacework = namespace("MainScreenModule");
 
-export default Vue.extend({
-  data: () => ({
-    show: false,
-    user: null,
-    items: [{ title: "Aplicaciones para la comunicación" }],
-  }),
-});
+@Component({
+  components: {
+    Invitations,
+  },
+})
+export default class CardInvitation extends Vue {
+  @Prop({
+    required: true,
+  })
+  public user!: User;
+
+  /**
+   * Accion obtenida del @module MainScreen
+   */
+  @InvitationSpacework.Action
+  private fetchInvitations!: (uid: string) => void;
+
+  /**
+   * Estado obtenido del @module MainScreen
+   */
+  @InvitationSpacework.State("invitations")
+  private invitations!: Invitation[];
+
+  /**
+   * Obtener Invitaciones del usuario
+   */
+  mounted(): void {
+    this.fetchInvitations(this.user.uid!);
+  }
+}
 </script>
 
-<style scoped>
-.v-card__title {
-  height: 150px !important;
-  background-color: #ffffff !important;
-  font-size: 2.5rem !important;
-  justify-content: center !important;
-}
-
-.v-card__subtitle {
-  background-color: #0c2a52;
-  font-size: 1rem !important;
-  justify-content: center !important;
-  color: #ffffff;
-}
-
-.v-card__actions {
-  background-color: #0c2a52;
-}
-
-.v-card__text {
-  width: 100%;
-  height: 60px;
-  align-items: center;
-  display: flex;
-}
-
-.theme--light.v-card > .v-card__text,
-.theme--light.v-card > .v-card__subtitle {
-  color: #ffffff;
-}
-
-.v-card__title + .v-card__subtitle,
-.v-card__title + .v-card__text {
-  padding-top: 16px;
-  padding-bottom: 0px;
-}
-</style>

@@ -101,16 +101,15 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
-
   /**
    * Obtiene los usuarios dentro del espacio de trabajo.
    */
   @Action
-  fetchUsersInWorkspace(): void{
-    this.context.commit("setLoadingUsersStatus",true);
-    WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
-      this.context.commit("setUsers",users);
-      this.context.commit("setLoadingUsersStatus",false);
+  fetchUsersInWorkspace(workspaceID: string): void {
+    this.context.commit("setLoadingUsersStatus", true);
+    WorkSpaceService.getUsersInWorkspace(workspaceID, users => {
+      this.context.commit("setUsers", users);
+      this.context.commit("setLoadingUsersStatus", false);
     });
   }
 
@@ -149,7 +148,6 @@ class WorkspaceModule extends VuexModule {
       this.context.commit("setChannelDeletedStatus", true);
     });
   }
-
 
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;

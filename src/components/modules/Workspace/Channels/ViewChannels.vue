@@ -1,24 +1,24 @@
 <template>
-  <v-list class="hola">
+  <v-list class="background-list">
     <list-channels
-      v-for="item in ChannelsText"
-      :key="item.title"
+      v-for="(item, index) in ChannelsText"
+      :key="index"
       :item="item"
-      :user="users"
+      :users="users"
       :channels="textChannels"
-      :url="workspace.uid"
+      :workspaceUID="workspace.uid"
     ></list-channels>
     <list-channels
       v-for="item in ChannelsVoice"
       :key="item.title"
       :item="item"
-      :user="users"
+      :users="users"
     ></list-channels>
     <list-channels
       v-for="item in ChannelsCode"
       :key="item.title"
       :item="item"
-      :user="users"
+      :users="users"
     ></list-channels>
   </v-list>
 </template>
@@ -26,11 +26,11 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { namespace } from "vuex-class";
 import ListChannels from "@/components/modules/Workspace/Channels/ListChannels.vue";
 import { Prop } from "vue-property-decorator";
 import { Workspace } from "@/models/workspace";
 import { TextChannel } from "@/models/textChannel";
+import { User } from "@/models/user";
 
 @Component({
   components: {
@@ -41,7 +41,7 @@ export default class Channels extends Vue {
   @Prop({
     required: true,
   })
-  public users!: [];
+  public users!: User[];
 
   @Prop({
     required: true,
@@ -80,7 +80,7 @@ export default class Channels extends Vue {
 </script>
 
 <style scoped>
-.hola {
+.background-list {
   background-color: #000029;
   color: white;
 }

@@ -4,7 +4,7 @@
       slot-scope="{ hover }"
       :to="{
         name: 'messages',
-        params: { idChannel: item.uid },
+        params: { idChannel: channel.uid },
       }"
     >
       <v-list-item-icon>
@@ -13,14 +13,20 @@
 
       <v-list-item-content>
         <v-list-item-title class="title">
-          {{ item.nombre }}
+          {{ channel.nombre }}
         </v-list-item-title>
       </v-list-item-content>
 
       <v-list-item-action>
         <v-menu v-model="menu" offset-y>
           <template #activator="{ on }">
-            <v-btn text icon v-on="on" :class="{ hidden: !hover && !menu }">
+            <v-btn
+              text
+              icon
+              v-on="on"
+              v-on:click.prevent
+              :class="{ hidden: !hover && !menu }"
+            >
               <v-icon color="white">mdi-cog</v-icon>
             </v-btn>
           </template>
@@ -35,7 +41,8 @@
                       block
                       class="btn"
                       v-bind="attrs"
-                      @click.passive="on"
+                      v-on="on"
+                      v-on:click.prevent
                     >
                       <v-icon color="info" class="mr-6">
                         mdi-account-multiple-outline
@@ -45,8 +52,8 @@
                   </template>
                   <v-list color="secondaryDark">
                     <v-list-item
-                      v-for="item in userList"
-                      :key="item.text"
+                      v-for="(user, index) in users"
+                      :key="index"
                       class="list-title"
                       color="secondaryDark"
                     >
@@ -54,8 +61,8 @@
                         class="black--text"
                         color="infoDark"
                         v-model="model"
-                        :label="item.text"
-                        :value="item"
+                        :label="user.nombre"
+                        :value="user"
                         @click.stop="() => {}"
                       ></v-checkbox>
                     </v-list-item>
@@ -85,18 +92,24 @@
                       Ingresa el nuevo nombre del canal
                     </v-toolbar>
                     <v-card-text>
-                      <v-form ref="form" v-model="valid" lazy-validation>
+                      <v-form
+                        ref="form"
+                        v-model="valid"
+                        lazy-validation
+                        @submit.prevent
+                      >
                         <v-row align="center" justify="center" class="mt-6">
                           <v-col cols="9">
                             <v-text-field
                               label="Nuevo nombre del canal"
-                              :placeholder="item.nombre"
+                              :placeholder="channel.nombre"
                               outlined
                               dense
                               color="primary"
                               prepend-inner-icon="mdi-account"
                               v-model="newNameChannel"
                               :rules="[rules.required]"
+                              @keyup.enter="editChannel"
                             ></v-text-field>
                           </v-col>
                         </v-row>
@@ -168,6 +181,7 @@
 
 <script lang="ts">
 import { TextChannel } from "@/models/textChannel";
+import { User } from "@/models/user";
 import { VForm } from "@/utils/types";
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
@@ -175,7 +189,37 @@ const WorkspaceOptions = namespace("WorkspaceModule");
 
 @Component
 export default class NameChannels extends Vue {
-  public show = false;
+  @Prop({
+    required: true,
+  })
+  public channel!: TextChannel;
+
+  @Prop({
+    required: true,
+  })
+  public icon!: string;
+
+  @Prop({
+    required: true,
+  })
+  public users!: User[];
+
+  @Prop({
+    required: true,
+  })
+  public workspaceUID!: string;
+
+  /**
+   * Acciones obtenidas del @module Workspace
+   */
+  @WorkspaceOptions.Action
+  private editTextChannel!: (textChannel: TextChannel) => Promise<void>;
+
+  @WorkspaceOptions.Action
+  private deleteTextChannel!: (textChannelID: string) => Promise<void>;
+
+  @Ref("form") readonly form!: VForm;
+
   public menu = false;
   public dialog = false;
   public dialogRenameChanel = false;
@@ -189,54 +233,26 @@ export default class NameChannels extends Vue {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
 
-  @Prop({
-    required: true,
-  })
-  public item!: TextChannel;
-
-  @Prop({
-    required: true,
-  })
-  public icon!: string;
-
-  @Prop({
-    required: true,
-  })
-  public userList!: [];
-
-  @Prop({
-    required: true,
-  })
-  public urll!: string;
-
-  @WorkspaceOptions.Action
-  private editTextChannel!: (textChannel: TextChannel) => Promise<void>;
-
-  @WorkspaceOptions.Action
-  private deleteTextChannel!: (textChannelID: string) => Promise<void>;
-
-  @Ref("form") readonly form!: VForm;
-
-  /*  toRouterSpace() {
-    if (this.$route.path != "/space/" + this.urll + "/" + this.item.uid) {
-      this.$router.replace("/space/" + this.urll + "/" + this.item.uid);
-    }
-  } */
-
-  editChannel() {
+  /**
+   * Editar información de un canal de texto
+   */
+  editChannel(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingRenameChanel = true;
-      this.item.nombre = this.newNameChannel;
-      this.editTextChannel(this.item);
+      this.channel.nombre = this.newNameChannel;
+      this.editTextChannel(this.channel);
       this.loadingRenameChanel = false;
       this.form.reset();
       this.dialogRenameChanel = false;
     }
   }
 
+  /**
+   * Eliminar canal de texto
+   */
   async deleteChannel() {
     this.loadingDelete = true;
-    await this.deleteTextChannel(this.item.uid!);
+    await this.deleteTextChannel(this.channel.uid!);
     this.loadingDelete = false;
     this.dialogDelete = false;
   }
@@ -253,7 +269,6 @@ export default class NameChannels extends Vue {
 
 .v-btn,
 .v-btn * {
-  /* turn off transitions for hide/show on hover */
   transition: none;
 }
 

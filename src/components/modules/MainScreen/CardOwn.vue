@@ -1,7 +1,7 @@
 <template>
   <v-row>
-    <v-col v-for="(item, index) in workSpacesList" :key="index" cols="4">
-      <my-workspaces :workspace="item" :user="user"></my-workspaces>
+    <v-col v-for="(workspace, index) in workSpacesList" :key="index" cols="4">
+      <my-workspace :workspace="workspace" :user="user"></my-workspace>
     </v-col>
     <collaboration-card></collaboration-card>
   </v-row>
@@ -14,15 +14,15 @@ import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import CollaborationCard from "@/components/modules/MainScreen/CardCollaboration.vue";
-import MyWorkspaces from "@/components/modules/MainScreen/MyWorkspaces/CardMyWorkspaces.vue";
+import MyWorkspace from "@/components/modules/MainScreen/MyWorkspaces/CardMyWorkspaces.vue";
 import { Prop } from "vue-property-decorator";
 const User = namespace("UserModule");
-const OwnSpacework = namespace("MainScreenModule");
+const MyWorkspaces = namespace("MainScreenModule");
 
 @Component({
   components: {
     CollaborationCard,
-    MyWorkspaces,
+    MyWorkspace,
   },
 })
 export default class CardOwn extends Vue {
@@ -31,17 +31,27 @@ export default class CardOwn extends Vue {
   })
   public user!: User;
 
+  /**
+   * Estado obtenido del @module User
+   */
   @User.State("user")
   private currentUser!: User;
 
-  @OwnSpacework.Action
+  /**
+   * Accion obtenida del @module MainScreen
+   */
+  @MyWorkspaces.Action
   private fetchWorkspaces!: (uid: string) => void;
 
-  @OwnSpacework.State("workSpacesList")
+  /**
+   * Estado obtenido del @module MainScreen
+   */
+  @MyWorkspaces.State("workSpacesList")
   private workSpacesList!: Workspace[];
 
-  public space: { visible: boolean }[] = [];
-
+  /**
+   * Se obtienen los espacio de trabajo de un usuario
+   */
   mounted(): void {
     this.fetchWorkspaces(this.currentUser.uid!);
   }

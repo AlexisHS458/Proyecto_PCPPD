@@ -7,7 +7,7 @@
       dense
       class="toolbar"
     >
-      <v-toolbar-title> {{ name }} </v-toolbar-title>
+      <v-toolbar-title> {{ nameWorkspace }} </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu v-if="1 == 2" v-model="menu" offset-y>
         <template #activator="{ on }">
@@ -121,7 +121,7 @@ export default class Toolbar extends Vue {
   @Prop({
     required: true,
   })
-  public name!: string;
+  public nameWorkspace!: string;
 
   public show = false;
   public menu = false;
@@ -204,7 +204,6 @@ export default class Toolbar extends Vue {
 
 .v-btn,
 .v-btn * {
-  /* turn off transitions for hide/show on hover */
   transition: none;
 }
 

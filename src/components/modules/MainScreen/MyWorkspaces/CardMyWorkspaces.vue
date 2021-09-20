@@ -20,34 +20,37 @@
         <v-divider></v-divider>
         <v-card-text class="card-text">
           <v-row align="center" justify="center">
-            <v-dialog transition="dialog-top-transition" max-width="600">
+            <v-dialog
+              transition="dialog-top-transition"
+              max-width="600"
+              v-model="dialog"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn color="error" text v-bind="attrs" v-on="on">
                   Eliminar espacio de trabajo
                   <v-icon color="error" class="ml-6"> mdi-delete </v-icon>
                 </v-btn>
               </template>
-              <template v-slot:default="dialog">
-                <v-card>
-                  <v-toolbar color="error" dark>
-                    Solicitud de confirmación
-                  </v-toolbar>
-                  <v-card-text>
-                    <div class="text-h6 pa-5 text-center">
-                      <p>¿SEGURO QUE QUIERES ELIMINAR TU ESPACIO DE TRABAJO?</p>
-                      <p>SE ELIMINARÁN TODOS LOS ARCHIVOS ENVIADOS.</p>
-                    </div>
-                    <v-row align="center" justify="center">
-                      <v-btn color="error" @click="deleteSpacework">
-                        SI, QUIERO ELIMINARLO
-                      </v-btn>
-                    </v-row>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn text @click="dialog.value = false">Cancelar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </template>
+
+              <v-card>
+                <v-toolbar color="error" dark>
+                  Solicitud de confirmación
+                </v-toolbar>
+                <v-card-text>
+                  <div class="text-h6 pa-5 text-center">
+                    <p>¿SEGURO QUE QUIERES ELIMINAR TU ESPACIO DE TRABAJO?</p>
+                    <p>SE ELIMINARÁN TODOS LOS ARCHIVOS ENVIADOS.</p>
+                  </div>
+                  <v-row align="center" justify="center">
+                    <v-btn color="error" @click="deleteSpacework">
+                      SI, QUIERO ELIMINARLO
+                    </v-btn>
+                  </v-row>
+                </v-card-text>
+                <v-card-actions class="justify-end">
+                  <v-btn text @click="dialog = false">Cancelar</v-btn>
+                </v-card-actions>
+              </v-card>
             </v-dialog>
           </v-row>
         </v-card-text>
@@ -66,8 +69,6 @@ const Workspace = namespace("MainScreenModule");
 
 @Component
 export default class WorkspaceCard extends Vue {
-  public show = false;
-  public getInitials = StringUtils.getInitials;
   @Prop({
     required: true,
   })
@@ -78,18 +79,30 @@ export default class WorkspaceCard extends Vue {
   })
   public user!: User;
 
+  /**
+   * Accion obtenida del @module MainScreen
+   */
   @Workspace.Action
   private deletedWorkSpaces!: (id: string) => void;
 
+  public show = false;
+  public getInitials = StringUtils.getInitials;
+  public dialog = false;
+
+  /**
+   * Elimina un espacio de trabajo
+   */
   deleteSpacework() {
     this.deletedWorkSpaces(this.workspace.uid);
+    this.dialog = false;
+    this.show = false;
   }
 
+  /**
+   * Redirreciona al espacio de trabajo
+   */
   toSpaceWork() {
-    this.$router.push(
-      "/space/" +
-        this.workspace.uid /* + "/" + this.workspace.canales_texto[0].uid */
-    );
+    this.$router.push("/space/" + this.workspace.uid);
   }
 }
 </script>

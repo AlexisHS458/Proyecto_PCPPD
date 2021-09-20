@@ -15,45 +15,48 @@
     :rules="[rules.lenght]"
   ></v-text-field> -->
   <v-flex>
-    <v-textarea
-      v-model="message"
-      append-icon="mdi-send"
-      rounded
-      class="text-input"
-      placeholder="Escribe tu mensaje"
-      autocomplete="off"
-      auto-grow
-      outlined
-      filled
-      dense
-      rows="1"
-      row-height="15"
-      counter="500"
-      :rules="[rules.size]"
-      @click:append="sendMessages"
-      background-color="primaryDark"
-      dark
-    >
-      <template v-slot:prepend-inner>
-        <v-file-input accept="image/*" hide-input></v-file-input>
-      </template>
-    </v-textarea>
-    <!--    <input
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+      <v-textarea
+        v-model="message"
+        append-icon="mdi-send"
+        rounded
+        class="text-input"
+        placeholder="Escribe tu mensaje"
+        autocomplete="off"
+        auto-grow
+        outlined
+        filled
+        dense
+        rows="1"
+        row-height="15"
+        counter="500"
+        :rules="[rules.size, rules.required]"
+        @click:append="sendMessages"
+        background-color="primaryDark"
+        dark
+      >
+        <template v-slot:prepend-inner>
+          <v-file-input accept="image/*" hide-input></v-file-input>
+        </template>
+      </v-textarea>
+      <!--    <input
       ref="uploader"
       class="d-none"
       type="file"
       accept="image/*"
       @change="onFileChanged"
     /> -->
+    </v-form>
   </v-flex>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import { Message } from "@/models/message";
 import { namespace } from "vuex-class";
 import { Workspace } from "@/models/workspace";
 import { User } from "@/models/user";
+import { VForm } from "@/utils/types";
 const Message = namespace("TextChannelModule");
 
 @Component
@@ -66,20 +69,7 @@ export default class InputMessage extends Vue {
   @Prop({
     required: true,
   })
-  public user!: User;
-
-  public messageModel = {} as Message;
-  public message = "";
-  public model = [];
-  public imageName = "";
-  public imageUrl: any;
-  public imageFile = "";
-  public isSelecting = false;
-  public selectedFile = "";
-  public rules = {
-    size: (v: string): string | boolean =>
-      v.length <= 500 || "Haz alcanzado el límite de caracteres",
-  };
+  public currentUser!: User;
 
   /*   onButtonClick() {
     this.isSelecting = true;
@@ -97,11 +87,11 @@ export default class InputMessage extends Vue {
     this.selectedFile = e.target.files[0];
   } */
 
+  /**
+   * Acciones obtenidas del @module Messages
+   */
   @Message.Action
   private sendMessage!: (message: Message) => Promise<void>;
-
-  @Message.Getter
-  private isLoadingMessages!: boolean;
 
   @Message.Action
   setTextChannelIDtoModule!: (id: string) => void;
@@ -109,23 +99,48 @@ export default class InputMessage extends Vue {
   @Message.Action
   setWorkspaceIDtoModule!: (id: string) => void;
 
+  /**
+   * Getter obtenido del @module Messages
+   */
+  @Message.Getter
+  private isLoadingMessages!: boolean;
+
+  @Ref("form") readonly form!: VForm;
+
+  public messageModel = {} as Message;
+  public message = "";
+  public model = [];
+  public imageName = "";
+  public imageUrl: any;
+  public imageFile = "";
+  public isSelecting = false;
+  public selectedFile = "";
+  public rules = {
+    size: (v: string): string | boolean =>
+      v.length <= 500 || "Haz alcanzado el límite de caracteres",
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+  };
+  public valid = true;
+
+  /**
+   * Mandar mensaje al canal de texto seleccionado
+   */
   async sendMessages() {
-    this.messageModel = {
-      uid_usuario: this.user.uid!,
-      usuarioNombre: this.user.nombre + " " + this.user.apellido,
-      contenido: this.message,
-      fecha: Date.now(),
-    };
-
-    this.setTextChannelIDtoModule(this.$route.params.id);
-    this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    await this.sendMessage(this.messageModel);
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.messageModel = {
+        uid_usuario: this.currentUser.uid!,
+        usuarioNombre:
+          this.currentUser.nombre + " " + this.currentUser.apellido,
+        contenido: this.message,
+        fecha: Date.now(),
+      };
+      this.setTextChannelIDtoModule(this.$route.params.id);
+      this.setWorkspaceIDtoModule(this.$route.params.idChannel);
+      await this.sendMessage(this.messageModel);
+      this.form.reset();
+      this.form.resetValidation();
+    }
   }
-
-  /*  mounted() {
-    console.log(this.$route.params.id);
-    console.log(this.$route.params.idChannel);
-  } */
 }
 </script>
 

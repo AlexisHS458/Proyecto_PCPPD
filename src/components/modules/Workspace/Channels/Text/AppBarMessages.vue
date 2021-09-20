@@ -5,8 +5,6 @@
   </v-app-bar>
 </template>
 
-
-
 <style scoped>
 .toolbar {
   flex: none;

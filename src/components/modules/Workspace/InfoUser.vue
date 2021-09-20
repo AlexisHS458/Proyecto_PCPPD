@@ -20,22 +20,19 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
+import { Prop } from "vue-property-decorator";
 const User = namespace("UserModule");
 
 @Component
 export default class UserInfo extends Vue {
+  @Prop({
+    required: true,
+  })
+  public currentUser!: User;
+
   public loading = false;
   public isTalk = true;
   public isListening = true;
-  @User.State("user")
-  private currentUser!: User;
-
-  @User.Action
-  private logout!: () => void;
-
-  mounted(): void {
-    this.currentUser;
-  }
 
   toggleMicrophone() {
     this.isTalk = !this.isTalk;

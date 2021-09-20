@@ -29,7 +29,12 @@
               Crear nuevo canal de {{ item.text }}
             </v-toolbar>
             <v-card-text>
-              <v-form ref="form" v-model="valid" lazy-validation>
+              <v-form
+                ref="form"
+                v-model="valid"
+                lazy-validation
+                @submit.prevent
+              >
                 <v-row align="center" justify="center" class="mt-6">
                   <v-col cols="9">
                     <v-text-field
@@ -41,6 +46,7 @@
                       prepend-inner-icon="mdi-forum"
                       :rules="[rules.required]"
                       v-model="nameChannel"
+                      @keyup.enter="addChannelText"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -58,12 +64,12 @@
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
         <v-list color="primaryDark">
           <namechannels
-            v-for="child in channels"
-            :key="child.uid"
-            :item="child"
+            v-for="(channel, index) in channels"
+            :key="index"
+            :channel="channel"
             :icon="item.icon"
-            :userList="user"
-            :urll="url"
+            :users="users"
+            :workspaceUID="workspaceUID"
           ></namechannels>
         </v-list>
       </v-expansion-panel-content>
@@ -77,6 +83,7 @@ import namechannels from "@/components/modules/Workspace/Channels/NameChannels.v
 import { namespace } from "vuex-class";
 import { TextChannel } from "@/models/textChannel";
 import { VForm } from "@/utils/types";
+import { User } from "@/models/user";
 const WorkspaceOptions = namespace("WorkspaceModule");
 @Component({
   components: {
@@ -84,8 +91,6 @@ const WorkspaceOptions = namespace("WorkspaceModule");
   },
 })
 export default class ListChannels extends Vue {
-  @Ref("form") readonly form!: VForm;
-
   @Prop({
     required: true,
   })
@@ -94,7 +99,7 @@ export default class ListChannels extends Vue {
   @Prop({
     required: true,
   })
-  public user!: [];
+  public users!: User[];
 
   @Prop({
     required: false,
@@ -104,19 +109,23 @@ export default class ListChannels extends Vue {
   @Prop({
     required: false,
   })
-  public url!: string;
+  public workspaceUID!: string;
 
-  @WorkspaceOptions.Getter
-  private isChannelCreated!: boolean;
-
+  /**
+   * Accion obtenida del @module Workspace
+   */
   @WorkspaceOptions.Action
   private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
 
-  @WorkspaceOptions.Action
-  private fetchTextChannels!: (id: string) => void;
+  /**
+   * Getter obtenido del @module Workspace
+   */
+  @WorkspaceOptions.Getter
+  private isChannelCreated!: boolean;
+
+  @Ref("form") readonly form!: VForm;
 
   public panel = [0];
-  public show = false;
   public dialog = false;
   public loading = false;
   public valid = true;
@@ -126,6 +135,9 @@ export default class ListChannels extends Vue {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
 
+  /**
+   * Crear nuevo canal de texto
+   */
   async addChannelText() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
@@ -137,12 +149,8 @@ export default class ListChannels extends Vue {
       this.loading = false;
       this.form.reset();
       this.dialog = false;
-      /*  } */
     }
   }
-  /*  mounted() {
-    console.log(this.channels);
-  } */
 }
 </script>
 
@@ -153,10 +161,7 @@ export default class ListChannels extends Vue {
 .hidden {
   visibility: hidden;
 }
-.hola {
-  background-color: #000029;
-  color: white;
-}
+
 .title {
   color: white;
 }

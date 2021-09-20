@@ -30,7 +30,6 @@ class InivtationsModule extends VuexModule {
 
   @Mutation
   public setUserNamesList(users: Array<User>): void {
-    console.log(users);
     this.users = users;
   }
 
@@ -56,7 +55,6 @@ class InivtationsModule extends VuexModule {
    */
   @Action
   async sendInvitation(invitation: Invitation): Promise<void> {
-    console.log(invitation);
     return await InvitationsService.sendInivitation(invitation)
       .then(() => {
         this.context.commit("invitationSentSuccess");

@@ -17,10 +17,9 @@ class MainScreenModule extends VuexModule {
   public workSpacesList: Workspace[] = [];
 
   /**
-    * Lista de invitaciones
-    */
-   public invitations: Invitation[] = [];
-
+   * Lista de invitaciones
+   */
+  public invitations: Invitation[] = [];
 
   /**
    * Status de los espacios de trabajo
@@ -55,7 +54,6 @@ class MainScreenModule extends VuexModule {
     this.status.loadingInvitationsList = status;
   }
 
- 
   @Mutation
   public createWorkSpaceSuccess(): void {
     this.status.createdWorkSpace = true;
@@ -91,7 +89,6 @@ class MainScreenModule extends VuexModule {
       });
   }
 
-
   /**
    * Elimina un espacio de trabajo
    * @param id ID de documento del Workspace (Workspace.uid)
@@ -126,11 +123,11 @@ class MainScreenModule extends VuexModule {
    * @param uid id del usuario
    */
   @Action
-  fetchInvitations(uid: string): void{
-    this.context.commit("setLoadingInvitationStatus",true);
+  fetchInvitations(uid: string): void {
+    this.context.commit("setLoadingInvitationStatus", true);
     InivtationsService.getInvitations(uid, invitations => {
       this.context.commit("setInvitationsList", invitations);
-      this.context.commit("setLoadingInvitationStatus",true);
+      this.context.commit("setLoadingInvitationStatus", false);
     });
   }
 
@@ -142,7 +139,7 @@ class MainScreenModule extends VuexModule {
     return this.status.createdWorkSpace;
   }
 
-  get workspacesList(): Workspace[]{
+  get workspacesList(): Workspace[] {
     return this.workSpacesList;
   }
 

@@ -34,7 +34,6 @@
                       outlined
                       dense
                       color="primary"
-                      class="hola"
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
@@ -59,17 +58,22 @@
                     >
                       Editar Información
                     </v-btn>
+                    {{ user }}
                   </v-col>
                 </v-form>
               </v-card-text>
-              <v-snackbar v-model="snackbar" :timeout="timeout" color="error">
-                {{ text }}
+              <v-snackbar
+                v-model="snackbarFailture"
+                :timeout="timeout"
+                color="error"
+              >
+                {{ textFailture }}
                 <template v-slot:action="{ attrs }">
                   <v-btn
                     color="white"
                     text
                     v-bind="attrs"
-                    @click="snackbar = false"
+                    @click="snackbarFailture = false"
                   >
                     Cerrar
                   </v-btn>
@@ -109,30 +113,40 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
-const Edit = namespace("UserModule");
+const EditUser = namespace("UserModule");
 
 @Component
 export default class ViewEdit extends Vue {
-  @Edit.Action
-  private fetchCurrentUser!: () => void;
+  /**
+   * Acciones obtenidas del @module User
+   */
+  @EditUser.Action
+  private fetchCurrentUser!: () => Promise<void>;
 
-  @Edit.Action
+  @EditUser.Action
   private saveUser!: (user: User) => Promise<void>;
 
-  @Edit.State("user")
+  /**
+   * Estado obtenido del @module User
+   */
+  @EditUser.State("user")
   private currentUser!: User;
 
-  @Edit.Getter
+  /**
+   * Getters obtenidos del @module User
+   */
+  @EditUser.Getter
   private isLoggedIn!: boolean;
 
-  @Edit.Getter
+  @EditUser.Getter
   private isLoading!: boolean;
 
+  public user = {} as User;
   public loading = false;
   public valid = true;
-  public snackbar = false;
+  public snackbarFailture = false;
   public snackbarSuccess = false;
-  public text = "Ocurrio un error al registrarte";
+  public textFailture = "Ocurrio un error al registrarte";
   public textSuccess = "Se actualizo tu información";
   public timeout = 2000;
   public rules = {
@@ -149,16 +163,25 @@ export default class ViewEdit extends Vue {
       /^[a-zA-Z0-9]+$/.test(v) || "Apellido inválido",
   };
 
-  created(): void {
+  /*  @Watch("user")
+  onChildChanged() {
+    this.getMessages();
+  } */
+
+  async created() {
     if (!this.isLoggedIn) {
-      this.fetchCurrentUser();
+      await this.fetchCurrentUser();
     }
+    /* this.user = JSON.parse(JSON.stringify(this.currentUser)); */
   }
 
+  /**
+   * Edita información del usuario actual
+   */
   async handleEditInfo(): Promise<void> {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
-      this.snackbar = false;
+      this.snackbarFailture = false;
       this.snackbarSuccess = false;
       await this.saveUser(this.currentUser);
       if (this.isLoggedIn) {
@@ -166,7 +189,7 @@ export default class ViewEdit extends Vue {
         this.snackbarSuccess = true;
       } else {
         this.loading = false;
-        this.snackbar = true;
+        this.snackbarFailture = true;
       }
     }
   }

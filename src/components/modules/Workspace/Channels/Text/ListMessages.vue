@@ -4,11 +4,11 @@
       <v-list-item-title class="title">
         <v-row>
           <v-col class="flex-grow-1 flex-shrink-1">
-            {{ messages.usuarioNombre }}</v-col
+            {{ message.usuarioNombre }}</v-col
           >
           <v-col class="flex-grow-0 flex-shrink-0">
             <div class="grey--text">
-              {{ toLocalDate(messages.fecha) }}
+              {{ toLocalDate(message.fecha) }}
             </div>
           </v-col>
           <v-col class="flex-grow-0 flex-shrink-1">
@@ -25,18 +25,24 @@
               <v-card>
                 <v-toolbar color="secondary" dark> Editar mensaje </v-toolbar>
                 <v-card-text>
-                  <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-form
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                    @submit.prevent
+                  >
                     <v-row align="center" justify="center" class="mt-6">
                       <v-col cols="9">
                         <v-text-field
                           v-model="text"
                           label="Mensaje"
-                          :placeholder="messages.contenido"
+                          :placeholder="message.contenido"
                           outlined
                           dense
                           color="primary"
                           prepend-inner-icon="mdi-message"
                           :rules="[rules.required]"
+                          @keyup.enter="editMessages"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -92,7 +98,7 @@
         </v-row>
       </v-list-item-title>
       <v-list-item-subtitle
-        v-html="messages.contenido"
+        v-html="message.contenido"
         class="subtitle"
       ></v-list-item-subtitle>
     </v-list-item-content>
@@ -111,6 +117,22 @@ const optionsMessage = namespace("TextChannelModule");
 
 @Component
 export default class Messages extends Vue {
+  @Prop({
+    required: true,
+  })
+  public message!: Message;
+
+  /**
+   * Acciones obtenidos del @module Messages
+   */
+  @optionsMessage.Action
+  private editMessage!: (message: Message) => Promise<void>;
+
+  @optionsMessage.Action
+  private deleteMessage!: (id: string | undefined) => Promise<void>;
+
+  @Ref("form") readonly form!: VForm;
+
   public dialog = false;
   public dialogEdit = false;
   public text = "";
@@ -120,43 +142,41 @@ export default class Messages extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
-  /* @Ref("form") readonly form!: VForm; */
 
-  @Prop({
-    required: true,
-  })
-  public messages!: Message;
-
-  @Ref("form") readonly form!: VForm;
-
-  @optionsMessage.Action
-  private editMessage!: (message: Message) => Promise<void>;
-
-  @optionsMessage.Action
-  private deleteMessage!: (id: string | undefined) => Promise<void>;
-
+  /**
+   * Cambiar fecha a un formato local
+   */
   toLocalDate(date: number): string {
     return new Date(date).toLocaleString();
   }
 
+  /**
+   * Editar mensaje
+   */
   async editMessages() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingEdit = true;
-      this.messages.contenido = this.text;
-      await this.editMessage(this.messages);
+      this.message.contenido = this.text;
+      await this.editMessage(this.message);
       this.loadingEdit = false;
       this.form.reset();
       this.dialogEdit = false;
     }
   }
 
+  /**
+   * Eliminar mensaje
+   */
   async deleteMessages() {
     this.loadingDelete = true;
-    await this.deleteMessage(this.messages.uid);
+    await this.deleteMessage(this.message.uid);
     this.loadingDelete = false;
     this.dialog = false;
   }
 
+  /**
+   * Cerrar dialog y resetear el formulario
+   */
   closeDialogEdit() {
     this.form.resetValidation();
     this.form.reset();
@@ -166,17 +186,6 @@ export default class Messages extends Vue {
 </script>
 
 <style scoped>
-.hola {
-  background-color: #0c2a52;
-  color: white;
-  max-height: 100vh;
-  overflow-x: auto;
-}
-
-.holaa {
-  z-index: 2;
-}
-
 .v-list-item__subtitle {
   color: #e0e0e0;
 }

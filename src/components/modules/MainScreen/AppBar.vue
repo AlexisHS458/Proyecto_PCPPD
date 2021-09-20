@@ -51,14 +51,23 @@ const User = namespace("UserModule");
 
 @Component
 export default class AppBar extends Vue {
-  @User.State("user")
-  private currentUser!: User;
-
+  /**
+   * Accion obtenida del @module User
+   */
   @User.Action
   private logout!: () => void;
 
+  /**
+   * Estado obtenido del @module User
+   */
+  @User.State("user")
+  private currentUser!: User;
+
   public loading = false;
 
+  /**
+   * Cierra sesión de la plataforma web
+   */
   async handleLogout(): Promise<void> {
     this.loading = true;
     await this.logout();

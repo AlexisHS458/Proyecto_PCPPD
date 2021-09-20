@@ -19,7 +19,7 @@
     <v-card>
       <v-toolbar color="primary" dark> Crea tu espacio de trabajo </v-toolbar>
       <v-card-text>
-        <v-form ref="form" v-model="valid" lazy-validation>
+        <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
           <v-row align="center" justify="center" class="mt-6">
             <v-col cols="9">
               <v-text-field
@@ -30,6 +30,7 @@
                 prepend-inner-icon="mdi-account"
                 v-model="workspace.nombre"
                 :rules="[rules.required]"
+                @keyup.enter="handleAddSpace"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -56,9 +57,15 @@ import Vue from "vue";
 
 @Component
 export default class AddCard extends Vue {
+  /**
+   * Accion obtenida del @module MainScreen
+   */
   @AddWorkspace.Action
   private addWorkSpace!: (workspace: Workspace) => void;
 
+  /**
+   * Estado obtenido del @module User
+   */
   @User.State("user")
   private currentUser!: User;
 
@@ -72,6 +79,9 @@ export default class AddCard extends Vue {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
 
+  /**
+   * Crear nuevo espacio de trabajo
+   */
   handleAddSpace(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.workspace.uid_usuario = this.currentUser.uid!;
@@ -81,6 +91,9 @@ export default class AddCard extends Vue {
     }
   }
 
+  /**
+   * Cerrar dialog y resetear el formulario
+   */
   closeAddSpace() {
     this.form.resetValidation();
     this.form.reset();

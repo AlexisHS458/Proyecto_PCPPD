@@ -4,31 +4,31 @@
       <v-list-item-avatar class="mr-1">
         <v-icon
           v-if="status == 'Online'"
-          v-text="item.icon"
+          v-text="'mdi-circle'"
           size="15"
           color="success"
         ></v-icon>
         <v-icon
           v-else-if="status == 'Offline'"
-          v-text="item.icon"
+          v-text="'mdi-circle'"
           size="15"
           color="grey"
         ></v-icon>
         <v-icon
           v-else-if="status == 'Away'"
-          v-text="item.icon"
+          v-text="'mdi-circle'"
           size="15"
           color="yellow"
         ></v-icon>
       </v-list-item-avatar>
       <v-list-item-content>
         <v-list-item-title
-          v-text="item.text"
+          v-text="user.nombre"
           class="list-title"
         ></v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
-        <v-menu v-model="menu" offset-y>
+        <v-menu v-if="user.uid != currentUser.uid" v-model="menu" offset-y>
           <template #activator="{ on }">
             <v-btn text icon v-on="on" :class="{ hidden: !hover && !menu }">
               <v-icon color="white">mdi-cog</v-icon>
@@ -89,18 +89,26 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class UserList extends Vue {
-  public show = false;
-  public menu = false;
-  public model = 1;
-  public status = Status.OFFLINE;
   @Prop({
     required: true,
   })
-  public item!: User;
+  public user!: User;
 
+  @Prop({
+    required: true,
+  })
+  public currentUser!: User;
+
+  public menu = false;
+  public model = 1;
+  public status = Status.OFFLINE;
+
+  /**
+   * Checar status de cada usuario
+   */
   mounted() {
-    if (this.item.uid) {
-      presenceServices.getPresence(this.item.uid, (status) => {
+    if (this.user.uid) {
+      presenceServices.getPresence(this.user.uid, (status) => {
         this.status = status;
       });
     }
@@ -118,7 +126,6 @@ export default class UserList extends Vue {
 
 .v-btn,
 .v-btn * {
-  /* turn off transitions for hide/show on hover */
   transition: none;
 }
 
