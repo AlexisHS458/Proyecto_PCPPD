@@ -1,7 +1,7 @@
 import { CodeChannel } from "./codeChannel";
 import { TextChannel } from "./textChannel";
 import { VoiceChannel } from "./voiceChannel";
-import { User } from "./user";
+
 
 /**
  * Modelo de espacios de trabajo
@@ -35,7 +35,7 @@ export interface Workspace {
   canales_voz: VoiceChannel[],
 
   /**
-   * Usuarios pertenencientes al espacio de trabajo
+   * IDs de usuarios pertenencientes al espacio de trabajo
    */
-  usuarios: User[]
+  usuarios: string[]
 }

@@ -1,7 +1,7 @@
 import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
 import { Collection } from "@/utils/collections";
-import UserService from "@/services/user.service";
+import WorkspaceService from "@/services/work_space.service";
 import { db } from "@/utils/firebase";
 
 
@@ -62,21 +62,28 @@ class InvitationsService{
     }
 
     /**
-     * Acepta la invitación a un espacio de trabajo
+     * Acepta la invitación a un espacio de trabajo y se agrega el usuario al
+     * espacio de trabajo
      * @param invitation 
      */
     async acceptInvitation(invitation: Invitation): Promise<void>{
-        const userRef =  await UserService.getUserInfoByID(invitation.idUsuarioInvitado);
+        const workspaceRef = await WorkspaceService.getWorkspaceInfo(invitation.idEspacioTrabajo);
 
-        db.collection(Collection.WORK_SPACE).doc(invitation.idEspacioTrabajo)
-        .collection(Collection.USERS).add(userRef);
+        workspaceRef.usuarios = [
+            ...workspaceRef.usuarios,
+            invitation.idUsuarioInvitado
+        ];
+
+        await db.collection(Collection.WORK_SPACE).doc(invitation.idEspacioTrabajo).update(workspaceRef);
+
+        return await this.deleteInvitation(invitation);
     }
 
     /**
-     * Rechaza e elimina la invitación al espacio de trabajo
+     * Elimina la invitación al espacio de trabajo, rechazandola.
      * @param invitation invitacion a eliminar
      */
-    async rejectInvitation(invitation: Invitation): Promise<void>{
+    async deleteInvitation(invitation: Invitation): Promise<void>{
         return await db.collection(Collection.USERS).doc(invitation.idUsuarioInvitado)
         .collection(Collection.INVITATIONS).doc(invitation.uid).delete();
     }

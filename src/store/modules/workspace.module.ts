@@ -105,9 +105,9 @@ class WorkspaceModule extends VuexModule {
    * Obtiene los usuarios dentro del espacio de trabajo.
    */
   @Action
-  fetchUsersInWorkspace(workspaceID: string): void {
+  fetchUsersInWorkspace(): void {
     this.context.commit("setLoadingUsersStatus", true);
-    WorkSpaceService.getUsersInWorkspace(workspaceID, users => {
+    WorkSpaceService.getUsersInWorkspace(this.workspace.usuarios, users => {
       this.context.commit("setUsers", users);
       this.context.commit("setLoadingUsersStatus", false);
     });
