@@ -97,7 +97,7 @@ export default class Spacework extends Vue {
   private fetchTextChannels!: (id: string) => void;
 
   @MyWorkSpace.Action
-  private fetchUsersInWorkspace!: (id: string) => void;
+  private fetchUsersInWorkspace!: () => void;
 
   /**
    * Estados obtenidos del @module Workspace
@@ -150,7 +150,7 @@ export default class Spacework extends Vue {
     //Obtener información de los canles del espacio de trabajo
     this.fetchTextChannels(this.$route.params.id);
     //Obtener usuarios del espacio de trabajo
-    this.fetchUsersInWorkspace(this.$route.params.id);
+    this.fetchUsersInWorkspace();
   }
 }
 </script>

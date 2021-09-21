@@ -8,6 +8,7 @@
 .card-center {
   justify-content: space-between;
   background-color: #0c2a52;
+  display: block;
 }
 
 .img {

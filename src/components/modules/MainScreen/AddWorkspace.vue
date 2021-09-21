@@ -28,7 +28,7 @@
                 dense
                 color="primary"
                 prepend-inner-icon="mdi-account"
-                v-model="workspace.nombre"
+                v-model="workspaceName"
                 :rules="[rules.required]"
                 @keyup.enter="handleAddSpace"
               ></v-text-field>
@@ -75,6 +75,7 @@ export default class AddCard extends Vue {
   public dialog = false;
   public valid = true;
   public workspace = {} as Workspace;
+  public workspaceName = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
@@ -85,7 +86,10 @@ export default class AddCard extends Vue {
   handleAddSpace(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.workspace.uid_usuario = this.currentUser.uid!;
+      this.workspace.nombre = this.workspaceName;
+      this.workspace.usuarios = [this.currentUser.uid!];
       this.addWorkSpace(this.workspace);
+      this.form.resetValidation();
       this.form.reset();
       this.dialog = false;
     }
