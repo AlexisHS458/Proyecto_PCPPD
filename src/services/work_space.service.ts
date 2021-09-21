@@ -40,7 +40,7 @@ class WorkSpaceService {
     onSnapshot: (workspaces: Workspace[]) => void
   ): void {
     db.collection(Collection.WORK_SPACE)
-      .where("uid_usuario", "==", uid)
+      .where('usuarios','array-contains', uid)
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<Workspace>(doc => {
@@ -94,14 +94,14 @@ class WorkSpaceService {
 
   /**
    * Recupera los usuarios dentro del espacio de trabajo.
-   * @param workspaceID ID del espacio de trabajo a consultar.
+   * @param usersID IDs de los usuarios dentro del espacio de trabajo.
    * @param onSnapshot Suscripcion a colección de usuarios.
    */
   getUsersInWorkspace(
-    workspaceID: string,
+    usersID: string[],
     onSnapshot: (users: User[]) => void
     ){
-      db.collection(Collection.WORK_SPACE).doc(workspaceID).collection(Collection.USERS)
+      db.collection(Collection.USERS).where('uid', 'in', usersID)
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<User>(doc => {
