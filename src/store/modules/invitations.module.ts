@@ -3,6 +3,7 @@ import InvitationsService from "@/services/invitations.service";
 import UserService from "@/services/user.service";
 import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
+import invitationsService from "@/services/invitations.service";
 
 /**
  * Modulo de invitaciones a espacios de trabajo
@@ -20,7 +21,9 @@ class InivtationsModule extends VuexModule {
   public status = {
     loadingInvitations: true,
     loadingUserNamesList: true,
-    invitationSent: false
+    invitationSent: false,
+    invitationAccepted: false,
+    invitationDeclined: false
   };
 
   @Mutation
@@ -48,6 +51,26 @@ class InivtationsModule extends VuexModule {
     this.status.invitationSent = false;
   }
 
+  @Mutation
+  public invitationAcceptedSuccess(): void {
+    this.status.invitationAccepted = true;
+  }
+
+  @Mutation
+  public invitationAcceptedFail(): void {
+    this.status.invitationAccepted = false;
+  }
+
+  @Mutation
+  public invitationDeclinedSuccess(): void {
+    this.status.invitationDeclined = true;
+  }
+
+  @Mutation
+  public invitationDeclinedFail(): void {
+    this.status.invitationDeclined = false;
+  }
+
   /**
    * Envia un mensaje al espacion de trabajo y canal especificado.
    * @param userID ID del usuario a invitar
@@ -73,6 +96,32 @@ class InivtationsModule extends VuexModule {
     UserService.getUsers(users => {
       this.context.commit("setUserNamesList", users);
       this.context.commit("setLoadingUserNamesStatus", false);
+    });
+  }
+
+  /**
+  * Acepta una invitacion al espacio de trabajo
+  */
+  @Action
+  async acceptInvitation(invitation: Invitation): Promise<void> {
+    invitationsService.acceptInvitation(invitation).then(() => {
+      this.context.commit("invitationAcceptedSuccess");
+    })
+    .catch(() => {
+      this.context.commit("invitationAcceptedFail");
+    });
+  }
+
+  /**
+  * Rechaza una invitacion al espacio de trabajo
+  */
+  @Action
+  async declineInvitation(invitation: Invitation): Promise<void> {
+    invitationsService.declineInvitation(invitation).then(() => {
+      this.context.commit("invitationDeclinedSuccess");
+    })
+    .catch(() => {
+      this.context.commit("invitationDeclinedFail");
     });
   }
 
