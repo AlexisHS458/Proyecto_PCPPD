@@ -133,7 +133,6 @@ export default class MessagesPage extends Vue {
   justify-content: space-between;
   background-color: #0c2a52;
 }
-
 .scroll::-webkit-scrollbar {
   width: 5px;
 }
@@ -145,13 +144,11 @@ export default class MessagesPage extends Vue {
   background-color: #11171a;
   border-radius: 10px;
 }
-
 .scroll {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
-
 .list-background {
   background-color: #0c2a52;
   color: white;

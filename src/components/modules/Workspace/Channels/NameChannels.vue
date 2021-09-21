@@ -186,7 +186,7 @@ import { VForm } from "@/utils/types";
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const WorkspaceOptions = namespace("WorkspaceModule");
-
+const User = namespace("UserModule");
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -217,6 +217,9 @@ export default class NameChannels extends Vue {
 
   @WorkspaceOptions.Action
   private deleteTextChannel!: (textChannelID: string) => Promise<void>;
+
+  @User.State("user")
+  private currentUser!: User;
 
   @Ref("form") readonly form!: VForm;
 
@@ -255,6 +258,7 @@ export default class NameChannels extends Vue {
     await this.deleteTextChannel(this.channel.uid!);
     this.loadingDelete = false;
     this.dialogDelete = false;
+    this.$router.replace({ path: "/space/" + this.workspaceUID });
   }
 }
 </script>

@@ -23,7 +23,6 @@ import FloatingButton from "@/components/modules/MainScreen/AddWorkspace.vue";
 import CollaborationCard from "@/components/modules/MainScreen/CardCollaboration.vue";
 import InvitationCard from "@/components/modules/MainScreen/CardInvitation.vue";
 import { User } from "@/models/user";
-import { Watch } from "vue-property-decorator";
 const User = namespace("UserModule");
 
 @Component({
@@ -57,15 +56,10 @@ export default class ViewMainScreen extends Vue {
   @User.Getter
   private isLoggedIn!: boolean;
 
-  /*  @Watch("currentUser")
-  async onChildChanged() {
-    await this.fetchCurrentUser();
-  } */
-
   async created() {
-    /*  if (!this.isLoggedIn) {
+    if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
-    } */
+    }
   }
 }
 </script>

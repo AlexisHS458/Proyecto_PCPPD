@@ -44,7 +44,8 @@ class UserModule extends VuexModule {
   }
 
   @Mutation
-  public saveUserSuccess(): void {
+  public saveUserSuccess(user: User): void {
+    this.user = user;
     this.status.logged = true;
   }
 
@@ -81,7 +82,7 @@ class UserModule extends VuexModule {
   async saveUser(user: User): Promise<void> {
     return await UserService.saveUser(user)
       .then(() => {
-        this.context.commit("saveUserSuccess");
+        this.context.commit("saveUserSuccess", user);
       })
       .catch(() => {
         this.context.commit("saveUserFailure");

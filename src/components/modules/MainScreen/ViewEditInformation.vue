@@ -21,7 +21,7 @@
                       label="Nombre"
                       outlined
                       :rules="[rules.required, rules.regex]"
-                      v-model="currentUser.nombre"
+                      v-model="user.nombre"
                       dense
                       prepend-inner-icon="mdi-account "
                     ></v-text-field>
@@ -30,7 +30,7 @@
                     <v-text-field
                       label="Apellidos"
                       :rules="[rules.required, rules.regexLastName]"
-                      v-model="currentUser.apellido"
+                      v-model="user.apellido"
                       outlined
                       dense
                       color="primary"
@@ -41,7 +41,7 @@
                     <v-text-field
                       label="Boleta o Número de empleado"
                       :rules="[rules.required, rules.regexBoleta]"
-                      v-model="currentUser.boleta"
+                      v-model="user.boleta"
                       outlined
                       dense
                       color="primary"
@@ -56,9 +56,8 @@
                       :loading="loading"
                       @click="handleEditInfo"
                     >
-                      Editar Información
+                      Guardar
                     </v-btn>
-                    {{ user }}
                   </v-col>
                 </v-form>
               </v-card-text>
@@ -172,7 +171,8 @@ export default class ViewEdit extends Vue {
     if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
     }
-    /* this.user = JSON.parse(JSON.stringify(this.currentUser)); */
+    /*  await this.fetchCurrentUser(); */
+    this.user = JSON.parse(JSON.stringify(this.currentUser));
   }
 
   /**
@@ -183,7 +183,7 @@ export default class ViewEdit extends Vue {
       this.loading = true;
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
-      await this.saveUser(this.currentUser);
+      await this.saveUser(this.user);
       if (this.isLoggedIn) {
         this.loading = false;
         this.snackbarSuccess = true;
