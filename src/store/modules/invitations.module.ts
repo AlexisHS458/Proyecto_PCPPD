@@ -117,7 +117,7 @@ class InivtationsModule extends VuexModule {
   */
   @Action
   async declineInvitation(invitation: Invitation): Promise<void> {
-    invitationsService.declineInvitation(invitation).then(() => {
+    invitationsService.deleteInvitation(invitation).then(() => {
       this.context.commit("invitationDeclinedSuccess");
     })
     .catch(() => {
