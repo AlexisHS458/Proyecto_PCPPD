@@ -7,6 +7,7 @@
         v-for="(message, index) in messages"
         :key="index"
         :message="message"
+        :currentUser="currentUser"
       ></list-messages>
     </v-list>
     <input-message

@@ -3,6 +3,7 @@
     <v-row>
       <app-bar></app-bar>
     </v-row>
+
     <own-card :user="currentUser"></own-card>
     <invitation-card :user="currentUser"></invitation-card>
     <floating-button></floating-button>

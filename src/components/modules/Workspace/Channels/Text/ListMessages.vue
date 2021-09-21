@@ -11,7 +11,10 @@
               {{ toLocalDate(message.fecha) }}
             </div>
           </v-col>
-          <v-col class="flex-grow-0 flex-shrink-1">
+          <v-col
+            v-if="message.uid_usuario == currentUser.uid"
+            class="flex-grow-0 flex-shrink-1"
+          >
             <v-dialog
               transition="dialog-top-transition"
               max-width="600"
@@ -113,6 +116,7 @@ import Vue from "vue";
 import { namespace } from "vuex-class";
 import { Message } from "@/models/message";
 import { VForm } from "@/utils/types.js";
+import { User } from "@/models/user";
 const optionsMessage = namespace("TextChannelModule");
 
 @Component
@@ -121,6 +125,11 @@ export default class Messages extends Vue {
     required: true,
   })
   public message!: Message;
+
+  @Prop({
+    required: true,
+  })
+  public currentUser!: User;
 
   /**
    * Acciones obtenidos del @module Messages

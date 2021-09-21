@@ -19,11 +19,10 @@
 
         <v-card-text>
           <v-row align="center" justify="space-around">
-            <v-btn color="success">
-              Aceptar
-              <v-icon class="ml-6"> mdi-check </v-icon>
+            <v-btn color="success" @click="acceptInvitationToWorkspace">
+              Aceptar <v-icon class="ml-6"> mdi-check </v-icon>
             </v-btn>
-            <v-btn color="error">
+            <v-btn color="error" @click="declineInvitationToWorkspace">
               Rechazar <v-icon class="ml-6"> mdi-close </v-icon>
             </v-btn>
           </v-row>
@@ -37,7 +36,8 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Invitation } from "@/models/invitation";
 import { StringUtils } from "@/utils/stringsUtils";
-
+import { namespace } from "vuex-class";
+const OptionsInvitation = namespace("InvitationsModule");
 @Component
 export default class InvitationsCard extends Vue {
   @Prop({
@@ -45,8 +45,22 @@ export default class InvitationsCard extends Vue {
   })
   public invitation!: Invitation;
 
+  @OptionsInvitation.Action
+  private acceptInvitation!: (invitation: Invitation) => void;
+
+  @OptionsInvitation.Action
+  private declineInvitation!: (invitation: Invitation) => void;
+
   public getInitials = StringUtils.getInitials;
   public show = false;
+
+  async acceptInvitationToWorkspace() {
+    await this.acceptInvitation(this.invitation);
+  }
+
+  async declineInvitationToWorkspace() {
+    await this.declineInvitation(this.invitation);
+  }
 }
 </script>
 
