@@ -18,7 +18,11 @@
       </v-list-item-content>
 
       <v-list-item-action>
-        <v-menu v-model="menu" offset-y>
+        <v-menu
+          v-if="workspace.uid_usuario == currentUser.uid"
+          v-model="menu"
+          offset-y
+        >
           <template #activator="{ on }">
             <v-btn
               text
@@ -182,6 +186,7 @@
 <script lang="ts">
 import { TextChannel } from "@/models/textChannel";
 import { User } from "@/models/user";
+import { Workspace } from "@/models/workspace";
 import { VForm } from "@/utils/types";
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
@@ -220,6 +225,9 @@ export default class NameChannels extends Vue {
 
   @User.State("user")
   private currentUser!: User;
+
+  @WorkspaceOptions.State("workspace")
+  private workspace!: Workspace;
 
   @Ref("form") readonly form!: VForm;
 

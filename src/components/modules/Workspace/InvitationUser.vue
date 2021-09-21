@@ -4,6 +4,7 @@
     <v-toolbar-title> Lista de usuarios </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-dialog
+      v-if="workspace.uid_usuario == user.uid"
       transition="dialog-top-transition"
       max-width="600"
       v-model="dialog"

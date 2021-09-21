@@ -2,7 +2,10 @@
   <v-row v-if="!isLoading && !isLoadingWorkspace" class="row" no-gutters>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto div">
-        <info-workspace :nameWorkspace="workspace.nombre"></info-workspace>
+        <info-workspace
+          :currentUser="currentUser"
+          :workspace="workspace"
+        ></info-workspace>
         <channels
           class="flex-grow-1"
           :users="users"
@@ -27,6 +30,7 @@
             :user="user"
             :key="index"
             :currentUser="currentUser"
+            :workspace="workspace"
           ></list-user>
         </v-list>
       </div>
