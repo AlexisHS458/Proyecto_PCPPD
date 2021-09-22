@@ -28,7 +28,11 @@
         ></v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
-        <v-menu v-if="user.uid != currentUser.uid" v-model="menu" offset-y>
+        <v-menu
+          v-if="workspace.uid_usuario == currentUser.uid"
+          v-model="menu"
+          offset-y
+        >
           <template #activator="{ on }">
             <v-btn text icon v-on="on" :class="{ hidden: !hover && !menu }">
               <v-icon color="white">mdi-cog</v-icon>
@@ -84,6 +88,7 @@
 <script lang="ts">
 import { Status } from "@/models/status";
 import { User } from "@/models/user";
+import { Workspace } from "@/models/workspace";
 import presenceServices from "@/services/presence.service";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
@@ -98,6 +103,11 @@ export default class UserList extends Vue {
     required: true,
   })
   public currentUser!: User;
+
+  @Prop({
+    required: true,
+  })
+  public workspace!: Workspace;
 
   public menu = false;
   public model = 1;

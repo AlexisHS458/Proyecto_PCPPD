@@ -8,6 +8,7 @@
 
         <span class="header"> {{ item.title }}</span>
         <v-dialog
+          v-if="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
           max-width="600"
           v-model="dialog"
@@ -84,7 +85,9 @@ import { namespace } from "vuex-class";
 import { TextChannel } from "@/models/textChannel";
 import { VForm } from "@/utils/types";
 import { User } from "@/models/user";
+import { Workspace } from "@/models/workspace";
 const WorkspaceOptions = namespace("WorkspaceModule");
+const User = namespace("UserModule");
 @Component({
   components: {
     namechannels,
@@ -118,10 +121,19 @@ export default class ListChannels extends Vue {
   private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
 
   /**
+   * Estado obtenido del @module Workspace
+   */
+  @WorkspaceOptions.State("workspace")
+  private workspace!: Workspace;
+
+  /**
    * Getter obtenido del @module Workspace
    */
   @WorkspaceOptions.Getter
   private isChannelCreated!: boolean;
+
+  @User.State("user")
+  private currentUser!: User;
 
   @Ref("form") readonly form!: VForm;
 

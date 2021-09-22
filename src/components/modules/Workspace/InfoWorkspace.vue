@@ -7,9 +7,13 @@
       dense
       class="toolbar"
     >
-      <v-toolbar-title> {{ nameWorkspace }} </v-toolbar-title>
+      <v-toolbar-title> {{ workspace.nombre }} </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-menu v-if="1 == 2" v-model="menu" offset-y>
+      <v-menu
+        v-if="workspace.uid_usuario !== currentUser.uid"
+        v-model="menu"
+        offset-y
+      >
         <template #activator="{ on }">
           <v-btn text icon v-on="on" :class="{ hidden: !hover && !menu }">
             <v-icon color="white">mdi-cog</v-icon>
@@ -114,6 +118,8 @@
 
 
 <script lang="ts">
+import { User } from "@/models/user";
+import { Workspace } from "@/models/workspace";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
@@ -121,7 +127,12 @@ export default class Toolbar extends Vue {
   @Prop({
     required: true,
   })
-  public nameWorkspace!: string;
+  public workspace!: Workspace;
+
+  @Prop({
+    required: true,
+  })
+  public currentUser!: User;
 
   public show = false;
   public menu = false;
