@@ -1,8 +1,7 @@
 import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
 import { Collection } from "@/utils/collections";
-import WorkspaceService from "@/services/work_space.service";
-import { db } from "@/utils/firebase";
+import { db, FieldValue} from "@/utils/firebase";
 
 
 /**
@@ -67,14 +66,10 @@ class InvitationsService{
      * @param invitation 
      */
     async acceptInvitation(invitation: Invitation): Promise<void>{
-        const workspaceRef = await WorkspaceService.getWorkspaceInfo(invitation.idEspacioTrabajo);
-
-        workspaceRef.usuarios = [
-            ...workspaceRef.usuarios,
-            invitation.idUsuarioInvitado
-        ];
-
-        await db.collection(Collection.WORK_SPACE).doc(invitation.idEspacioTrabajo).update(workspaceRef);
+        await db.collection(Collection.WORK_SPACE).doc(invitation.idEspacioTrabajo)
+        .update({
+            'usuarios': FieldValue.arrayUnion(invitation.idUsuarioInvitado)
+        });
 
         return await this.deleteInvitation(invitation);
     }
