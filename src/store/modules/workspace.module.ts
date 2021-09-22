@@ -4,6 +4,7 @@ import { TextChannel } from "@/models/textChannel";
 import ChannelsService from "@/services/channels.service";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { User } from "@/models/user";
+import work_spaceService from "@/services/work_space.service";
 
 /**
  * Modulo de acceso a información de un solo espacio de trabajo
@@ -33,7 +34,8 @@ class WorkspaceModule extends VuexModule {
     loadingUsers: true,
     channelCreated: false,
     channelEdited: false,
-    channelDeleted: false
+    channelDeleted: false,
+    userRemoved: false
   };
 
   @Mutation
@@ -69,6 +71,11 @@ class WorkspaceModule extends VuexModule {
   @Mutation
   public setLoadingUsersStatus(status: boolean): void {
     this.status.loadingUsers = status;
+  }
+
+  @Mutation
+  public setUserRemovedStatus(status: boolean): void {
+    this.status.userRemoved = status;
   }
 
   @Mutation
@@ -149,6 +156,18 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
+  /**
+  * @param IDUser usuario a expulsar
+  * @param IDWorkSpace espacio de trabajo
+  */
+  @Action
+  async kickUser(IDUser: string, IDWorkSpace: string): Promise<void> {
+    this.context.commit("setUserRemovedStatus", false);
+    work_spaceService.removeUser(IDUser, IDWorkSpace).then(() => {
+      this.context.commit("setUserRemovedStatus", true);
+    })
+  }
+
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
   }
@@ -163,6 +182,9 @@ class WorkspaceModule extends VuexModule {
   }
   get isLoadingUsersOnline(): boolean {
     return this.status.loadingUsers;
+  }
+  get isUserRemoved(): boolean {
+    return this.status.userRemoved;
   }
 }
 

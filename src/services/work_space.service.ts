@@ -110,6 +110,19 @@ class WorkSpaceService {
         );
       });
   }
+
+  /**
+  * Remueve un usuario de un espacio de trabajo.
+  * @param IDUser usuario a remover
+  * @param IDWorkSpace espacio de trabajo
+  */
+  async removeUser(IDUser: string, IDWorkSpace: string): Promise<void>{
+    const work_spaceRef: Workspace = await this.getWorkspaceInfo(IDWorkSpace);
+    const index = work_spaceRef.usuarios.indexOf(IDUser);
+    work_spaceRef.usuarios.splice(index,1);
+    return await db.collection(Collection.WORK_SPACE).doc(IDWorkSpace).update(work_spaceRef);
+  }
+
 }
 
 export default new WorkSpaceService();

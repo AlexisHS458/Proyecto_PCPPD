@@ -2,6 +2,7 @@ import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import InivtationsService from "@/services/invitations.service";
+import work_spaceService from "@/services/work_space.service";
 import WorkSpaceService from "@/services/work_space.service";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 
@@ -31,7 +32,8 @@ class MainScreenModule extends VuexModule {
     loadingList: true,
     loadingInvitationsList: true,
     createdWorkSpace: false,
-    deletedWorkSpace: false
+    deletedWorkSpace: false,
+    leaveWorkSpace: false
   };
 
   @Mutation
@@ -53,6 +55,11 @@ class MainScreenModule extends VuexModule {
   public setLoadingInvitationStatus(status: boolean): void {
     this.status.loadingInvitationsList = status;
   }
+
+  @Mutation
+    public setLeaveWorkSpaceStatus(status: boolean): void {
+      this.status.leaveWorkSpace = status;
+    }
 
   @Mutation
   public createWorkSpaceSuccess(): void {
@@ -131,6 +138,18 @@ class MainScreenModule extends VuexModule {
     });
   }
 
+  /**
+  * @param IDUser usuario a expulsar
+  * @param IDWorkSpace espacio de trabajo
+  */
+  @Action
+  async leaveWorkSpace(IDUser: string, IDWorkSpace: string): Promise<void> {
+    this.context.commit("setLeaveWorkSpaceStatus", false);
+    work_spaceService.removeUser(IDUser, IDWorkSpace).then(() => {
+      this.context.commit("setLeaveWorkSpaceStatus", true);
+    })
+  }
+
   get isLoadingList(): boolean {
     return this.status.loadingList;
   }
@@ -145,6 +164,10 @@ class MainScreenModule extends VuexModule {
 
   get isLoadingInvitations(): boolean {
     return this.status.loadingInvitationsList;
+  }
+
+  get isLeftWorkSpace(): boolean {
+    return this.status.leaveWorkSpace;
   }
 }
 
