@@ -157,13 +157,13 @@ class WorkspaceModule extends VuexModule {
   }
 
   /**
-  * @param IDUser usuario a expulsar
-  * @param IDWorkSpace espacio de trabajo
-  */
+   * Elimina un usuario del espacio de trabajo.
+   * @param idUser usuario a expulsar
+   */
   @Action
-  async kickUser(IDUser: string, IDWorkSpace: string): Promise<void> {
+  async kickUser(idUser: string): Promise<void> {
     this.context.commit("setUserRemovedStatus", false);
-    work_spaceService.removeUser(IDUser, IDWorkSpace).then(() => {
+    work_spaceService.removeUser(idUser, this.workspace.uid).then(() => {
       this.context.commit("setUserRemovedStatus", true);
     })
   }

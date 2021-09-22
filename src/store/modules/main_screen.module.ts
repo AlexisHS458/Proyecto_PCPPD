@@ -1,4 +1,5 @@
 import { Invitation } from "@/models/invitation";
+import { LeaveWorkspace } from "@/models/leaveWorkspace";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import InivtationsService from "@/services/invitations.service";
@@ -139,13 +140,15 @@ class MainScreenModule extends VuexModule {
   }
 
   /**
-  * @param IDUser usuario a expulsar
+  * @param idUser usuario a expulsar
   * @param IDWorkSpace espacio de trabajo
   */
   @Action
-  async leaveWorkSpace(IDUser: string, IDWorkSpace: string): Promise<void> {
+  async leaveWorkSpace(leaveWorkSpace: LeaveWorkspace): Promise<void> {
     this.context.commit("setLeaveWorkSpaceStatus", false);
-    work_spaceService.removeUser(IDUser, IDWorkSpace).then(() => {
+    work_spaceService.removeUser(
+      leaveWorkSpace.uidUser, leaveWorkSpace.uidWorkspace
+      ).then(() => {
       this.context.commit("setLeaveWorkSpaceStatus", true);
     })
   }
