@@ -164,7 +164,7 @@ class MainScreenModule extends VuexModule {
       leaveWorkSpace.uidUser, leaveWorkSpace.uidWorkspace
       ).then(() => {
       this.context.commit("setLeaveWorkSpaceStatus", true);
-      this.context.commit("setSnackBarMessage","Se ha enviadó la invitación correctamente");
+      this.context.commit("setSnackBarMessage","Has abandonado el espacio de trabajo");
       this.context.commit("setShowSnackBarMessage", true);
     })
   }
