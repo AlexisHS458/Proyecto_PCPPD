@@ -16,6 +16,11 @@ class InivtationsModule extends VuexModule {
   public users: User[] = [];
 
   /**
+   * Mensaje a mostrar en snackbar
+   */
+  public snackbarMessage = "";
+
+  /**
    * Estatos de consulta de la invitacion
    */
   public status = {
@@ -23,7 +28,8 @@ class InivtationsModule extends VuexModule {
     loadingUserNamesList: true,
     invitationSent: false,
     invitationAccepted: false,
-    invitationDeclined: false
+    invitationDeclined: false,
+    showSnackbar: false
   };
 
   @Mutation
@@ -71,6 +77,16 @@ class InivtationsModule extends VuexModule {
     this.status.invitationDeclined = false;
   }
 
+  @Mutation
+  public setSnackBarMessage(message: string): void {
+    this.snackbarMessage = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessage(status: boolean) :void {
+    this.status.showSnackbar = status;
+  }
+
   /**
    * Envia un mensaje al espacion de trabajo y canal especificado.
    * @param userID ID del usuario a invitar
@@ -81,9 +97,13 @@ class InivtationsModule extends VuexModule {
     return await InvitationsService.sendInivitation(invitation)
       .then(() => {
         this.context.commit("invitationSentSuccess");
+        this.context.commit("setSnackBarMessage","Invitacion enviada correctamente");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("invitationSentFail");
+        this.context.commit("setSnackBarMessage","Fallo al enviar invitacion");
+        this.context.commit("setShowSnackBarMessage", true);
       });
   }
 
@@ -125,12 +145,41 @@ class InivtationsModule extends VuexModule {
     });
   }
 
+  /**
+   * Coloca un mensaje en el snackbar
+   * @param message mensaje a mostrar en el snackbar
+   */
+  @Action
+  setMessageOnSnackbar(message: string): void{
+    this.context.commit("setSnackBarMessage", message);
+  }
+ 
+  /**
+   * Hace visible el snackbar
+   */
+  @Action
+  setVisibleSnackBar(): void{
+    this.context.commit("setShowSnackBarMessage", true);
+  }
+
+  /**
+   * Hace no visible el snackbar
+   */
+  @Action
+  setNotVisibleSnackBar(): void{
+    this.context.commit("setShowSnackBarMessage", false);
+  }
+
   get isLoadingInvitationsInvitationSent(): boolean {
     return this.status.invitationSent;
   }
 
   get isLoadingUserNames(): boolean {
     return this.status.loadingUserNamesList;
+  }
+
+  get showSnackbar(): boolean{
+    return this.status.showSnackbar;
   }
 }
 
