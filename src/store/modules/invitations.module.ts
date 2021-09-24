@@ -126,9 +126,13 @@ class InivtationsModule extends VuexModule {
   async acceptInvitation(invitation: Invitation): Promise<void> {
     invitationsService.acceptInvitation(invitation).then(() => {
       this.context.commit("invitationAcceptedSuccess");
+      this.context.commit("setSnackBarMessage","Se acepto correctamente la invitación");
+      this.context.commit("setShowSnackBarMessage", true);
     })
     .catch(() => {
       this.context.commit("invitationAcceptedFail");
+      this.context.commit("setSnackBarMessage","Error al aceptar la invitación");
+      this.context.commit("setShowSnackBarMessage", true);
     });
   }
 
@@ -139,9 +143,13 @@ class InivtationsModule extends VuexModule {
   async declineInvitation(invitation: Invitation): Promise<void> {
     invitationsService.deleteInvitation(invitation).then(() => {
       this.context.commit("invitationDeclinedSuccess");
+      this.context.commit("setSnackBarMessage","Se rechazo correctamente la invitación");
+      this.context.commit("setShowSnackBarMessage", true);
     })
     .catch(() => {
       this.context.commit("invitationDeclinedFail");
+      this.context.commit("setSnackBarMessage","Error al rechazar la invitación");
+      this.context.commit("setShowSnackBarMessage", true);
     });
   }
 

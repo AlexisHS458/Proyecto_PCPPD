@@ -16,9 +16,18 @@ class UserModule extends VuexModule {
   public user?: User = undefined;
 
   /**
+   * Mensaje a mostrar en snackbar
+   */
+  public snackbarMessage = "";
+
+  /**
    * Status del usuario
    */
-  public status = { logged: false, loading: true };
+  public status = { 
+    logged: false, 
+    loading: true,
+    showSnackbar: false
+  };
 
   @Mutation
   public setUser(user: User): void {
@@ -63,6 +72,16 @@ class UserModule extends VuexModule {
     this.status.logged = false;
   }
 
+  @Mutation
+  public setSnackBarMessage(message: string): void {
+    this.snackbarMessage = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessage(status: boolean) :void {
+    this.status.showSnackbar = status;
+  }
+
   /**
    * Obtiene información de usuario.
    */
@@ -83,9 +102,13 @@ class UserModule extends VuexModule {
     return await UserService.saveUser(user)
       .then(() => {
         this.context.commit("saveUserSuccess", user);
+        this.context.commit("setSnackBarMessage","Exito al registrar usuario");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("saveUserFailure");
+        this.context.commit("setSnackBarMessage","Error al registrar usuario");
+        this.context.commit("setShowSnackBarMessage", true);
       });
   }
 
@@ -106,6 +129,10 @@ class UserModule extends VuexModule {
 
   get isLoading(): boolean {
     return this.status.loading;
+  }
+
+  get showSnackbar(): boolean{
+    return this.status.showSnackbar;
   }
 }
 

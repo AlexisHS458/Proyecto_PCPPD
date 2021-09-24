@@ -105,9 +105,13 @@ class MainScreenModule extends VuexModule {
     return await WorkSpaceService.createWorkSpace(workspace)
       .then(() => {
         this.context.commit("createWorkSpaceSuccess");
+        this.context.commit("setSnackBarMessage","El espacio de trabajo ha sido creado exitosamente");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("createWorkSpaceFailure");
+        this.context.commit("setSnackBarMessage","Error al crear el espacio de trabajo");
+        this.context.commit("setShowSnackBarMessage", true);
       });
   }
 
@@ -121,9 +125,13 @@ class MainScreenModule extends VuexModule {
     return await WorkSpaceService.deleteWorkSpace(id)
       .then(() => {
         this.context.commit("deleteWorkSpaceSuccess");
+        this.context.commit("setSnackBarMessage","El espacio de trabajo ha sido eliminado");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("deleteWorkSpaceFailure");
+        this.context.commit("setSnackBarMessage","Error al eliminar el espacio de trabajo");
+        this.context.commit("setShowSnackBarMessage", true);
       });
   }
 

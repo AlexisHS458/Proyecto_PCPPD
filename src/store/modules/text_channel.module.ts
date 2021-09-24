@@ -24,13 +24,19 @@ class TextChannelModule extends VuexModule {
   public textChannelID!: string;
 
   /**
+   * Mensaje a mostrar en snackbar
+   */
+  public snackbarMessage = "";
+
+  /**
    * Estatos de consulta del canal de texto
    */
   public status = {
     loadingMessages: true,
     messageSent: false,
     messageEdited: false,
-    messageDeleted: false
+    messageDeleted: false,
+    showSnackbar: false
   };
 
   @Mutation
@@ -83,6 +89,16 @@ class TextChannelModule extends VuexModule {
     this.textChannelID = textChannelID;
   }
 
+  @Mutation
+  public setSnackBarMessage(message: string): void {
+    this.snackbarMessage = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessage(status: boolean) :void {
+    this.status.showSnackbar = status;
+  }
+
   /**
    * Coloca el ID del espacio de trabajo
    * @param id ID del workspase
@@ -113,6 +129,8 @@ class TextChannelModule extends VuexModule {
       })
       .catch(() => {
         this.context.commit("messageSentFail");
+        this.context.commit("setSnackBarMessage","Error al enviar mensaje");
+        this.context.commit("setShowSnackBarMessage", true);
       });
   }
 
@@ -125,9 +143,13 @@ class TextChannelModule extends VuexModule {
     return await MessageService.editMessage(this.workspaceID, this.textChannelID, message)
       .then(() => {
         this.context.commit("messageEditedSuccess");
+        this.context.commit("setSnackBarMessage","Mensaje editado correctamente");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("messageEditedFail");
+        this.context.commit("setSnackBarMessage","Error al editar mensaje");
+        this.context.commit("setShowSnackBarMessage", true);
       });
   }
 
@@ -140,9 +162,13 @@ class TextChannelModule extends VuexModule {
     return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, id)
       .then(() => {
         this.context.commit("messageDeletedSuccess");
+        this.context.commit("setSnackBarMessage","Mensaje eliminado correctamente");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("messageDeletedFail");
+        this.context.commit("setSnackBarMessage","Error al eliminar mensaje");
+        this.context.commit("setShowSnackBarMessage", true);
       });
   }
 
@@ -179,6 +205,10 @@ class TextChannelModule extends VuexModule {
 
   get isLoadingMessagesMessageDeleted(): boolean {
     return this.status.messageDeleted;
+  }
+
+  get showSnackbar(): boolean{
+    return this.status.showSnackbar;
   }
 }
 
