@@ -123,6 +123,31 @@ class UserModule extends VuexModule {
       });
   }
 
+  /**
+   * Coloca un mensaje en el snackbar
+   * @param message mensaje a mostrar en el snackbar
+   */
+   @Action
+   setMessageOnSnackbar(message: string): void{
+     this.context.commit("setSnackBarMessage", message);
+   }
+ 
+   /**
+    * Hace visible el snackbar
+    */
+   @Action
+   setVisibleSnackBar(): void{
+     this.context.commit("setShowSnackBarMessage", true);
+   }
+ 
+   /**
+    * Hace no visible el snackbar
+    */
+   @Action
+   setNotVisibleSnackBar(): void{
+     this.context.commit("setShowSnackBarMessage", false);
+   }
+
   get isLoggedIn(): boolean {
     return this.status.logged;
   }
