@@ -41,7 +41,11 @@
           <v-list color="secondary">
             <v-list-item-content class="justify-center card-list">
               <div class="mx-auto text-right">
-                <v-dialog transition="dialog-top-transition" max-width="600">
+                <v-dialog
+                  transition="dialog-top-transition"
+                  max-width="600"
+                  v-model="dialog"
+                >
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
                       depressed
@@ -67,11 +71,13 @@
                         </p>
                       </div>
                       <v-row align="center" justify="center">
-                        <v-btn color="error"> SI, QUIERO ELIMINARLO </v-btn>
+                        <v-btn color="error" @click="kickUserWorkspace">
+                          SI, QUIERO ELIMINARLO
+                        </v-btn>
                       </v-row>
                     </v-card-text>
                     <v-card-actions class="justify-end">
-                      <v-btn text @click="dialog.value = false">Cancelar</v-btn>
+                      <v-btn text @click="dialog = false">Cancelar</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -91,6 +97,8 @@ import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import presenceServices from "@/services/presence.service";
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { namespace } from "vuex-class";
+const KickUserWorkSpace = namespace("WorkspaceModule");
 
 @Component
 export default class UserList extends Vue {
@@ -109,9 +117,16 @@ export default class UserList extends Vue {
   })
   public workspace!: Workspace;
 
+  /**
+   * Accion obtenida del @module Workspace
+   */
+  @KickUserWorkSpace.Action
+  private kickUser!: (id: string) => void;
+
   public menu = false;
   public model = 1;
   public status = Status.OFFLINE;
+  public dialog = false;
 
   /**
    * Checar status de cada usuario
@@ -122,6 +137,11 @@ export default class UserList extends Vue {
         this.status = status;
       });
     }
+  }
+
+  async kickUserWorkspace() {
+    await this.kickUser(this.user.uid!);
+    this.dialog = false;
   }
 }
 </script>

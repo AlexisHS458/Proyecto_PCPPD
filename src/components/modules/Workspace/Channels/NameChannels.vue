@@ -266,7 +266,9 @@ export default class NameChannels extends Vue {
     await this.deleteTextChannel(this.channel.uid!);
     this.loadingDelete = false;
     this.dialogDelete = false;
-    this.$router.replace({ path: "/space/" + this.workspaceUID });
+    if (this.$route.path != "/space/" + this.workspaceUID) {
+      this.$router.replace({ path: "/space/" + this.workspaceUID });
+    }
   }
 }
 </script>

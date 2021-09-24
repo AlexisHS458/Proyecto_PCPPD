@@ -7,6 +7,15 @@
       dense
       class="toolbar"
     >
+      <v-btn depressed text fab small class="mr-4" :to="'/mainscreen'">
+        <v-img
+          class="img"
+          src="@/assets/logo.png"
+          max-height="40"
+          max-width="40"
+          contain
+        ></v-img>
+      </v-btn>
       <v-toolbar-title> {{ workspace.nombre }} </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu
@@ -22,7 +31,11 @@
         <v-list color="secondary">
           <v-list-item-content class="justify-center card-list">
             <div class="mx-auto text-right">
-              <v-dialog transition="dialog-top-transition" max-width="600">
+              <v-dialog
+                transition="dialog-top-transition"
+                max-width="600"
+                v-model="dialogLeave"
+              >
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     depressed
@@ -48,11 +61,13 @@
                       </p>
                     </div>
                     <v-row align="center" justify="center">
-                      <v-btn color="error"> SI, Abandonar </v-btn>
+                      <v-btn color="error" @click="leaveUserWorkspace">
+                        SI, Abandonar
+                      </v-btn>
                     </v-row>
                   </v-card-text>
                   <v-card-actions class="justify-end">
-                    <v-btn text @click="dialog.value = false">Cancelar</v-btn>
+                    <v-btn text @click="dialogLeave = false">Cancelar</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
@@ -102,7 +117,7 @@
                     </v-data-table>
                   </v-card-text>
                   <v-card-actions class="justify-end">
-                    <v-btn @click="dialog.value = false" color="error"
+                    <v-btn @click="dialog = false" color="error"
                       >Eliminar</v-btn
                     >
                   </v-card-actions>
@@ -121,7 +136,9 @@
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import { Component, Prop, Vue } from "vue-property-decorator";
-
+import { namespace } from "vuex-class";
+const LeaveWorkspace = namespace("MainScreenModule");
+import { LeaveWorkspace } from "@/models/leaveWorkspace";
 @Component
 export default class Toolbar extends Vue {
   @Prop({
@@ -134,11 +151,19 @@ export default class Toolbar extends Vue {
   })
   public currentUser!: User;
 
+  /**
+   * Accion obtenida del @module Mainscreen
+   */
+  @LeaveWorkspace.Action
+  private leaveWorkSpace!: (leaveWorkSpace: LeaveWorkspace) => Promise<void>;
+
   public show = false;
   public menu = false;
   public model = 1;
   public selected = [];
   public singleSelect = false;
+  public dialogLeave = false;
+  public userLeave = {} as LeaveWorkspace;
   public headers = [
     {
       sortable: false,
@@ -194,6 +219,17 @@ export default class Toolbar extends Vue {
       size: "1 MB",
     },
   ];
+
+  async leaveUserWorkspace() {
+    this.userLeave = {
+      uidUser: this.currentUser.uid!,
+      uidWorkspace: this.workspace.uid!,
+      nombreWorkspace: this.workspace.nombre,
+    };
+    await this.leaveWorkSpace(this.userLeave);
+    this.dialogLeave = false;
+    this.$router.replace({ path: "/mainscreen" });
+  }
 }
 </script>
 
@@ -225,5 +261,9 @@ export default class Toolbar extends Vue {
 .btn {
   justify-content: left !important;
   color: white;
+}
+
+.img {
+  border-radius: 90px;
 }
 </style>

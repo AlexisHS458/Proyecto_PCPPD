@@ -56,10 +56,12 @@ export default class InvitationsCard extends Vue {
 
   async acceptInvitationToWorkspace() {
     await this.acceptInvitation(this.invitation);
+    this.show = false;
   }
 
   async declineInvitationToWorkspace() {
     await this.declineInvitation(this.invitation);
+    this.show = false;
   }
 }
 </script>

@@ -1,16 +1,25 @@
 <template>
   <div class="mx-auto card-center">
-    <app-bar-messages></app-bar-messages>
-    <v-list three-line class="list-background scroll" ref="vList">
-      <list-messages
-        class="flex-grow-1"
-        v-for="(message, index) in messages"
-        :key="index"
-        :message="message"
-        :currentUser="currentUser"
-      ></list-messages>
+    <app-bar-messages :channelApp="channel"></app-bar-messages>
+    <v-list
+      three-line
+      class="list-background scroll flex-grow-1 flex-shrink-1"
+      ref="vList"
+    >
+      <template v-if="messages.length > 0">
+        <list-messages
+          v-for="(message, index) in messages"
+          :key="index"
+          :message="message"
+          :currentUser="currentUser"
+        ></list-messages>
+      </template>
+      <template v-else>
+        <v-img src="@/assets/Messages.svg" class="img-not-messages"> </v-img>
+      </template>
     </v-list>
     <input-message
+      class="flex-grow-0 flex-shrink-0"
       :workspace="workspace"
       :currentUser="currentUser"
     ></input-message>
@@ -109,12 +118,16 @@ export default class MessagesPage extends Vue {
     this.getMessages();
   }
 
+  public channel? = {} as TextChannel;
   /**
    * Obtener mensajes
    */
   getMessages() {
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
+    this.channel = this.workspace.canales_texto.find(
+      (channel) => channel.uid === this.$route.params.idChannel
+    );
     this.fetchMesages(() => {
       setTimeout(() => {
         //Mostrar scroll inverso
@@ -155,6 +168,16 @@ export default class MessagesPage extends Vue {
   color: white;
   max-height: 100vh;
   overflow-x: auto;
+}
+.img-not-messages {
+  width: 40rem;
+  height: 20rem;
+  margin: auto;
+
+  /*  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 7rem; */
 }
 </style>
 

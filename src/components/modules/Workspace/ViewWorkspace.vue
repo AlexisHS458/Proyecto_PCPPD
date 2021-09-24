@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="!isLoading && !isLoadingWorkspace" class="row" no-gutters>
+  <v-row v-if="!isLoading && !isLoadingWorkspace" no-gutters>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto div">
         <info-workspace
@@ -35,6 +35,11 @@
         </v-list>
       </div>
     </v-col>
+    <snackbar
+      :snackText="snackbarMessage"
+      :status="status.showSnackbar"
+      :timeout="timeout"
+    ></snackbar>
   </v-row>
   <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
@@ -51,6 +56,7 @@ import InfoUser from "@/components/modules/Workspace/InfoUser.vue";
 import Channels from "@/components/modules/Workspace/Channels/ViewChannels.vue";
 import InvitationUser from "@/components/modules/Workspace/InvitationUser.vue";
 import ListUser from "@/components/modules/Workspace/ListUsers.vue";
+import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
@@ -58,7 +64,7 @@ import { Message } from "@/models/message";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
-
+const Invitations = namespace("InvitationsModule");
 @Component({
   components: {
     InfoWorkspace,
@@ -66,6 +72,7 @@ const Messages = namespace("TextChannelModule");
     InfoUser,
     InvitationUser,
     ListUser,
+    Snackbar,
   },
 })
 export default class Spacework extends Vue {
@@ -98,7 +105,7 @@ export default class Spacework extends Vue {
   private fetchMyWorkspace!: (id: string) => Promise<void>;
 
   @MyWorkSpace.Action
-  private fetchTextChannels!: (id: string) => void;
+  private fetchTextChannels!: (id: string) => Promise<void>;
 
   @MyWorkSpace.Action
   private fetchUsersInWorkspace!: () => void;
@@ -145,6 +152,14 @@ export default class Spacework extends Vue {
   @Messages.Getter
   private isLoadingMessages!: boolean;
 
+  @Invitations.State("snackbarMessage")
+  private snackbarMessage!: string;
+
+  @Invitations.State("status")
+  private status!: any;
+
+  public timeout = -1;
+
   async created() {
     if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
@@ -152,7 +167,7 @@ export default class Spacework extends Vue {
     //Obtener información del espacio de trabajo
     await this.fetchMyWorkspace(this.$route.params.id);
     //Obtener información de los canles del espacio de trabajo
-    this.fetchTextChannels(this.$route.params.id);
+    await this.fetchTextChannels(this.$route.params.id);
     //Obtener usuarios del espacio de trabajo
     this.fetchUsersInWorkspace();
   }

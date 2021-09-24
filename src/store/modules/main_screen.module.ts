@@ -24,7 +24,7 @@ class MainScreenModule extends VuexModule {
   /**
    * Mensaje a mostrar en snackbar
    */
-   public snackbarMessage = "";
+  public snackbarMessage = "";
 
   /**
    * Status de los espacios de trabajo
@@ -62,9 +62,9 @@ class MainScreenModule extends VuexModule {
   }
 
   @Mutation
-    public setLeaveWorkSpaceStatus(status: boolean): void {
-      this.status.leaveWorkSpace = status;
-    }
+  public setLeaveWorkSpaceStatus(status: boolean): void {
+    this.status.leaveWorkSpace = status;
+  }
 
   @Mutation
   public createWorkSpaceSuccess(): void {
@@ -92,7 +92,7 @@ class MainScreenModule extends VuexModule {
   }
 
   @Mutation
-  public setShowSnackBarMessage(status: boolean) :void {
+  public setShowSnackBarMessage(status: boolean): void {
     this.status.showSnackbar = status;
   }
 
@@ -162,19 +162,20 @@ class MainScreenModule extends VuexModule {
   }
 
   /**
-  * @param idUser usuario a expulsar
-  * @param IDWorkSpace espacio de trabajo
-  */
+   * @param idUser usuario a expulsar
+   * @param IDWorkSpace espacio de trabajo
+   */
   @Action
   async leaveWorkSpace(leaveWorkSpace: LeaveWorkspace): Promise<void> {
     this.context.commit("setLeaveWorkSpaceStatus", false);
-    WorkSpaceService.removeUser(
-      leaveWorkSpace.uidUser, leaveWorkSpace.uidWorkspace
-      ).then(() => {
+    WorkSpaceService.removeUser(leaveWorkSpace.uidUser, leaveWorkSpace.uidWorkspace).then(() => {
       this.context.commit("setLeaveWorkSpaceStatus", true);
-      this.context.commit("setSnackBarMessage","Has abandonado el espacio de trabajo");
+      this.context.commit(
+        "setSnackBarMessage",
+        "Has abandonado el espacio de trabajo" + " " + leaveWorkSpace.nombreWorkspace
+      );
       this.context.commit("setShowSnackBarMessage", true);
-    })
+    });
   }
 
   /**
@@ -182,7 +183,7 @@ class MainScreenModule extends VuexModule {
    * @param message mensaje a mostrar en el snackbar
    */
   @Action
-  setMessageOnSnackbar(message: string): void{
+  setMessageOnSnackbar(message: string): void {
     this.context.commit("setSnackBarMessage", message);
   }
 
@@ -190,7 +191,7 @@ class MainScreenModule extends VuexModule {
    * Hace visible el snackbar
    */
   @Action
-  setVisibleSnackBar(): void{
+  setVisibleSnackBar(): void {
     this.context.commit("setShowSnackBarMessage", true);
   }
 
@@ -198,7 +199,7 @@ class MainScreenModule extends VuexModule {
    * Hace no visible el snackbar
    */
   @Action
-  setNotVisibleSnackBar(): void{
+  setNotVisibleSnackBar(): void {
     this.context.commit("setShowSnackBarMessage", false);
   }
 
@@ -222,7 +223,7 @@ class MainScreenModule extends VuexModule {
     return this.status.leaveWorkSpace;
   }
 
-  get showSnackbar(): boolean{
+  get showSnackbar(): boolean {
     return this.status.showSnackbar;
   }
 }

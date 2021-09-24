@@ -40,6 +40,7 @@ export default class UserInfo extends Vue {
 
   toggleHeadphones() {
     this.isListening = !this.isListening;
+    this.isTalk = !this.isTalk;
   }
 }
 </script>

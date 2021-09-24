@@ -7,8 +7,9 @@
       :users="users"
       :channels="textChannels"
       :workspaceUID="workspace.uid"
+      :workspaceChannels="workspace.canales_texto"
     ></list-channels>
-    <list-channels
+    <!--  <list-channels
       v-for="item in ChannelsVoice"
       :key="item.title"
       :item="item"
@@ -19,7 +20,7 @@
       :key="item.title"
       :item="item"
       :users="users"
-    ></list-channels>
+    ></list-channels> -->
   </v-list>
 </template>
 

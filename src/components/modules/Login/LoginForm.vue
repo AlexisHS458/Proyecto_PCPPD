@@ -49,13 +49,33 @@ import { Component, Vue } from "vue-property-decorator";
 import { firebase } from "@/utils/firebase";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
-
+import { namespace } from "vuex-class";
+import { User } from "@/models/user";
+const Auth = namespace("UserModule");
 @Component
 export default class LoginForm extends Vue {
   /**
+   * Acciones obtenidas del @module User
+   */
+  @Auth.Action
+  private fetchCurrentUser!: () => void;
+
+  /**
+   * Estado obtenido del @module User
+   */
+  @Auth.State("user")
+  private currentUser!: User;
+
+  /**
+   * Getter obtenido del @module User
+   */
+  @Auth.Getter
+  private isLoggedIn!: boolean;
+
+  /**
    * Inicia sesión a la plataforma
    */
-  mounted(): void {
+  async mounted() {
     let ui = firebaseui.auth.AuthUI.getInstance();
     if (!ui) {
       ui = new firebaseui.auth.AuthUI(firebase.auth());
