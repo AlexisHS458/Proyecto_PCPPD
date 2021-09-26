@@ -83,7 +83,13 @@ export default class WorkspaceCard extends Vue {
    * Accion obtenida del @module MainScreen
    */
   @Workspace.Action
-  private deletedWorkSpaces!: (id: string) => void;
+  private deletedWorkSpaces!: (id: string) => Promise<void>;
+
+  /**
+   * Estado obtenido del @module MainScreen
+   */
+  @Workspace.State("status")
+  private status!: any;
 
   public show = false;
   public getInitials = StringUtils.getInitials;
@@ -92,10 +98,15 @@ export default class WorkspaceCard extends Vue {
   /**
    * Elimina un espacio de trabajo
    */
-  deleteSpacework() {
-    this.deletedWorkSpaces(this.workspace.uid);
-    this.dialog = false;
-    this.show = false;
+  async deleteSpacework() {
+    await this.deletedWorkSpaces(this.workspace.uid);
+    if (this.status.showSnackbar && !this.status.showSnackbarError) {
+      this.dialog = false;
+      this.show = false;
+    } else {
+      this.dialog = false;
+      this.show = false;
+    }
   }
 
   /**

@@ -45,18 +45,37 @@ export default class InvitationsCard extends Vue {
   })
   public invitation!: Invitation;
 
+  /**
+   * Acciones obtenidas del @module Invitations
+   */
   @OptionsInvitation.Action
   private acceptInvitation!: (invitation: Invitation) => void;
 
   @OptionsInvitation.Action
   private declineInvitation!: (invitation: Invitation) => void;
 
+  @OptionsInvitation.State("status")
+  private statusInvitations!: any;
+
+  @OptionsInvitation.State("snackbarMessage")
+  private snackbarMessageInvitation!: string;
+
+  /**
+   * Estado obtenidas del @module Invitations
+   */
+  @OptionsInvitation.State("status")
+  private status!: any;
+
   public getInitials = StringUtils.getInitials;
   public show = false;
 
   async acceptInvitationToWorkspace() {
     await this.acceptInvitation(this.invitation);
-    this.show = false;
+    if (this.status.showSnackbar && !this.status.showSnackbarError) {
+      this.show = false;
+    } else {
+      this.show = false;
+    }
   }
 
   async declineInvitationToWorkspace() {

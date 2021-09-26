@@ -126,6 +126,9 @@ export default class ListChannels extends Vue {
   @WorkspaceOptions.Action
   private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
 
+  @WorkspaceOptions.State("status")
+  private status!: any;
+
   /**
    * Estado obtenido del @module Workspace
    */
@@ -163,12 +166,16 @@ export default class ListChannels extends Vue {
         nombre: this.nameChannel,
         permisos: [],
       };
-      console.log(this.channels.length);
       await this.createTextChannel(this.textChannel);
-
-      this.loading = false;
-      this.form.reset();
-      this.dialog = false;
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.loading = false;
+        this.form.reset();
+        this.dialog = false;
+      } else {
+        this.loading = false;
+        this.form.reset();
+        this.dialog = false;
+      }
     }
   }
 }

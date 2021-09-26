@@ -21,6 +21,11 @@ class InivtationsModule extends VuexModule {
   public snackbarMessage = "";
 
   /**
+   * Mensaje a mostrar error en snackbar
+   */
+  public snackbarMessageError = "";
+
+  /**
    * Estatos de consulta de la invitacion
    */
   public status = {
@@ -29,7 +34,8 @@ class InivtationsModule extends VuexModule {
     invitationSent: false,
     invitationAccepted: false,
     invitationDeclined: false,
-    showSnackbar: false
+    showSnackbar: false,
+    showSnackbarError: false
   };
 
   @Mutation
@@ -83,7 +89,17 @@ class InivtationsModule extends VuexModule {
   }
 
   @Mutation
-  public setShowSnackBarMessage(status: boolean) :void {
+  public setSnackBarMessageError(message: string): void {
+    this.snackbarMessageError = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessageError(status: boolean): void {
+    this.status.showSnackbarError = status;
+  }
+
+  @Mutation
+  public setShowSnackBarMessage(status: boolean): void {
     this.status.showSnackbar = status;
   }
 
@@ -97,13 +113,13 @@ class InivtationsModule extends VuexModule {
     return await InvitationsService.sendInivitation(invitation)
       .then(() => {
         this.context.commit("invitationSentSuccess");
-        this.context.commit("setSnackBarMessage","Invitacion enviada correctamente");
+        this.context.commit("setSnackBarMessage", "Invitacion enviada correctamente");
         this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("invitationSentFail");
-        this.context.commit("setSnackBarMessage","Fallo al enviar invitacion");
-        this.context.commit("setShowSnackBarMessage", true);
+        this.context.commit("setSnackBarMessageError", "Fallo al enviar invitacion");
+        this.context.commit("setShowSnackBarMessageError", true);
       });
   }
 
@@ -120,37 +136,41 @@ class InivtationsModule extends VuexModule {
   }
 
   /**
-  * Acepta una invitacion al espacio de trabajo
-  */
+   * Acepta una invitacion al espacio de trabajo
+   */
   @Action
   async acceptInvitation(invitation: Invitation): Promise<void> {
-    invitationsService.acceptInvitation(invitation).then(() => {
-      this.context.commit("invitationAcceptedSuccess");
-      this.context.commit("setSnackBarMessage","Se acepto correctamente la invitación");
-      this.context.commit("setShowSnackBarMessage", true);
-    })
-    .catch(() => {
-      this.context.commit("invitationAcceptedFail");
-      this.context.commit("setSnackBarMessage","Error al aceptar la invitación");
-      this.context.commit("setShowSnackBarMessage", true);
-    });
+    invitationsService
+      .acceptInvitation(invitation)
+      .then(() => {
+        this.context.commit("invitationAcceptedSuccess");
+        this.context.commit("setSnackBarMessage", "Se acepto correctamente la invitación");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("invitationAcceptedFail");
+        this.context.commit("setSnackBarMessageError", "Error al aceptar la invitación");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
   }
 
   /**
-  * Rechaza una invitacion al espacio de trabajo
-  */
+   * Rechaza una invitacion al espacio de trabajo
+   */
   @Action
   async declineInvitation(invitation: Invitation): Promise<void> {
-    invitationsService.deleteInvitation(invitation).then(() => {
-      this.context.commit("invitationDeclinedSuccess");
-      this.context.commit("setSnackBarMessage","Se rechazo correctamente la invitación");
-      this.context.commit("setShowSnackBarMessage", true);
-    })
-    .catch(() => {
-      this.context.commit("invitationDeclinedFail");
-      this.context.commit("setSnackBarMessage","Error al rechazar la invitación");
-      this.context.commit("setShowSnackBarMessage", true);
-    });
+    invitationsService
+      .deleteInvitation(invitation)
+      .then(() => {
+        this.context.commit("invitationDeclinedSuccess");
+        this.context.commit("setSnackBarMessage", "Se rechazo correctamente la invitación");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("invitationDeclinedFail");
+        this.context.commit("setSnackBarMessageError", "Error al rechazar la invitación");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
   }
 
   /**
@@ -158,24 +178,40 @@ class InivtationsModule extends VuexModule {
    * @param message mensaje a mostrar en el snackbar
    */
   @Action
-  setMessageOnSnackbar(message: string): void{
+  setMessageOnSnackbar(message: string): void {
     this.context.commit("setSnackBarMessage", message);
   }
- 
+
   /**
    * Hace visible el snackbar
    */
   @Action
-  setVisibleSnackBar(): void{
+  setVisibleSnackBar(): void {
     this.context.commit("setShowSnackBarMessage", true);
+  }
+
+  /**
+   * Hace visible el snackbar de error
+   */
+  @Action
+  setVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", true);
   }
 
   /**
    * Hace no visible el snackbar
    */
   @Action
-  setNotVisibleSnackBar(): void{
+  setNotVisibleSnackBar(): void {
     this.context.commit("setShowSnackBarMessage", false);
+  }
+
+  /**
+   * Hace no visible el snackbar de error
+   */
+  @Action
+  setNotVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", false);
   }
 
   get isLoadingInvitationsInvitationSent(): boolean {
@@ -186,7 +222,7 @@ class InivtationsModule extends VuexModule {
     return this.status.loadingUserNamesList;
   }
 
-  get showSnackbar(): boolean{
+  get showSnackbar(): boolean {
     return this.status.showSnackbar;
   }
 }

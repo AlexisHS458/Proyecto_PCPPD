@@ -21,12 +21,18 @@ class UserModule extends VuexModule {
   public snackbarMessage = "";
 
   /**
+   * Mensaje a mostrar error en snackbar
+   */
+  public snackbarMessageError = "";
+
+  /**
    * Status del usuario
    */
-  public status = { 
-    logged: false, 
+  public status = {
+    logged: false,
     loading: true,
-    showSnackbar: false
+    showSnackbar: false,
+    showSnackbarError: false
   };
 
   @Mutation
@@ -78,8 +84,18 @@ class UserModule extends VuexModule {
   }
 
   @Mutation
-  public setShowSnackBarMessage(status: boolean) :void {
+  public setSnackBarMessageError(message: string): void {
+    this.snackbarMessageError = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessage(status: boolean): void {
     this.status.showSnackbar = status;
+  }
+
+  @Mutation
+  public setShowSnackBarMessageError(status: boolean): void {
+    this.status.showSnackbarError = status;
   }
 
   /**
@@ -102,13 +118,13 @@ class UserModule extends VuexModule {
     return await UserService.saveUser(user)
       .then(() => {
         this.context.commit("saveUserSuccess", user);
-        this.context.commit("setSnackBarMessage","Exito al registrar usuario");
+        this.context.commit("setSnackBarMessage", "Exito al registrar usuario");
         this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("saveUserFailure");
-        this.context.commit("setSnackBarMessage","Error al registrar usuario");
-        this.context.commit("setShowSnackBarMessage", true);
+        this.context.commit("setSnackBarMessageError", "Error al registrar usuario");
+        this.context.commit("setShowSnackBarMessageError", true);
       });
   }
 
@@ -127,26 +143,42 @@ class UserModule extends VuexModule {
    * Coloca un mensaje en el snackbar
    * @param message mensaje a mostrar en el snackbar
    */
-   @Action
-   setMessageOnSnackbar(message: string): void{
-     this.context.commit("setSnackBarMessage", message);
-   }
- 
-   /**
-    * Hace visible el snackbar
-    */
-   @Action
-   setVisibleSnackBar(): void{
-     this.context.commit("setShowSnackBarMessage", true);
-   }
- 
-   /**
-    * Hace no visible el snackbar
-    */
-   @Action
-   setNotVisibleSnackBar(): void{
-     this.context.commit("setShowSnackBarMessage", false);
-   }
+  @Action
+  setMessageOnSnackbar(message: string): void {
+    this.context.commit("setSnackBarMessage", message);
+  }
+
+  /**
+   * Hace visible el snackbar
+   */
+  @Action
+  setVisibleSnackBar(): void {
+    this.context.commit("setShowSnackBarMessage", true);
+  }
+
+  /**
+   * Hace visible el snackbar de error
+   */
+  @Action
+  setVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", true);
+  }
+
+  /**
+   * Hace no visible el snackbar
+   */
+  @Action
+  setNotVisibleSnackBar(): void {
+    this.context.commit("setShowSnackBarMessage", false);
+  }
+
+  /**
+   * Hace no visible el snackbar de error
+   */
+  @Action
+  setNotVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", false);
+  }
 
   get isLoggedIn(): boolean {
     return this.status.logged;
@@ -156,7 +188,7 @@ class UserModule extends VuexModule {
     return this.status.loading;
   }
 
-  get showSnackbar(): boolean{
+  get showSnackbar(): boolean {
     return this.status.showSnackbar;
   }
 }

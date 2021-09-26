@@ -35,10 +35,39 @@
         </v-list>
       </div>
     </v-col>
+    <!--   Peticiones exitosas del modulo de Invitaciones -->
     <snackbar
+      :color="'success'"
       :snackText="snackbarMessage"
       :status="status.showSnackbar"
       :timeout="timeout"
+      :method="setNotVisibleSnackBarInvitations"
+    ></snackbar>
+
+    <!--   Errores del modulo de Invitaciones -->
+    <snackbar
+      :color="'error'"
+      :snackText="snackbarErrorMessage"
+      :status="status.showSnackbarError"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarErrorInvitations"
+    ></snackbar>
+
+    <!--   Peticiones exitosas del modulo de Workspace -->
+    <snackbar
+      :color="'success'"
+      :snackText="snackbarMessageWorkspace"
+      :status="statusWorkspace.showSnackbar"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarWorkspace"
+    ></snackbar>
+    <!--   Errores del modulo de Workspace -->
+    <snackbar
+      :color="'error'"
+      :snackText="snackbarMessageErrorWorkspace"
+      :status="statusWorkspace.showSnackbarError"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarErrorWorkspace"
     ></snackbar>
   </v-row>
   <div v-else class="div-progress-circular">
@@ -110,6 +139,12 @@ export default class Spacework extends Vue {
   @MyWorkSpace.Action
   private fetchUsersInWorkspace!: () => void;
 
+  @MyWorkSpace.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarWorkspace!: () => void;
+
+  @MyWorkSpace.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarErrorWorkspace!: () => void;
+
   /**
    * Estados obtenidos del @module Workspace
    */
@@ -121,6 +156,15 @@ export default class Spacework extends Vue {
 
   @MyWorkSpace.State("users")
   private users!: User[];
+
+  @MyWorkSpace.State("status")
+  private statusWorkspace!: any;
+
+  @MyWorkSpace.State("snackbarMessage")
+  private snackbarMessageWorkspace!: string;
+
+  @MyWorkSpace.State("snackbarMessageError")
+  private snackbarMessageErrorWorkspace!: string;
 
   /**
    * Getter obtenido del @module Workspace
@@ -141,7 +185,7 @@ export default class Spacework extends Vue {
   private setWorkspaceIDtoModule!: (id: string) => void;
 
   /**
-   * Estado obtenido del @module Messages
+   * Estados obtenidos del @module Messages
    */
   @Messages.State("messages")
   private messages!: Message[];
@@ -152,8 +196,23 @@ export default class Spacework extends Vue {
   @Messages.Getter
   private isLoadingMessages!: boolean;
 
+  /**
+   * Acciones obtenidas del @module Invitations
+   */
+  @Invitations.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarInvitations!: () => void;
+
+  @Invitations.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarErrorInvitations!: () => void;
+
+  /**
+   * Estados obtenidos del @module Invitations
+   */
   @Invitations.State("snackbarMessage")
   private snackbarMessage!: string;
+
+  @Invitations.State("snackbarMessageError")
+  private snackbarErrorMessage!: string;
 
   @Invitations.State("status")
   private status!: any;
@@ -170,6 +229,11 @@ export default class Spacework extends Vue {
     await this.fetchTextChannels(this.$route.params.id);
     //Obtener usuarios del espacio de trabajo
     this.fetchUsersInWorkspace();
+  }
+
+  destroyed() {
+    this.setNotVisibleSnackBarInvitations();
+    this.setNotVisibleSnackBarWorkspace();
   }
 }
 </script>

@@ -31,29 +31,28 @@
                   <v-icon color="error" class="ml-6"> mdi-arrow-left </v-icon>
                 </v-btn>
               </template>
-              <template v-slot:default="dialog">
-                <v-card>
-                  <v-toolbar color="error" dark>
-                    Solicitud de confirmación
-                  </v-toolbar>
-                  <v-card-text>
-                    <div class="text-h6 pa-4 text-center">
-                      <p>
-                        ¿SEGURO QUE QUIERES ABANDONAR ESTE ESPACIO DE TRABAJO?
-                      </p>
-                      <p>YA NO TENDRÁS ACCESO A NINGUNO DE LOS CANALES.</p>
-                    </div>
-                    <v-row align="center" justify="center">
-                      <v-btn color="error" @click="leaveUserWorkspace">
-                        SI, QUIERO ABANDONARLO
-                      </v-btn>
-                    </v-row>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn text @click="dialog = false">Cancelar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </template>
+
+              <v-card>
+                <v-toolbar color="error" dark>
+                  Solicitud de confirmación
+                </v-toolbar>
+                <v-card-text>
+                  <div class="text-h6 pa-4 text-center">
+                    <p>
+                      ¿SEGURO QUE QUIERES ABANDONAR ESTE ESPACIO DE TRABAJO?
+                    </p>
+                    <p>YA NO TENDRÁS ACCESO A NINGUNO DE LOS CANALES.</p>
+                  </div>
+                  <v-row align="center" justify="center">
+                    <v-btn color="error" @click="leaveUserWorkspace">
+                      SI, QUIERO ABANDONARLO
+                    </v-btn>
+                  </v-row>
+                </v-card-text>
+                <v-card-actions class="justify-end">
+                  <v-btn text @click="dialog = false">Cancelar</v-btn>
+                </v-card-actions>
+              </v-card>
             </v-dialog>
           </v-row>
         </v-card-text>
@@ -134,7 +133,7 @@ export default class CardCollaboration extends Vue {
       nombreWorkspace: this.workspace.nombre,
     };
     await this.leaveWorkSpace(this.userLeave);
-    if (this.status.showSnackbar) {
+    if (this.status.showSnackbar && this.status.showSnackbarError) {
       this.show = false;
       this.dialog = false;
     } else {

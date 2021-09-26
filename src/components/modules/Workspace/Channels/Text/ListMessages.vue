@@ -140,6 +140,12 @@ export default class Messages extends Vue {
   @optionsMessage.Action
   private deleteMessage!: (id: string | undefined) => Promise<void>;
 
+  /**
+   * Estado obtenido del @module Messages
+   */
+  @optionsMessage.State("status")
+  private status!: any;
+
   @Ref("form") readonly form!: VForm;
 
   public dialog = false;
@@ -167,9 +173,15 @@ export default class Messages extends Vue {
       this.loadingEdit = true;
       this.message.contenido = this.text;
       await this.editMessage(this.message);
-      this.loadingEdit = false;
-      this.form.reset();
-      this.dialogEdit = false;
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.loadingEdit = false;
+        this.form.reset();
+        this.dialogEdit = false;
+      } else {
+        this.loadingEdit = false;
+        this.form.reset();
+        this.dialogEdit = false;
+      }
     }
   }
 
@@ -179,8 +191,13 @@ export default class Messages extends Vue {
   async deleteMessages() {
     this.loadingDelete = true;
     await this.deleteMessage(this.message.uid);
-    this.loadingDelete = false;
-    this.dialog = false;
+    if (this.status.showSnackbar && !this.status.showSnackbarError) {
+      this.loadingDelete = false;
+      this.dialog = false;
+    } else {
+      this.loadingDelete = false;
+      this.dialog = false;
+    }
   }
 
   /**

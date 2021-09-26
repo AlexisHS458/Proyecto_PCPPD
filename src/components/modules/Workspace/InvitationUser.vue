@@ -176,7 +176,7 @@ export default class ToolbarUsers extends Vue {
         idUsuarioInvitado: this.invitation,
       };
       await this.sendInvitation(this.invitationModel);
-      if (this.status.showSnackbar) {
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.form.reset();
         this.loading = false;
         this.dialog = false;

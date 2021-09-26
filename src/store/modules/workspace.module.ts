@@ -32,6 +32,11 @@ class WorkspaceModule extends VuexModule {
   public snackbarMessage = "";
 
   /**
+   * Mensaje a mostrar error en snackbar
+   */
+  public snackbarMessageError = "";
+
+  /**
    * Status de la consulta del espacio de trabajo
    */
   public status = {
@@ -41,7 +46,8 @@ class WorkspaceModule extends VuexModule {
     channelEdited: false,
     channelDeleted: false,
     userRemoved: false,
-    showSnackbar: false
+    showSnackbar: false,
+    showSnackbarError: false
   };
 
   @Mutation
@@ -92,6 +98,16 @@ class WorkspaceModule extends VuexModule {
   @Mutation
   public setSnackBarMessage(message: string): void {
     this.snackbarMessage = message;
+  }
+
+  @Mutation
+  public setSnackBarMessageError(message: string): void {
+    this.snackbarMessageError = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessageError(status: boolean): void {
+    this.status.showSnackbarError = status;
   }
 
   @Mutation
@@ -147,11 +163,12 @@ class WorkspaceModule extends VuexModule {
       .then(() => {
         this.context.commit("setChannelCreatedStatus", true);
         this.context.commit("setSnackBarMessage", "Exito al crear canal");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("setChannelCreatedStatus", false);
-        this.context.commit("setSnackBarMessage", "Error al crear canal");
-        this.context.commit("setShowSnackBarMessage", true);
+        this.context.commit("setSnackBarMessageError", "Error al crear canal");
+        this.context.commit("setShowSnackBarMessageError", true);
       });
   }
 
@@ -166,11 +183,12 @@ class WorkspaceModule extends VuexModule {
       .then(() => {
         this.context.commit("setChannelEditedStatus", true);
         this.context.commit("setSnackBarMessage", "Exito al editar canal");
+        this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("setChannelEditedStatus", false);
-        this.context.commit("setSnackBarMessage", "Error al editar canal");
-        this.context.commit("setShowSnackBarMessage", true);
+        this.context.commit("setSnackBarMessageError", "Error al editar canal");
+        this.context.commit("setShowSnackBarMessageError", true);
       });
   }
 
@@ -189,8 +207,8 @@ class WorkspaceModule extends VuexModule {
       })
       .catch(() => {
         this.context.commit("setChannelDeletedStatus", false);
-        this.context.commit("setSnackBarMessage", "Error al eliminar canal");
-        this.context.commit("setShowSnackBarMessage", true);
+        this.context.commit("setSnackBarMessageError", "Error al eliminar canal");
+        this.context.commit("setShowSnackBarMessageError", true);
       });
   }
 
@@ -206,30 +224,46 @@ class WorkspaceModule extends VuexModule {
     });
   }
 
-/**
+  /**
    * Coloca un mensaje en el snackbar
    * @param message mensaje a mostrar en el snackbar
    */
- @Action
- setMessageOnSnackbar(message: string): void{
-   this.context.commit("setSnackBarMessage", message);
- }
+  @Action
+  setMessageOnSnackbar(message: string): void {
+    this.context.commit("setSnackBarMessage", message);
+  }
 
- /**
-  * Hace visible el snackbar
-  */
- @Action
- setVisibleSnackBar(): void{
-   this.context.commit("setShowSnackBarMessage", true);
- }
+  /**
+   * Hace visible el snackbar
+   */
+  @Action
+  setVisibleSnackBar(): void {
+    this.context.commit("setShowSnackBarMessage", true);
+  }
 
- /**
-  * Hace no visible el snackbar
-  */
- @Action
- setNotVisibleSnackBar(): void{
-   this.context.commit("setShowSnackBarMessage", false);
- }
+  /**
+   * Hace visible el snackbar de error
+   */
+  @Action
+  setVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", true);
+  }
+
+  /**
+   * Hace no visible el snackbar
+   */
+  @Action
+  setNotVisibleSnackBar(): void {
+    this.context.commit("setShowSnackBarMessage", false);
+  }
+
+  /**
+   * Hace no visible el snackbar de error
+   */
+  @Action
+  setNotVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", false);
+  }
 
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;

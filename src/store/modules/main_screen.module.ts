@@ -27,6 +27,11 @@ class MainScreenModule extends VuexModule {
   public snackbarMessage = "";
 
   /**
+   * Mensaje a mostrar error en snackbar
+   */
+  public snackbarMessageError = "";
+
+  /**
    * Status de los espacios de trabajo
    * @param loadingList T: Si la lista esta cargando, F: si ya está cargada
    * @param createdWorkSpace T: Si se creó un nuevo WS, F: Si no se creó
@@ -34,6 +39,7 @@ class MainScreenModule extends VuexModule {
    */
   public status = {
     showSnackbar: false,
+    showSnackbarError: false,
     loadingList: true,
     loadingInvitationsList: true,
     createdWorkSpace: false,
@@ -92,6 +98,16 @@ class MainScreenModule extends VuexModule {
   }
 
   @Mutation
+  public setSnackBarMessageError(message: string): void {
+    this.snackbarMessageError = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessageError(status: boolean): void {
+    this.status.showSnackbarError = status;
+  }
+
+  @Mutation
   public setShowSnackBarMessage(status: boolean): void {
     this.status.showSnackbar = status;
   }
@@ -105,13 +121,19 @@ class MainScreenModule extends VuexModule {
     return await WorkSpaceService.createWorkSpace(workspace)
       .then(() => {
         this.context.commit("createWorkSpaceSuccess");
-        this.context.commit("setSnackBarMessage","El espacio de trabajo ha sido creado exitosamente");
+        this.context.commit(
+          "setSnackBarMessage",
+          "El espacio de trabajo ha sido creado exitosamente"
+        );
         this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("createWorkSpaceFailure");
-        this.context.commit("setSnackBarMessage","Error al crear el espacio de trabajo");
-        this.context.commit("setShowSnackBarMessage", true);
+        /**
+         * Nuevas mutaciones
+         */
+        this.context.commit("setSnackBarMessageError", "Error al crear el espacio de trabajo");
+        this.context.commit("setShowSnackBarMessageError", true);
       });
   }
 
@@ -125,13 +147,13 @@ class MainScreenModule extends VuexModule {
     return await WorkSpaceService.deleteWorkSpace(id)
       .then(() => {
         this.context.commit("deleteWorkSpaceSuccess");
-        this.context.commit("setSnackBarMessage","El espacio de trabajo ha sido eliminado");
+        this.context.commit("setSnackBarMessage", "El espacio de trabajo ha sido eliminado");
         this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
         this.context.commit("deleteWorkSpaceFailure");
-        this.context.commit("setSnackBarMessage","Error al eliminar el espacio de trabajo");
-        this.context.commit("setShowSnackBarMessage", true);
+        this.context.commit("setSnackBarMessageError", "Error al eliminar el espacio de trabajo");
+        this.context.commit("setShowSnackBarMessageError", true);
       });
   }
 
@@ -196,11 +218,27 @@ class MainScreenModule extends VuexModule {
   }
 
   /**
+   * Hace visible el snackbar de error
+   */
+  @Action
+  setVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", true);
+  }
+
+  /**
    * Hace no visible el snackbar
    */
   @Action
   setNotVisibleSnackBar(): void {
     this.context.commit("setShowSnackBarMessage", false);
+  }
+
+  /**
+   * Hace no visible el snackbar de error
+   */
+  @Action
+  setNotVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", false);
   }
 
   get isLoadingList(): boolean {

@@ -6,16 +6,37 @@
     <own-card :user="currentUser"></own-card>
     <invitation-card :user="currentUser"></invitation-card>
     <floating-button></floating-button>
+    <!--   Peticiones exitosas del modulo de MainScreen -->
     <snackbar
+      :color="'success'"
       :snackText="snackbarMessage"
       :status="status.showSnackbar"
       :timeout="timeout"
-      :method="closeSnackbar"
+      :method="setNotVisibleSnackBar"
     ></snackbar>
+    <!--   Errores del modulo de MainScreen -->
     <snackbar
-      :snackText="snackbarMessage"
-      :status="status.showSnackbar"
-      :timeout="2000"
+      :color="'error'"
+      :snackText="snackbarMessageError"
+      :status="status.showSnackbarError"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarError"
+    ></snackbar>
+    <!--   Errores del modulo de Invitaciones -->
+    <snackbar
+      :color="'error'"
+      :snackText="snackbarMessageErrorInvitation"
+      :status="statusInvitations.showSnackbarError"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarErrorInvitations"
+    ></snackbar>
+    <!--   Peticiones exitosas del modulo de Invitaciones -->
+    <snackbar
+      :color="'success'"
+      :snackText="snackbarMessageInvitation"
+      :status="statusInvitations.showSnackbar"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarInvitations"
     ></snackbar>
   </v-container>
   <div v-else class="div-progress-circular">
@@ -37,7 +58,7 @@ import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
 import { User } from "@/models/user";
 const User = namespace("UserModule");
 const LeaveWorkspace = namespace("MainScreenModule");
-const Invitations = namespace("MainScreenModule");
+const Invitations = namespace("InvitationsModule");
 @Component({
   components: {
     AppBar,
@@ -73,18 +94,44 @@ export default class ViewMainScreen extends Vue {
   /**
    * Accion obtenida de @module MainScreen
    */
+  @LeaveWorkspace.Action
+  private setNotVisibleSnackBar!: () => void;
+
+  @LeaveWorkspace.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarError!: () => void;
 
   /**
    * Estados obtenidos del @module MainScreen
    */
-  @LeaveWorkspace.Action
-  private setNotVisibleSnackBar!: () => void;
-
   @LeaveWorkspace.State("snackbarMessage")
   private snackbarMessage!: string;
 
+  @LeaveWorkspace.State("snackbarMessageError")
+  private snackbarMessageError!: string;
+
   @LeaveWorkspace.State("status")
   private status!: any;
+
+  /**
+   * Acciones obtenidas del @module Invitations
+   */
+  @Invitations.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarInvitations!: () => void;
+
+  @Invitations.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarErrorInvitations!: () => void;
+
+  /**
+   * Estados obtenidos del @module Invitations
+   */
+  @Invitations.State("status")
+  private statusInvitations!: any;
+
+  @Invitations.State("snackbarMessage")
+  private snackbarMessageInvitation!: string;
+
+  @Invitations.State("snackbarMessageError")
+  private snackbarMessageErrorInvitation!: string;
 
   public timeout = -1;
 
@@ -94,12 +141,11 @@ export default class ViewMainScreen extends Vue {
     }
   }
 
-  closeSnackbar() {
-    this.setNotVisibleSnackBar();
-  }
-
   destroyed() {
     this.setNotVisibleSnackBar();
+    this.setNotVisibleSnackBarInvitations();
+    this.setNotVisibleSnackBarErrorInvitations();
+    this.setNotVisibleSnackBarError();
   }
 }
 </script>
