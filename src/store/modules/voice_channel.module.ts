@@ -11,12 +11,12 @@ class VoiceChannelModule extends VuexModule{
     /**
      * Stream de audio local
      */
-    public localStream: MediaStream | undefined;
+    public localStream: MediaStream | undefined = undefined;
 
     /**
      * Stream de audio remoto
      */
-    public remoteStream: MediaStream | undefined;
+    public remoteStream: MediaStream | undefined = undefined;
 
 
     @Mutation 
@@ -32,7 +32,7 @@ class VoiceChannelModule extends VuexModule{
 
     @Action
     public setupLocalStream():  void{
-        
+
     }
 
     /**

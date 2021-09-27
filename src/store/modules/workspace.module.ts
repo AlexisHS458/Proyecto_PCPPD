@@ -4,7 +4,7 @@ import { TextChannel } from "@/models/textChannel";
 import ChannelsService from "@/services/channels.service";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { User } from "@/models/user";
-import work_spaceService from "@/services/work_space.service";
+import { VoiceChannel } from "@/models/voiceChannel";
 
 /**
  * Modulo de acceso a información de un solo espacio de trabajo
@@ -25,6 +25,12 @@ class WorkspaceModule extends VuexModule {
    * Canales de texto del espacio de trabajo
    */
   public textChannels: TextChannel[] = [];
+
+
+  /**
+   * Canales de voz en el espacio de trabajo
+   */
+  public voiceChannels: VoiceChannel[] = [];
 
   /**
    * Mensaje a mostrar en snackbar
@@ -58,6 +64,10 @@ class WorkspaceModule extends VuexModule {
   @Mutation
   public setTextChannels(textChannels: Array<TextChannel>): void {
     this.textChannels = textChannels;
+  }
+  @Mutation
+  public setVoiceChannels(voiceChannels: Array<VoiceChannel>): void {
+    this.voiceChannels= voiceChannels;
   }
 
   @Mutation
@@ -128,7 +138,7 @@ class WorkspaceModule extends VuexModule {
   }
 
   /**
-   * Obtiene los canales de texto del canal de código
+   * Obtiene los canales de texto del espacio de trabajo
    * @param uid ID único del espacio de trabajo a consultar
    */
   @Action
@@ -139,6 +149,19 @@ class WorkspaceModule extends VuexModule {
       this.context.commit("setLoadingStatus", false);
     });
   }
+
+  /**
+   * Obtiene los canales de voz del espacio de trabajo
+   * @param uid ID único del espacio de trabajo a consultar
+   */
+   @Action
+   async fetchVoiceChannels(uid: string): Promise<void> {
+     this.context.commit("setLoadingStatus", true);
+     ChannelsService.getVoiceChannels(uid, voiceChannels => {
+       this.context.commit("setVoiceChannels", voiceChannels);
+       this.context.commit("setLoadingStatus", false);
+     });
+   }
 
   /**
    * Obtiene los usuarios dentro del espacio de trabajo.
@@ -211,6 +234,66 @@ class WorkspaceModule extends VuexModule {
         this.context.commit("setShowSnackBarMessageError", true);
       });
   }
+
+/**
+   * Crea un canal de voz en el espacio de trabajo
+   * @param voiceChannel Canal de voz a agregar al espacio de trabajo
+   */
+ @Action
+ async createVoiceChannel(voiceChannel: VoiceChannel): Promise<void> {
+   this.context.commit("setChannelCreatedStatus", false);
+   ChannelsService.createVoiceChannel(this.workspace.uid, voiceChannel)
+     .then(() => {
+       this.context.commit("setChannelCreatedStatus", true);
+       this.context.commit("setSnackBarMessage", "Exito al crear canal");
+       this.context.commit("setShowSnackBarMessage", true);
+     })
+     .catch(() => {
+       this.context.commit("setChannelCreatedStatus", false);
+       this.context.commit("setSnackBarMessageError", "Error al crear canal");
+       this.context.commit("setShowSnackBarMessageError", true);
+     });
+ }
+
+ /**
+  * Editar un canal de voz
+  * @param voiceChannel Información del nuevo canal de voz
+  */
+ @Action
+ async editVoiceChannel(voiceChannel: VoiceChannel): Promise<void> {
+   this.context.commit("setChannelEditedStatus", false);
+   ChannelsService.editVoiceChannel(this.workspace.uid, voiceChannel)
+     .then(() => {
+       this.context.commit("setChannelEditedStatus", true);
+       this.context.commit("setSnackBarMessage", "Exito al editar canal");
+       this.context.commit("setShowSnackBarMessage", true);
+     })
+     .catch(() => {
+       this.context.commit("setChannelEditedStatus", false);
+       this.context.commit("setSnackBarMessageError", "Error al editar canal");
+       this.context.commit("setShowSnackBarMessageError", true);
+     });
+ }
+
+ /**
+  * Elimina un canal de voz del espacio de trabajo
+  * @param voiceChannelID ID del canal de texto a eliminar
+  */
+ @Action
+ async deleteVoiceChannel(voiceChannelID: string): Promise<void> {
+   this.context.commit("setChannelDeletedStatus", false);
+   ChannelsService.deleteVoiceChannel(this.workspace.uid, voiceChannelID)
+     .then(() => {
+       this.context.commit("setChannelDeletedStatus", true);
+       this.context.commit("setSnackBarMessage", "Exito al eliminar canal");
+       this.context.commit("setShowSnackBarMessage", true);
+     })
+     .catch(() => {
+       this.context.commit("setChannelDeletedStatus", false);
+       this.context.commit("setSnackBarMessageError", "Error al eliminar canal");
+       this.context.commit("setShowSnackBarMessageError", true);
+     });
+ }
 
   /**
    * Elimina un usuario del espacio de trabajo.
