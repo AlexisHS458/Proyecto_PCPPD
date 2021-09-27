@@ -1,7 +1,3 @@
-import { CodeChannel } from "./codeChannel";
-import { TextChannel } from "./textChannel";
-import { VoiceChannel } from "./voiceChannel";
-
 /**
  * Modelo de espacios de trabajo
  */
@@ -18,20 +14,6 @@ export interface Workspace {
    * Nombre del espacio de trabajo
    */
   nombre: string;
-
-  /**
-   * Canales de código dentro del espacio de trabajo
-   */
-  canales_codigo?: CodeChannel;
-  /**
-   * Canales de texto dentro del espacio de trabajo
-   */
-  canales_texto: TextChannel[];
-
-  /**
-   * Canales de voz dentro del espacio de trabajo
-   */
-  canales_voz: VoiceChannel[];
 
   /**
    * IDs de usuarios pertenencientes al espacio de trabajo

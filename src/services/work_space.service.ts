@@ -1,7 +1,6 @@
 import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
-import ChannelsService from "@/services/channels.service";
 import { User } from "@/models/user";
 
 /**
@@ -48,11 +47,7 @@ class WorkSpaceService {
               ...doc.data(),
               uid: doc.id, 
             };
-            const workspaceData = <Workspace>workspace;
-            ChannelsService.getTextChannels(doc.id, textChannels => {
-              workspaceData.canales_texto = textChannels;
-            })
-            return workspaceData;
+            return <Workspace>workspace;
           })
         );
       });
