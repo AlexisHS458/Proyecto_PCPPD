@@ -29,20 +29,18 @@ class VoiceChannelModule extends VuexModule{
         this.remoteStream = stream;
     }
 
-
-    @Action
-    public setupLocalStream():  void{
-
+    @Mutation
+    public addTrack(track: MediaStreamTrack){
+        this.peerConnection?.addTrack(track, this.localStream!);
     }
 
-    /**
-     * Coloca los track el local stream a la peer connection
-     */
     @Action
-    public pushTrackFromLocalStream(){
-
-
+    public setupLocalStream(): void{
+        this.localStream?.getTracks().forEach((track) => {
+            this.context.commit("addTrack",track);
+        })
     }
+
 
 }
 
