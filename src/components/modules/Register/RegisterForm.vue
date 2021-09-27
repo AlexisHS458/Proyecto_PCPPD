@@ -25,7 +25,7 @@
                       :rules="[rules.required, rules.regex]"
                       outlined
                       dense
-                      prepend-inner-icon="mdi-account "
+                      prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="8">
@@ -48,6 +48,7 @@
                       dense
                       color="primary"
                       prepend-inner-icon="mdi-credit-card-outline"
+                      :error-messages="textError"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="4">
@@ -116,8 +117,10 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
+import { Ref } from "vue-property-decorator";
+import { VForm } from "@/utils/types";
 const Auth = namespace("UserModule");
-
+const GetUsers = namespace("InvitationsModule");
 @Component
 export default class Register extends Vue {
   /**
@@ -144,11 +147,26 @@ export default class Register extends Vue {
   @Auth.Getter
   private isLoading!: boolean;
 
+  /**
+   * Accion obtenida del @module Invitations
+   */
+  @GetUsers.Action
+  private fetchUserNames!: () => void;
+
+  /**
+   * Estado obtenido del @module Invitations
+   */
+  @GetUsers.State("users")
+  private users!: User[];
+
+  @Ref("form") readonly form!: VForm;
+
   public loading = false;
   public valid = true;
   public snackbar = false;
   public text = "Ocurrio un error al registrarte";
   public timeout = 2000;
+  public textError = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regex: (v: string): string | boolean =>
@@ -160,10 +178,11 @@ export default class Register extends Vue {
         v
       ) || "Apellido inválido",
     regexBoleta: (v: string): string | boolean =>
-      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido",
+      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválida",
   };
 
   async created(): Promise<void> {
+    this.fetchUserNames();
     //Se obtiene información del usuario.
     await this.fetchCurrentUser();
     //Si el usuario ya esta regsitrado será redireccionado a la pantalla principal
@@ -178,15 +197,22 @@ export default class Register extends Vue {
    */
   async handleRegister(): Promise<void> {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.form.resetValidation();
       this.loading = true;
       this.snackbar = false;
-      await this.saveUser(this.currentUser);
-      if (this.isLoggedIn) {
-        this.loading = false;
-        this.$router.push({ path: "/Mainscreen" });
+
+      if (!this.users.find((user) => user.boleta === this.currentUser.boleta)) {
+        await this.saveUser(this.currentUser);
+        if (this.isLoggedIn) {
+          this.loading = false;
+          this.$router.push({ path: "/Mainscreen" });
+        } else {
+          this.loading = false;
+          this.snackbar = true;
+        }
       } else {
+        this.textError = "Boleta duplicada";
         this.loading = false;
-        this.snackbar = true;
       }
     }
   }

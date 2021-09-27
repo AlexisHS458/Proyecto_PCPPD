@@ -46,6 +46,7 @@
                       dense
                       color="primary"
                       prepend-inner-icon="mdi-credit-card-outline"
+                      :error-messages="textError"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="4">
@@ -112,7 +113,10 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
+import { Ref } from "vue-property-decorator";
+import { VForm } from "@/utils/types";
 const EditUser = namespace("UserModule");
+const GetUsers = namespace("InvitationsModule");
 
 @Component
 export default class ViewEdit extends Vue {
@@ -140,6 +144,20 @@ export default class ViewEdit extends Vue {
   @EditUser.Getter
   private isLoading!: boolean;
 
+  /**
+   * Accion obtenida del @module Invitations
+   */
+  @GetUsers.Action
+  private fetchUserNames!: () => void;
+
+  /**
+   * Estado obtenido del @module Invitations
+   */
+  @GetUsers.State("users")
+  private users!: User[];
+
+  @Ref("form") readonly form!: VForm;
+
   public user = {} as User;
   public loading = false;
   public valid = true;
@@ -148,6 +166,7 @@ export default class ViewEdit extends Vue {
   public textFailture = "Ocurrio un error al registrarte";
   public textSuccess = "Se actualizo tu información";
   public timeout = 2000;
+  public textError = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regex: (v: string): string | boolean =>
@@ -173,6 +192,7 @@ export default class ViewEdit extends Vue {
     }
     /*  await this.fetchCurrentUser(); */
     this.user = JSON.parse(JSON.stringify(this.currentUser));
+    this.fetchUserNames();
   }
 
   /**
@@ -180,16 +200,27 @@ export default class ViewEdit extends Vue {
    */
   async handleEditInfo(): Promise<void> {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.form.resetValidation();
       this.loading = true;
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
-      await this.saveUser(this.user);
-      if (this.isLoggedIn) {
+      /*   let index = this.users.findIndex((user) => user.uid === this.user.uid);
+      if (index > -1) {
+        this.users.splice(index, 1);
+      } */
+      if (!this.users.find((user) => user.boleta === this.user.boleta)) {
+        await this.saveUser(this.user);
+        if (this.isLoggedIn) {
+          this.loading = false;
+          this.snackbarSuccess = true;
+        } else {
+          this.loading = false;
+          this.snackbarFailture = true;
+        }
+      }
+      {
         this.loading = false;
-        this.snackbarSuccess = true;
-      } else {
-        this.loading = false;
-        this.snackbarFailture = true;
+        this.textError = "Boleta duplicada";
       }
     }
   }

@@ -103,10 +103,16 @@ export default class ToolbarUsers extends Vue {
   private sendInvitation!: (invitation: Invitation) => Promise<void>;
 
   /**
-   * Estado obtenido del @module Invitations
+   * Estados obtenidos del @module Invitations
    */
   @Invitations.State("users")
   private users!: User[];
+
+  @Invitations.State("status")
+  private status!: any;
+
+  @Invitations.State("snackbarMessage")
+  private snackbarMessage!: string;
 
   @Watch("invitation")
   onChildChanged(val: string) {
@@ -170,9 +176,15 @@ export default class ToolbarUsers extends Vue {
         idUsuarioInvitado: this.invitation,
       };
       await this.sendInvitation(this.invitationModel);
-      this.form.reset();
-      this.loading = false;
-      this.dialog = false;
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.form.reset();
+        this.loading = false;
+        this.dialog = false;
+      } else {
+        this.form.reset();
+        this.loading = false;
+        this.dialog = false;
+      }
     }
   }
 

@@ -223,11 +223,22 @@ export default class NameChannels extends Vue {
   @WorkspaceOptions.Action
   private deleteTextChannel!: (textChannelID: string) => Promise<void>;
 
-  @User.State("user")
-  private currentUser!: User;
+  /**
+   * Estado obtenido del @module Workspace
+   */
+
+  @WorkspaceOptions.State("status")
+  private status!: any;
 
   @WorkspaceOptions.State("workspace")
   private workspace!: Workspace;
+
+  /**
+   * Estado obtenido del @module User
+   */
+
+  @User.State("user")
+  private currentUser!: User;
 
   @Ref("form") readonly form!: VForm;
 
@@ -252,9 +263,15 @@ export default class NameChannels extends Vue {
       this.loadingRenameChanel = true;
       this.channel.nombre = this.newNameChannel;
       this.editTextChannel(this.channel);
-      this.loadingRenameChanel = false;
-      this.form.reset();
-      this.dialogRenameChanel = false;
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.loadingRenameChanel = false;
+        this.form.reset();
+        this.dialogRenameChanel = false;
+      } else {
+        this.loadingRenameChanel = false;
+        this.form.reset();
+        this.dialogRenameChanel = false;
+      }
     }
   }
 
@@ -264,9 +281,13 @@ export default class NameChannels extends Vue {
   async deleteChannel() {
     this.loadingDelete = true;
     await this.deleteTextChannel(this.channel.uid!);
+    /*  if (this.status.showSnackbar) { */
     this.loadingDelete = false;
     this.dialogDelete = false;
-    this.$router.replace({ path: "/space/" + this.workspaceUID });
+    if (this.$route.path != "/space/" + this.workspaceUID) {
+      this.$router.replace({ path: "/space/" + this.workspaceUID });
+      /* } */
+    }
   }
 }
 </script>

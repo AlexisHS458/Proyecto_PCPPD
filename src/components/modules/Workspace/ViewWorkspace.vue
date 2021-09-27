@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="!isLoading && !isLoadingWorkspace" class="row" no-gutters>
+  <v-row v-if="!isLoading && !isLoadingWorkspace" no-gutters>
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto div">
         <info-workspace
@@ -35,6 +35,40 @@
         </v-list>
       </div>
     </v-col>
+    <!--   Peticiones exitosas del modulo de Invitaciones -->
+    <snackbar
+      :color="'success'"
+      :snackText="snackbarMessage"
+      :status="status.showSnackbar"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarInvitations"
+    ></snackbar>
+
+    <!--   Errores del modulo de Invitaciones -->
+    <snackbar
+      :color="'error'"
+      :snackText="snackbarErrorMessage"
+      :status="status.showSnackbarError"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarErrorInvitations"
+    ></snackbar>
+
+    <!--   Peticiones exitosas del modulo de Workspace -->
+    <snackbar
+      :color="'success'"
+      :snackText="snackbarMessageWorkspace"
+      :status="statusWorkspace.showSnackbar"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarWorkspace"
+    ></snackbar>
+    <!--   Errores del modulo de Workspace -->
+    <snackbar
+      :color="'error'"
+      :snackText="snackbarMessageErrorWorkspace"
+      :status="statusWorkspace.showSnackbarError"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarErrorWorkspace"
+    ></snackbar>
   </v-row>
   <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
@@ -51,6 +85,7 @@ import InfoUser from "@/components/modules/Workspace/InfoUser.vue";
 import Channels from "@/components/modules/Workspace/Channels/ViewChannels.vue";
 import InvitationUser from "@/components/modules/Workspace/InvitationUser.vue";
 import ListUser from "@/components/modules/Workspace/ListUsers.vue";
+import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
@@ -58,7 +93,7 @@ import { Message } from "@/models/message";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
-
+const Invitations = namespace("InvitationsModule");
 @Component({
   components: {
     InfoWorkspace,
@@ -66,6 +101,7 @@ const Messages = namespace("TextChannelModule");
     InfoUser,
     InvitationUser,
     ListUser,
+    Snackbar,
   },
 })
 export default class Spacework extends Vue {
@@ -98,10 +134,16 @@ export default class Spacework extends Vue {
   private fetchMyWorkspace!: (id: string) => Promise<void>;
 
   @MyWorkSpace.Action
-  private fetchTextChannels!: (id: string) => void;
+  private fetchTextChannels!: (id: string) => Promise<void>;
 
   @MyWorkSpace.Action
   private fetchUsersInWorkspace!: () => void;
+
+  @MyWorkSpace.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarWorkspace!: () => void;
+
+  @MyWorkSpace.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarErrorWorkspace!: () => void;
 
   /**
    * Estados obtenidos del @module Workspace
@@ -114,6 +156,15 @@ export default class Spacework extends Vue {
 
   @MyWorkSpace.State("users")
   private users!: User[];
+
+  @MyWorkSpace.State("status")
+  private statusWorkspace!: any;
+
+  @MyWorkSpace.State("snackbarMessage")
+  private snackbarMessageWorkspace!: string;
+
+  @MyWorkSpace.State("snackbarMessageError")
+  private snackbarMessageErrorWorkspace!: string;
 
   /**
    * Getter obtenido del @module Workspace
@@ -134,7 +185,7 @@ export default class Spacework extends Vue {
   private setWorkspaceIDtoModule!: (id: string) => void;
 
   /**
-   * Estado obtenido del @module Messages
+   * Estados obtenidos del @module Messages
    */
   @Messages.State("messages")
   private messages!: Message[];
@@ -145,6 +196,29 @@ export default class Spacework extends Vue {
   @Messages.Getter
   private isLoadingMessages!: boolean;
 
+  /**
+   * Acciones obtenidas del @module Invitations
+   */
+  @Invitations.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarInvitations!: () => void;
+
+  @Invitations.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarErrorInvitations!: () => void;
+
+  /**
+   * Estados obtenidos del @module Invitations
+   */
+  @Invitations.State("snackbarMessage")
+  private snackbarMessage!: string;
+
+  @Invitations.State("snackbarMessageError")
+  private snackbarErrorMessage!: string;
+
+  @Invitations.State("status")
+  private status!: any;
+
+  public timeout = -1;
+
   async created() {
     if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
@@ -152,9 +226,14 @@ export default class Spacework extends Vue {
     //Obtener información del espacio de trabajo
     await this.fetchMyWorkspace(this.$route.params.id);
     //Obtener información de los canles del espacio de trabajo
-    this.fetchTextChannels(this.$route.params.id);
+    await this.fetchTextChannels(this.$route.params.id);
     //Obtener usuarios del espacio de trabajo
     this.fetchUsersInWorkspace();
+  }
+
+  destroyed() {
+    this.setNotVisibleSnackBarInvitations();
+    this.setNotVisibleSnackBarWorkspace();
   }
 }
 </script>

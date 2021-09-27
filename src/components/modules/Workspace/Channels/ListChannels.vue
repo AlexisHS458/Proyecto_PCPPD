@@ -8,13 +8,14 @@
 
         <span class="header"> {{ item.title }}</span>
         <v-dialog
-          v-if="workspace.uid_usuario == currentUser.uid"
+          v-show="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
           max-width="600"
           v-model="dialog"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
+              v-show="channels.length < 2"
               class="add mx-2"
               icon
               color="white"
@@ -114,11 +115,19 @@ export default class ListChannels extends Vue {
   })
   public workspaceUID!: string;
 
+  @Prop({
+    required: false,
+  })
+  public workspaceChannels!: any;
+
   /**
    * Accion obtenida del @module Workspace
    */
   @WorkspaceOptions.Action
   private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
+
+  @WorkspaceOptions.State("status")
+  private status!: any;
 
   /**
    * Estado obtenido del @module Workspace
@@ -158,9 +167,15 @@ export default class ListChannels extends Vue {
         permisos: [],
       };
       await this.createTextChannel(this.textChannel);
-      this.loading = false;
-      this.form.reset();
-      this.dialog = false;
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.loading = false;
+        this.form.reset();
+        this.dialog = false;
+      } else {
+        this.loading = false;
+        this.form.reset();
+        this.dialog = false;
+      }
     }
   }
 }

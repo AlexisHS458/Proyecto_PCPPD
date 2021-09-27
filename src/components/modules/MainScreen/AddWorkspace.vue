@@ -37,7 +37,9 @@
         </v-form>
       </v-card-text>
       <v-card-actions class="justify-end">
-        <v-btn color="success" @click="handleAddSpace">Aceptar</v-btn>
+        <v-btn color="success" @click="handleAddSpace" :loading="loading"
+          >Aceptar</v-btn
+        >
         <v-btn text @click="closeAddSpace">Cancelar</v-btn>
       </v-card-actions>
     </v-card>
@@ -61,7 +63,13 @@ export default class AddCard extends Vue {
    * Accion obtenida del @module MainScreen
    */
   @AddWorkspace.Action
-  private addWorkSpace!: (workspace: Workspace) => void;
+  private addWorkSpace!: (workspace: Workspace) => Promise<void>;
+
+  /**
+   * Estado obtenido del @module MainScreen
+   */
+  @AddWorkspace.State("status")
+  private status!: any;
 
   /**
    * Estado obtenido del @module User
@@ -72,6 +80,7 @@ export default class AddCard extends Vue {
   @Ref("form") readonly form!: VForm;
 
   public show = false;
+  public loading = false;
   public dialog = false;
   public valid = true;
   public workspace = {} as Workspace;
@@ -83,15 +92,24 @@ export default class AddCard extends Vue {
   /**
    * Crear nuevo espacio de trabajo
    */
-  handleAddSpace(): void {
+  async handleAddSpace() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loading = true;
       this.workspace.uid_usuario = this.currentUser.uid!;
       this.workspace.nombre = this.workspaceName;
       this.workspace.usuarios = [this.currentUser.uid!];
-      this.addWorkSpace(this.workspace);
-      this.form.resetValidation();
-      this.form.reset();
-      this.dialog = false;
+      await this.addWorkSpace(this.workspace);
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.form.resetValidation();
+        this.form.reset();
+        this.loading = false;
+        this.dialog = false;
+      } else {
+        this.form.resetValidation();
+        this.form.reset();
+        this.loading = false;
+        this.dialog = false;
+      }
     }
   }
 

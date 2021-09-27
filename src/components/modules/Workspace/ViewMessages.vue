@@ -1,19 +1,46 @@
 <template>
   <div class="mx-auto card-center">
-    <app-bar-messages></app-bar-messages>
-    <v-list three-line class="list-background scroll" ref="vList">
-      <list-messages
-        class="flex-grow-1"
-        v-for="(message, index) in messages"
-        :key="index"
-        :message="message"
-        :currentUser="currentUser"
-      ></list-messages>
+    <app-bar-messages :channelApp="channel"></app-bar-messages>
+    <v-list
+      three-line
+      class="list-background scroll flex-grow-1 flex-shrink-1"
+      ref="vList"
+    >
+      <template v-if="messages.length > 0">
+        <list-messages
+          v-for="(message, index) in messages"
+          :key="index"
+          :message="message"
+          :currentUser="currentUser"
+        ></list-messages>
+      </template>
+      <template v-else>
+        <v-img src="@/assets/Messages.svg" class="img-not-messages"> </v-img>
+      </template>
     </v-list>
     <input-message
+      class="flex-grow-0 flex-shrink-0"
       :workspace="workspace"
       :currentUser="currentUser"
     ></input-message>
+
+    <!--   Peticiones exitosas del modulo de TextChannel -->
+    <snackbar
+      :color="'success'"
+      :snackText="snackbarMessage"
+      :status="status.showSnackbar"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBar"
+    ></snackbar>
+
+    <!--   Errores del modulo de TextChannel -->
+    <snackbar
+      :color="'error'"
+      :snackText="snackbarMessageError"
+      :status="status.showSnackbarError"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarError"
+    ></snackbar>
   </div>
 </template>
 
@@ -24,6 +51,7 @@ import { namespace } from "vuex-class";
 import AppBarMessages from "@/components/modules/Workspace/Channels/Text/AppBarMessages.vue";
 import InputMessage from "@/components/modules/Workspace/Channels/Text/InputMessage.vue";
 import ListMessages from "@/components/modules/Workspace/Channels/Text/ListMessages.vue";
+import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
@@ -32,9 +60,10 @@ import { Prop, Watch } from "vue-property-decorator";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
-
+const Invitations = namespace("InvitationsModule");
 @Component({
   components: {
+    Snackbar,
     AppBarMessages,
     InputMessage,
     ListMessages,
@@ -61,6 +90,12 @@ export default class MessagesPage extends Vue {
   @MyWorkSpace.Action
   private fetchTextChannels!: (id: string) => void;
 
+  @MyWorkSpace.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarWorkspace!: () => void;
+
+  @MyWorkSpace.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarErrorWorkspace!: () => void;
+
   /**
    * Estados obtenidas del @module Workspace
    */
@@ -82,17 +117,37 @@ export default class MessagesPage extends Vue {
   @Messages.Action
   setWorkspaceIDtoModule!: (id: string) => void;
 
+  @Messages.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBar!: () => void;
+
+  @Messages.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarError!: () => void;
   /**
    * Estado obtenido del @module Messages
    */
   @Messages.State("messages")
   private messages!: Message[];
 
+  @Messages.State("snackbarMessage")
+  private snackbarMessage!: string;
+
+  @Messages.State("snackbarMessageError")
+  private snackbarMessageError!: string;
+
+  @Messages.State("status")
+  private status!: any;
+
   /**
    * Getters obtenido del @module Messages
    */
   @Messages.Getter
   private isLoadingMessages!: boolean;
+
+  @Invitations.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarInvitations!: () => void;
+
+  @Invitations.Action("setNotVisibleSnackBarError")
+  setNotVisibleSnackBarErrorInvitations!: () => void;
 
   /**
    * Cada que se cambie de canal de texto se mandara a llamar la función de obtener mensajes
@@ -102,6 +157,9 @@ export default class MessagesPage extends Vue {
     this.getMessages();
   }
 
+  public channel? = {} as TextChannel;
+  public timeout = -1;
+
   /**
    * Obtener mensajes
    */
@@ -109,12 +167,30 @@ export default class MessagesPage extends Vue {
     this.getMessages();
   }
 
+  destroyed() {
+    this.setNotVisibleSnackBarWorkspace();
+    this.setNotVisibleSnackBar();
+    this.setNotVisibleSnackBarInvitations();
+    this.setNotVisibleSnackBarError();
+    this.setNotVisibleSnackBarErrorWorkspace();
+    this.setNotVisibleSnackBarErrorInvitations();
+  }
+
   /**
    * Obtener mensajes
    */
   getMessages() {
+    this.setNotVisibleSnackBar();
+    this.setNotVisibleSnackBarInvitations();
+    this.setNotVisibleSnackBarWorkspace();
+    this.setNotVisibleSnackBarError();
+    this.setNotVisibleSnackBarErrorWorkspace();
+    this.setNotVisibleSnackBarErrorInvitations();
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
+    this.channel = this.workspace.canales_texto.find(
+      (channel) => channel.uid === this.$route.params.idChannel
+    );
     this.fetchMesages(() => {
       setTimeout(() => {
         //Mostrar scroll inverso
@@ -155,6 +231,16 @@ export default class MessagesPage extends Vue {
   color: white;
   max-height: 100vh;
   overflow-x: auto;
+}
+.img-not-messages {
+  width: 40rem;
+  height: 20rem;
+  margin: auto;
+
+  /*  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 7rem; */
 }
 </style>
 
