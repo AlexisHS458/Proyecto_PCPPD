@@ -8,7 +8,7 @@
 
         <span class="header"> {{ item.title }}</span>
         <v-dialog
-          v-show="workspace.uid_usuario == currentUser.uid"
+          v-if="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
           max-width="600"
           v-model="dialog"

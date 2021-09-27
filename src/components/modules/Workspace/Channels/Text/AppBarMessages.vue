@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
-import { Workspace } from "@/models/workspace";
 import { TextChannel } from "@/models/textChannel";
 
 @Component
@@ -15,7 +14,7 @@ export default class AppBarMessages extends Vue {
   @Prop({
     required: true,
   })
-  public channelApp?: TextChannel;
+  public channelApp!: TextChannel;
 }
 </script>
 

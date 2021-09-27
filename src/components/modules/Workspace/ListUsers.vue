@@ -85,6 +85,63 @@
             </v-list-item-content>
           </v-list>
         </v-menu>
+        <!--  <v-menu
+          v-else-if="currentUser.uid == currentUser.uid"
+          v-model="menu"
+          offset-y
+        >
+          <template #activator="{ on }">
+            <v-btn text icon v-on="on" :class="{ hidden: !hover && !menu }">
+              <v-icon color="white">mdi-cog</v-icon>
+            </v-btn>
+          </template>
+          <v-list color="secondary">
+            <v-list-item-content class="justify-center card-list">
+              <div class="mx-auto text-right">
+                <v-dialog
+                  transition="dialog-top-transition"
+                  max-width="600"
+                  v-model="dialog"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      depressed
+                      text
+                      block
+                      class="btn"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon color="error" class="mr-6"> mdi-delete </v-icon>
+                      Eliminar
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <v-toolbar color="error" dark>
+                      Solicitud de confirmación
+                    </v-toolbar>
+                    <v-card-text>
+                      <div class="text-h6 pa-5 text-center">
+                        <p>
+                          ¿SEGURO QUE DESEAS ELIMINAR ESTE COLABORADOR DEL
+                          ESPACIO DE TRABAJO?
+                        </p>
+                      </div>
+                      <v-row align="center" justify="center">
+                        <v-btn color="error" @click="kickUserWorkspace">
+                          SI, QUIERO ELIMINARLO
+                        </v-btn>
+                      </v-row>
+                    </v-card-text>
+                    <v-card-actions class="justify-end">
+                      <v-btn text @click="dialog = false">Cancelar</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </div>
+            </v-list-item-content>
+          </v-list>
+        </v-menu> -->
       </v-list-item-action>
     </v-list-item>
   </v-hover>
@@ -127,6 +184,7 @@ export default class UserList extends Vue {
   public model = 1;
   public status = Status.OFFLINE;
   public dialog = false;
+  public isValid = true;
 
   /**
    * Checar status de cada usuario
@@ -142,6 +200,12 @@ export default class UserList extends Vue {
   async kickUserWorkspace() {
     await this.kickUser(this.user.uid!);
     this.dialog = false;
+  }
+
+  validated() {
+    if (this.workspace.uid_usuario == this.currentUser.uid) {
+      this.isValid = false;
+    }
   }
 }
 </script>

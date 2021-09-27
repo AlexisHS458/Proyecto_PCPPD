@@ -88,7 +88,7 @@ export default class MessagesPage extends Vue {
   private fetchMyWorkspace!: (id: string) => void;
 
   @MyWorkSpace.Action
-  private fetchTextChannels!: (id: string) => void;
+  private fetchTextChannels!: (id: string) => Promise<void>;
 
   @MyWorkSpace.Action("setNotVisibleSnackBar")
   setNotVisibleSnackBarWorkspace!: () => void;
@@ -163,7 +163,8 @@ export default class MessagesPage extends Vue {
   /**
    * Obtener mensajes
    */
-  mounted() {
+  /* async */ mounted() {
+    /*   await this.fetchTextChannels(this.$route.params.id); */
     this.getMessages();
   }
 
@@ -188,9 +189,10 @@ export default class MessagesPage extends Vue {
     this.setNotVisibleSnackBarErrorInvitations();
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    this.channel = this.workspace.canales_texto.find(
+    this.channel = this.textChannel.find(
       (channel) => channel.uid === this.$route.params.idChannel
     );
+
     this.fetchMesages(() => {
       setTimeout(() => {
         //Mostrar scroll inverso

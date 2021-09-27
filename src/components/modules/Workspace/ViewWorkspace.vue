@@ -227,6 +227,7 @@ export default class Spacework extends Vue {
     await this.fetchMyWorkspace(this.$route.params.id);
     //Obtener información de los canles del espacio de trabajo
     await this.fetchTextChannels(this.$route.params.id);
+
     //Obtener usuarios del espacio de trabajo
     this.fetchUsersInWorkspace();
   }
