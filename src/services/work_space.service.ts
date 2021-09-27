@@ -73,16 +73,7 @@ class WorkSpaceService {
              uid: value.id
             } 
             if (workspaceData) {
-              const workspace = <Workspace>workspaceData;
-              
-              ChannelsService.getTextChannels(workspace.uid, textChannels => {
-                workspace.canales_texto = textChannels;
-              })
-              ChannelsService.getVoiceChannels(workspace.uid, voiceChannels => {
-                workspace.canales_voz = voiceChannels;
-              })
-
-              resolve(workspace);
+              resolve(<Workspace>workspaceData);
             }
           },
           error => {

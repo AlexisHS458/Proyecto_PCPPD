@@ -8,19 +8,7 @@ import { Collection } from "@/utils/collections";
  * Conexión a servicios de información de los canales.
  */
 class ChannelsService {
-  /**
-   * Agrega un nuevo canal de codigo
-   * @param codeChannel
-   * @returns CodeChannel. Referencia del canal de codigo creado.
-   */
-  async createCodeChannel(
-    workSpaceID: string,
-    name: string,
-    codeChannel: CodeChannel
-  ): Promise<CodeChannel> {
-    const codeChannelRef = (await db.collection(Collection.CHANNELS).add(codeChannel)).get();
-    return <CodeChannel>(await codeChannelRef).data();
-  }
+  
 
   /**
    * Agrega un nuevo canal de texto
@@ -61,50 +49,8 @@ class ChannelsService {
     .delete();
   }
 
-  /**
-   * Agrega un nuevo canal de voz
-   * @param voiceChannel
-   * @returns CodeChannel. Referencia del canal de voz creado.
-   */
-  async createVoiceChannel(
-    workSpaceID: string,
-    name: string,
-    voiceChannel: VoiceChannel
-  ): Promise<VoiceChannel> {
-    const voiceChannelRef = (await db.collection(Collection.CHANNELS).add(voiceChannel)).get();
-    return <VoiceChannel>(await voiceChannelRef).data();
-  }
-
-  /**
-   * Eliminar un un canal existente
-   * @param id ID del documento a eliminar
-   */
-  async deleteChannel(id: string): Promise<void> {
-    const delChannel = await db
-      .collection(Collection.CHANNELS)
-      .doc(id)
-      .delete();
-  }
-
-  /**
-   * Recupera los canales de codigo de un espacio de trabajo
-   * @param id ID del espacio de trabajo a recuperar sus canales
-   */
-  getCodeChannels(id: string, onSnapshot: (codeChannels: CodeChannel[]) => void): void {
-    db.collection(Collection.CHANNELS)
-      .where("uid_usuario", "==", id)
-      .onSnapshot(snapshot => {
-        onSnapshot(
-          snapshot.docs.map<CodeChannel>(doc => {
-            const codeChannel = {
-              ...doc.data(),
-              id: doc.id
-            };
-            return <CodeChannel>codeChannel;
-          })
-        );
-      });
-  }
+  
+  
 
   /**
    * Recupera los canales de texto de un espacio de trabajo
@@ -134,20 +80,22 @@ class ChannelsService {
    * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
    */
   getVoiceChannels(workSpaceID: string, onSnapshot: (voiceChannels: VoiceChannel[]) => void): void {
-    db.collection(Collection.CHANNELS)
-      .doc(workSpaceID)
-      .collection(Collection.VOICE_CHANNEL)
-      .onSnapshot(snapshot => {
-        onSnapshot(
-          snapshot.docs.map<VoiceChannel>(doc => {
-            const voiceChannel = {
-              ...doc.data(),
-              id: doc.id
-            };
-            return <VoiceChannel>voiceChannel;
-          })
-        );
-      });
+
+    db.collection(Collection.WORK_SPACE)
+    .doc(workSpaceID)
+    .collection(Collection.TEXT_CHANNEL)
+    .onSnapshot(snapshot => {
+      onSnapshot(
+        snapshot.docs.map<VoiceChannel>(doc => {
+          const voiceChannel = {
+            ...doc.data(),
+            uid: doc.id
+          };
+          return <VoiceChannel>voiceChannel;
+        })
+      );
+    });
+    
   }
 }
 

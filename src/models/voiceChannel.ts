@@ -1,5 +1,5 @@
 export interface VoiceChannel {
-    id: string,
+    uid?: string,
     nombre: string,
     permisos: string[]
 }
