@@ -247,11 +247,13 @@ class WorkspaceModule extends VuexModule {
        this.context.commit("setChannelCreatedStatus", true);
        this.context.commit("setSnackBarMessage", "Exito al crear canal");
        this.context.commit("setShowSnackBarMessage", true);
+
      })
      .catch(() => {
        this.context.commit("setChannelCreatedStatus", false);
        this.context.commit("setSnackBarMessageError", "Error al crear canal");
        this.context.commit("setShowSnackBarMessageError", true);
+
      });
  }
 
@@ -267,11 +269,13 @@ class WorkspaceModule extends VuexModule {
        this.context.commit("setChannelEditedStatus", true);
        this.context.commit("setSnackBarMessage", "Exito al editar canal");
        this.context.commit("setShowSnackBarMessage", true);
+
      })
      .catch(() => {
        this.context.commit("setChannelEditedStatus", false);
        this.context.commit("setSnackBarMessageError", "Error al editar canal");
        this.context.commit("setShowSnackBarMessageError", true);
+
      });
  }
 
@@ -287,11 +291,13 @@ class WorkspaceModule extends VuexModule {
        this.context.commit("setChannelDeletedStatus", true);
        this.context.commit("setSnackBarMessage", "Exito al eliminar canal");
        this.context.commit("setShowSnackBarMessage", true);
+
      })
      .catch(() => {
        this.context.commit("setChannelDeletedStatus", false);
        this.context.commit("setSnackBarMessageError", "Error al eliminar canal");
        this.context.commit("setShowSnackBarMessageError", true);
+       
      });
  }
 

@@ -66,6 +66,10 @@ class RTCService{
         const answerCandidates = callDoc.collection(Collection.ANSWER_CANDIDATES);
         const offerCandidates = callDoc.collection(Collection.OFFER_CANDIDATES);
 
+        this.rtcPeerConnection.onicecandidate = (event) =>{
+            event.candidate && answerCandidates.add(event.candidate.toJSON());
+        }
+
         const callData = <Call>(await callDoc.get()).data();
 
         await this.rtcPeerConnection.setRemoteDescription(
