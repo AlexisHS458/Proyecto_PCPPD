@@ -121,10 +121,7 @@ class MainScreenModule extends VuexModule {
     return await WorkSpaceService.createWorkSpace(workspace)
       .then(() => {
         this.context.commit("createWorkSpaceSuccess");
-        this.context.commit(
-          "setSnackBarMessage",
-          "El espacio de trabajo ha sido creado exitosamente"
-        );
+        this.context.commit("setSnackBarMessage", "El espacio de trabajo ha sido creado exitosamente");
         this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {
@@ -192,10 +189,8 @@ class MainScreenModule extends VuexModule {
     this.context.commit("setLeaveWorkSpaceStatus", false);
     WorkSpaceService.removeUser(leaveWorkSpace.uidUser, leaveWorkSpace.uidWorkspace).then(() => {
       this.context.commit("setLeaveWorkSpaceStatus", true);
-      this.context.commit(
-        "setSnackBarMessage",
-        "Has abandonado el espacio de trabajo" + " " + leaveWorkSpace.nombreWorkspace
-      );
+      this.context.commit("setSnackBarMessage",
+      "Has abandonado el espacio de trabajo" + " " + leaveWorkSpace.nombreWorkspace);
       this.context.commit("setShowSnackBarMessage", true);
     });
   }

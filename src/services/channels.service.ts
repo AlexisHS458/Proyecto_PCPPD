@@ -75,6 +75,45 @@ class ChannelsService {
       });
   }
 
+/**
+   * Agrega un nuevo canal de voz
+   * @param workSpaceID ID del espacio de trabajo
+   * @param voiceChannel Canal de voz a agregar a la DB
+   * @returns VoiceChannel. Referencia del canal de texto creado.
+   */
+ async createVoiceChannel(workSpaceID: string, voiceChannel: VoiceChannel): Promise<VoiceChannel> {
+  const voiceChannelRef = (
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workSpaceID)
+      .collection(Collection.VOICE_CHANNEL)
+      .add(voiceChannel)
+  ).get();
+  return <VoiceChannel>(await voiceChannelRef).data();
+}
+
+/**
+ * Edita un canal de voz
+ * @param workspaceID ID del espacio de trabajo
+ * @param voiceChannel VoiceChannel del canal a editar
+ */
+async editVoiceChannel(workspaceID: string, voiceChannel: VoiceChannel): Promise<void>{
+  await  db.collection(Collection.WORK_SPACE).doc(workspaceID)
+    .collection(Collection.VOICE_CHANNEL).doc(voiceChannel.uid)
+    .update(voiceChannel);
+}
+
+/**
+ * Elimina un canal de voz
+ * @param workspaceID ID del espacio de trabajo
+ * @param voiceChannelID ID del canal de voz a eliminar
+ */
+async deleteVoiceChannel(workspaceID: string, voiceChannelID: string): Promise<void>{
+  await db.collection(Collection.WORK_SPACE).doc(workspaceID)
+  .collection(Collection.VOICE_CHANNEL).doc(voiceChannelID)
+  .delete();
+}
+
   /**
    * Recupera los canales de voz de un espacio de trabajo
    * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
