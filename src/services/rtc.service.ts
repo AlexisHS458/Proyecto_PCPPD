@@ -1,4 +1,3 @@
-import { servers } from "@/utils/rtc";
 import { db } from "@/utils/firebase";
 import { Collection } from "@/utils/collections";
 import { SDP } from "@/models/sdp";
@@ -8,18 +7,20 @@ import { Call } from "@/models/call";
  * Servicio de comunicación por voz
  */
 class RTCService{
-    rtcPeerConnection: RTCPeerConnection;
-    constructor(){
-        this.rtcPeerConnection = new RTCPeerConnection(servers);
-    }
-   
+
     /**
      * Crea una oferta de llamada en el canal de voz especificado
      * @param workspaceID ID del espacio de trabajo
      * @param voiceChannelID  ID del canal de voz
+     * @param rtcPeerConnection conexión RTC
      */
-    async createAnOffer(workspaceID: string, voiceChannelID: string): Promise<void> {
-        const offerDescription = await this.rtcPeerConnection.createOffer();
+    async createAnOffer(
+        workspaceID: string,
+        voiceChannelID: string,
+        rtcPeerConnection: RTCPeerConnection
+
+    ): Promise<void> {
+        const offerDescription = await rtcPeerConnection.createOffer();
         const offer = <SDP>{
             sdp: offerDescription.sdp,
             type: offerDescription.type
@@ -34,21 +35,24 @@ class RTCService{
      * Suscripción para escuchar las respuestas remotas
      * @param workspaceID ID del espacio de trabajo
      * @param voiceChannelID  ID del canal de voz
+     * @param rtcPeerConnection conexión RTC
      */
     listenForRemoteAnswer(
         workspaceID: string,
         voiceChannelID: string,
+        rtcPeerConnection: RTCPeerConnection,
+        onSnapshot: (answer: RTCSessionDescription) => void
     ): void {
         const callDoc = db.collection(Collection.WORK_SPACE).doc(workspaceID)
             .collection(Collection.VOICE_CHANNEL).doc(voiceChannelID);
-        
+
         callDoc.onSnapshot((snapshot) => {
             const data = <Call>snapshot.data();
-            if(!this.rtcPeerConnection.currentLocalDescription && data?.answer){
-                const answerDescription = new RTCSessionDescription(data.answer);
-                this.rtcPeerConnection.setRemoteDescription(answerDescription);
+            if(!rtcPeerConnection.currentLocalDescription && data?.answer){
+                onSnapshot(new RTCSessionDescription(data.answer));
             }
         });
+
     }
 
     /**
@@ -59,6 +63,7 @@ class RTCService{
     async answerCall(
         workspaceID: string,
         voiceChannelID: string,
+        rtcPeerConnection: RTCPeerConnection,
     ): Promise<void>{
         const callDoc = db.collection(Collection.WORK_SPACE).doc(workspaceID)
             .collection(Collection.VOICE_CHANNEL).doc(voiceChannelID);
@@ -66,18 +71,18 @@ class RTCService{
         const answerCandidates = callDoc.collection(Collection.ANSWER_CANDIDATES);
         const offerCandidates = callDoc.collection(Collection.OFFER_CANDIDATES);
 
-        this.rtcPeerConnection.onicecandidate = (event) =>{
+        rtcPeerConnection.onicecandidate = (event) =>{
             event.candidate && answerCandidates.add(event.candidate.toJSON());
         }
 
         const callData = <Call>(await callDoc.get()).data();
 
-        await this.rtcPeerConnection.setRemoteDescription(
+        await rtcPeerConnection.setRemoteDescription(
             new RTCSessionDescription(callData.offer)
         );
 
-        const answerDescription = await this.rtcPeerConnection.createAnswer();
-        await this.rtcPeerConnection.setLocalDescription(answerDescription);
+        const answerDescription = await rtcPeerConnection.createAnswer();
+        await rtcPeerConnection.setLocalDescription(answerDescription);
 
         const answer = <SDP>{
             sdp: answerDescription.sdp,
@@ -89,8 +94,8 @@ class RTCService{
         offerCandidates.onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if(change.type === 'added'){
-                    let data = change.doc.data();
-                    this.rtcPeerConnection.addIceCandidate(
+                    const data = change.doc.data();
+                    rtcPeerConnection.addIceCandidate(
                         new RTCIceCandidate(data)
                     );
                 }
@@ -99,9 +104,6 @@ class RTCService{
         });
     } 
 
-    get getRTCPeerConnection(): RTCPeerConnection{
-        return this.rtcPeerConnection;
-    }
 }
 
 export default new RTCService();
