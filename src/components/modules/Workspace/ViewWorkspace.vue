@@ -11,6 +11,7 @@
           :users="users"
           :workspace="workspace"
           :textChannels="textChannel"
+          :voiceChannels="voiceChannel"
         ></channels>
         <info-user :currentUser="currentUser"></info-user>
       </div>
@@ -90,6 +91,7 @@ import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
+import { VoiceChannel } from "@/models/voiceChannel";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
@@ -137,6 +139,9 @@ export default class Spacework extends Vue {
   private fetchTextChannels!: (id: string) => Promise<void>;
 
   @MyWorkSpace.Action
+  private fetchVoiceChannels!: (id: string) => Promise<void>;
+
+  @MyWorkSpace.Action
   private fetchUsersInWorkspace!: () => void;
 
   @MyWorkSpace.Action("setNotVisibleSnackBar")
@@ -150,6 +155,9 @@ export default class Spacework extends Vue {
    */
   @MyWorkSpace.State("textChannels")
   private textChannel!: TextChannel[];
+
+  @MyWorkSpace.State("voiceChannels")
+  private voiceChannel!: VoiceChannel[];
 
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
@@ -225,9 +233,10 @@ export default class Spacework extends Vue {
     }
     //Obtener información del espacio de trabajo
     await this.fetchMyWorkspace(this.$route.params.id);
-    //Obtener información de los canles del espacio de trabajo
+    //Obtener información de los canales de texto espacio de trabajo
     await this.fetchTextChannels(this.$route.params.id);
-
+    //Obtener información de los canales de voz espacio de trabajo
+    await this.fetchVoiceChannels(this.$route.params.id);
     //Obtener usuarios del espacio de trabajo
     this.fetchUsersInWorkspace();
   }

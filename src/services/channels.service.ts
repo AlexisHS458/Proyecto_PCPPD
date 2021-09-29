@@ -8,8 +8,6 @@ import { Collection } from "@/utils/collections";
  * Conexión a servicios de información de los canales.
  */
 class ChannelsService {
-  
-
   /**
    * Agrega un nuevo canal de texto
    * @param workSpaceID ID del espacio de trabajo
@@ -32,9 +30,12 @@ class ChannelsService {
    * @param workspaceID ID del espacio de trabajo
    * @param textChannel TextChannel del canal a editar
    */
-  async editTextChannel(workspaceID: string, textChannel: TextChannel): Promise<void>{
-    await  db.collection(Collection.WORK_SPACE).doc(workspaceID)
-      .collection(Collection.TEXT_CHANNEL).doc(textChannel.uid)
+  async editTextChannel(workspaceID: string, textChannel: TextChannel): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannel.uid)
       .update(textChannel);
   }
 
@@ -43,22 +44,20 @@ class ChannelsService {
    * @param workspaceID ID del espacio de trabajo
    * @param textChannelID ID del canal de texto a eliminar
    */
-  async deleteTextChannel(workspaceID: string, textChannelID: string): Promise<void>{
-    await db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .collection(Collection.TEXT_CHANNEL).doc(textChannelID)
-    .delete();
+  async deleteTextChannel(workspaceID: string, textChannelID: string): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .doc(textChannelID)
+      .delete();
   }
-
-  
-  
 
   /**
    * Recupera los canales de texto de un espacio de trabajo
    * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
    */
-  getTextChannels(workSpaceID: string,
-     onSnapshot: (textChannels: TextChannel[]) => void
-     ): void {
+  getTextChannels(workSpaceID: string, onSnapshot: (textChannels: TextChannel[]) => void): void {
     db.collection(Collection.WORK_SPACE)
       .doc(workSpaceID)
       .collection(Collection.TEXT_CHANNEL)
@@ -75,66 +74,70 @@ class ChannelsService {
       });
   }
 
-/**
+  /**
    * Agrega un nuevo canal de voz
    * @param workSpaceID ID del espacio de trabajo
    * @param voiceChannel Canal de voz a agregar a la DB
    * @returns VoiceChannel. Referencia del canal de texto creado.
    */
- async createVoiceChannel(workSpaceID: string, voiceChannel: VoiceChannel): Promise<VoiceChannel> {
-  const voiceChannelRef = (
+  async createVoiceChannel(workSpaceID: string, voiceChannel: VoiceChannel): Promise<VoiceChannel> {
+    const voiceChannelRef = (
+      await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workSpaceID)
+        .collection(Collection.VOICE_CHANNEL)
+        .add(voiceChannel)
+    ).get();
+    return <VoiceChannel>(await voiceChannelRef).data();
+  }
+
+  /**
+   * Edita un canal de voz
+   * @param workspaceID ID del espacio de trabajo
+   * @param voiceChannel VoiceChannel del canal a editar
+   */
+  async editVoiceChannel(workspaceID: string, voiceChannel: VoiceChannel): Promise<void> {
     await db
       .collection(Collection.WORK_SPACE)
-      .doc(workSpaceID)
+      .doc(workspaceID)
       .collection(Collection.VOICE_CHANNEL)
-      .add(voiceChannel)
-  ).get();
-  return <VoiceChannel>(await voiceChannelRef).data();
-}
+      .doc(voiceChannel.uid)
+      .update(voiceChannel);
+  }
 
-/**
- * Edita un canal de voz
- * @param workspaceID ID del espacio de trabajo
- * @param voiceChannel VoiceChannel del canal a editar
- */
-async editVoiceChannel(workspaceID: string, voiceChannel: VoiceChannel): Promise<void>{
-  await  db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .collection(Collection.VOICE_CHANNEL).doc(voiceChannel.uid)
-    .update(voiceChannel);
-}
-
-/**
- * Elimina un canal de voz
- * @param workspaceID ID del espacio de trabajo
- * @param voiceChannelID ID del canal de voz a eliminar
- */
-async deleteVoiceChannel(workspaceID: string, voiceChannelID: string): Promise<void>{
-  await db.collection(Collection.WORK_SPACE).doc(workspaceID)
-  .collection(Collection.VOICE_CHANNEL).doc(voiceChannelID)
-  .delete();
-}
+  /**
+   * Elimina un canal de voz
+   * @param workspaceID ID del espacio de trabajo
+   * @param voiceChannelID ID del canal de voz a eliminar
+   */
+  async deleteVoiceChannel(workspaceID: string, voiceChannelID: string): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.VOICE_CHANNEL)
+      .doc(voiceChannelID)
+      .delete();
+  }
 
   /**
    * Recupera los canales de voz de un espacio de trabajo
    * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
    */
   getVoiceChannels(workSpaceID: string, onSnapshot: (voiceChannels: VoiceChannel[]) => void): void {
-
     db.collection(Collection.WORK_SPACE)
-    .doc(workSpaceID)
-    .collection(Collection.TEXT_CHANNEL)
-    .onSnapshot(snapshot => {
-      onSnapshot(
-        snapshot.docs.map<VoiceChannel>(doc => {
-          const voiceChannel = {
-            ...doc.data(),
-            uid: doc.id
-          };
-          return <VoiceChannel>voiceChannel;
-        })
-      );
-    });
-    
+      .doc(workSpaceID)
+      .collection(Collection.VOICE_CHANNEL)
+      .onSnapshot(snapshot => {
+        onSnapshot(
+          snapshot.docs.map<VoiceChannel>(doc => {
+            const voiceChannel = {
+              ...doc.data(),
+              uid: doc.id
+            };
+            return <VoiceChannel>voiceChannel;
+          })
+        );
+      });
   }
 }
 

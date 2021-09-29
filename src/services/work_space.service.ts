@@ -13,9 +13,7 @@ class WorkSpaceService {
    * @returns WorkSpace. Referencia del espacio de trabajo creado.
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
-    const workSpaceRef = (
-      await db.collection(Collection.WORK_SPACE).add(workspace)
-    ).get();
+    const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
     return <Workspace>(await workSpaceRef).data();
   }
 
@@ -34,18 +32,15 @@ class WorkSpaceService {
    * Recupera los espacios de trabajo de un usuario
    * @param uid ID del usuario a recuperar sus espacios de trabajo
    */
-  getWorkspaces(
-    uid: string,
-    onSnapshot: (workspaces: Workspace[]) => void
-  ): void {
+  getWorkspaces(uid: string, onSnapshot: (workspaces: Workspace[]) => void): void {
     db.collection(Collection.WORK_SPACE)
-      .where('usuarios','array-contains', uid)
+      .where("usuarios", "array-contains", uid)
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<Workspace>(doc => {
             const workspace = {
               ...doc.data(),
-              uid: doc.id, 
+              uid: doc.id
             };
             return <Workspace>workspace;
           })
@@ -54,19 +49,19 @@ class WorkSpaceService {
   }
 
   /**
-  * Recupera un espacio de trabajo
-  * @param uid ID del espacio de trabajo a consultar
-  */
+   * Recupera un espacio de trabajo
+   * @param uid ID del espacio de trabajo a consultar
+   */
   async getWorkspaceInfo(uid: string): Promise<Workspace> {
     return new Promise((resolve, reject) => {
       db.collection(Collection.WORK_SPACE)
         .doc(uid)
         .onSnapshot(
           value => {
-            const workspaceData ={
-             ...value.data(),
-             uid: value.id
-            } 
+            const workspaceData = {
+              ...value.data(),
+              uid: value.id
+            };
             if (workspaceData) {
               resolve(<Workspace>workspaceData);
             }
@@ -83,11 +78,9 @@ class WorkSpaceService {
    * @param usersID IDs de los usuarios dentro del espacio de trabajo.
    * @param onSnapshot Suscripcion a colección de usuarios.
    */
-  getUsersInWorkspace(
-    usersID: string[],
-    onSnapshot: (users: User[]) => void
-    ){
-      db.collection(Collection.USERS).where('uid', 'in', usersID)
+  getUsersInWorkspace(usersID: string[], onSnapshot: (users: User[]) => void) {
+    db.collection(Collection.USERS)
+      .where("uid", "in", usersID)
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<User>(doc => {
@@ -98,17 +91,19 @@ class WorkSpaceService {
   }
 
   /**
-  * Remueve un usuario de un espacio de trabajo.
-  * @param IDUser usuario a remover
-  * @param IDWorkSpace espacio de trabajo
-  */
-  async removeUser(IDUser: string, IDWorkSpace: string): Promise<void>{
+   * Remueve un usuario de un espacio de trabajo.
+   * @param IDUser usuario a remover
+   * @param IDWorkSpace espacio de trabajo
+   */
+  async removeUser(IDUser: string, IDWorkSpace: string): Promise<void> {
     const work_spaceRef: Workspace = await this.getWorkspaceInfo(IDWorkSpace);
     const index = work_spaceRef.usuarios.indexOf(IDUser);
-    work_spaceRef.usuarios.splice(index,1);
-    return await db.collection(Collection.WORK_SPACE).doc(IDWorkSpace).update(work_spaceRef);
+    work_spaceRef.usuarios.splice(index, 1);
+    return await db
+      .collection(Collection.WORK_SPACE)
+      .doc(IDWorkSpace)
+      .update(work_spaceRef);
   }
-
 }
 
 export default new WorkSpaceService();

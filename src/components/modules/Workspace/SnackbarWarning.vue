@@ -1,6 +1,6 @@
 <template>
   <v-snackbar v-model="status" :timeout="timeout" :color="color">
-    {{ snackText }}
+    <p v-html="snackText" class="mb-0"></p>
     <template v-slot:action="{ attrs }">
       <v-btn color="white" text v-bind="attrs" @click="method"> Cerrar </v-btn>
     </template>
