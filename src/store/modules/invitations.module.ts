@@ -35,7 +35,8 @@ class InivtationsModule extends VuexModule {
     invitationAccepted: false,
     invitationDeclined: false,
     showSnackbar: false,
-    showSnackbarError: false
+    showSnackbarError: false,
+    showSnackbarWarning: false
   };
 
   @Mutation
@@ -101,6 +102,11 @@ class InivtationsModule extends VuexModule {
   @Mutation
   public setShowSnackBarMessage(status: boolean): void {
     this.status.showSnackbar = status;
+  }
+
+  @Mutation
+  public setShowSnackBarMessageWarning(status: boolean): void {
+    this.status.showSnackbarWarning = status;
   }
 
   /**
@@ -199,6 +205,14 @@ class InivtationsModule extends VuexModule {
   }
 
   /**
+   * Hace visible el snackbar de warning
+   */
+  @Action
+  setVisibleSnackBarWarning(): void {
+    this.context.commit("setShowSnackBarMessageWarning", true);
+  }
+
+  /**
    * Hace no visible el snackbar
    */
   @Action
@@ -212,6 +226,14 @@ class InivtationsModule extends VuexModule {
   @Action
   setNotVisibleSnackBarError(): void {
     this.context.commit("setShowSnackBarMessageError", false);
+  }
+
+  /**
+   * Hace no visible el snackbar de warning
+   */
+  @Action
+  setNotVisibleSnackBarWarning(): void {
+    this.context.commit("setShowSnackBarMessageWarning", false);
   }
 
   get isLoadingInvitationsInvitationSent(): boolean {

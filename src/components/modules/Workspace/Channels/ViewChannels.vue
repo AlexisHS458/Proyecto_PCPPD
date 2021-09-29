@@ -9,13 +9,16 @@
       :workspaceUID="workspace.uid"
       :workspaceChannels="workspace.canales_texto"
     ></list-channels>
-    <!--  <list-channels
+
+    <list-channels-voice
       v-for="item in ChannelsVoice"
       :key="item.title"
       :item="item"
       :users="users"
-    ></list-channels>
-    <list-channels
+      :channels="voiceChannels"
+      :workspaceUID="workspace.uid"
+    ></list-channels-voice>
+    <!--   <list-channels
       v-for="item in ChannelsCode"
       :key="item.title"
       :item="item"
@@ -28,14 +31,17 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import ListChannels from "@/components/modules/Workspace/Channels/ListChannels.vue";
+import ListChannelsVoice from "@/components/modules/Workspace/Channels/Voice/ListChannelsVoice.vue";
 import { Prop } from "vue-property-decorator";
 import { Workspace } from "@/models/workspace";
 import { TextChannel } from "@/models/textChannel";
 import { User } from "@/models/user";
+import { VoiceChannel } from "@/models/voiceChannel";
 
 @Component({
   components: {
     ListChannels,
+    ListChannelsVoice,
   },
 })
 export default class Channels extends Vue {
@@ -53,6 +59,11 @@ export default class Channels extends Vue {
     required: true,
   })
   public textChannels!: TextChannel[];
+
+  @Prop({
+    required: true,
+  })
+  public voiceChannels!: VoiceChannel[];
 
   public ChannelsText = [
     {

@@ -1,12 +1,6 @@
 <template>
   <v-hover>
-    <v-list-item
-      slot-scope="{ hover }"
-      :to="{
-        name: 'messages',
-        params: { idChannel: channel.uid },
-      }"
-    >
+    <v-list-item slot-scope="{ hover }">
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
       </v-list-item-icon>
@@ -110,7 +104,7 @@
                               outlined
                               dense
                               color="primary"
-                              prepend-inner-icon="mdi-account"
+                              prepend-inner-icon="mdi-account-voice"
                               v-model="newNameChannel"
                               :rules="[rules.required]"
                               @keyup.enter="editChannel"
@@ -184,8 +178,8 @@
 </template>
 
 <script lang="ts">
-import { TextChannel } from "@/models/textChannel";
 import { User } from "@/models/user";
+import { VoiceChannel } from "@/models/voiceChannel";
 import { Workspace } from "@/models/workspace";
 import { VForm } from "@/utils/types";
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
@@ -197,7 +191,7 @@ export default class NameChannels extends Vue {
   @Prop({
     required: true,
   })
-  public channel!: TextChannel;
+  public channel!: VoiceChannel;
 
   @Prop({
     required: true,
@@ -218,10 +212,10 @@ export default class NameChannels extends Vue {
    * Acciones obtenidas del @module Workspace
    */
   @WorkspaceOptions.Action
-  private editTextChannel!: (textChannel: TextChannel) => Promise<void>;
+  private editVoiceChannel!: (voiceChannel: VoiceChannel) => Promise<void>;
 
   @WorkspaceOptions.Action
-  private deleteTextChannel!: (textChannelID: string) => Promise<void>;
+  private deleteVoiceChannel!: (voiceChannelID: string) => Promise<void>;
 
   /**
    * Estado obtenido del @module Workspace
@@ -256,13 +250,13 @@ export default class NameChannels extends Vue {
   };
 
   /**
-   * Editar información de un canal de texto
+   * Editar información de un canal de voz
    */
   editChannel(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingRenameChanel = true;
       this.channel.nombre = this.newNameChannel;
-      this.editTextChannel(this.channel);
+      this.editVoiceChannel(this.channel);
       if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.loadingRenameChanel = false;
         this.form.reset();
@@ -276,25 +270,18 @@ export default class NameChannels extends Vue {
   }
 
   /**
-   * Cerrer dialog de editar canal de texto
-   */
-/*   closeDialog(){
-
-  } */
-
-  /**
-   * Eliminar canal de texto
+   * Eliminar canal de voz
    */
   async deleteChannel() {
     this.loadingDelete = true;
-    await this.deleteTextChannel(this.channel.uid!);
+    await this.deleteVoiceChannel(this.channel.uid!);
     /*  if (this.status.showSnackbar) { */
     this.loadingDelete = false;
     this.dialogDelete = false;
-    if (this.$route.path != "/space/" + this.workspaceUID) {
-      this.$router.replace({ path: "/space/" + this.workspaceUID });
-      /* } */
-    }
+    /* if (this.$route.path != "/space/" + this.workspaceUID) {
+      this.$router.replace({ path: "/space/" + this.workspaceUID }); */
+    /* } */
+    /* } */
   }
 }
 </script>

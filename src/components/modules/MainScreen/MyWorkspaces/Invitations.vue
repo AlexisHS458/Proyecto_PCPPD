@@ -37,7 +37,9 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { Invitation } from "@/models/invitation";
 import { StringUtils } from "@/utils/stringsUtils";
 import { namespace } from "vuex-class";
+import { Workspace } from "@/models/workspace";
 const OptionsInvitation = namespace("InvitationsModule");
+const MyWorkSpace = namespace("WorkspaceModule");
 @Component
 export default class InvitationsCard extends Vue {
   @Prop({
@@ -54,6 +56,15 @@ export default class InvitationsCard extends Vue {
   @OptionsInvitation.Action
   private declineInvitation!: (invitation: Invitation) => void;
 
+  @OptionsInvitation.Action
+  private setMessageOnSnackbar!: (message: string) => void;
+
+  @OptionsInvitation.Action
+  private setVisibleSnackBarWarning!: () => void;
+
+  /**
+   * Estados obtenidos del @module Invitations
+   */
   @OptionsInvitation.State("status")
   private statusInvitations!: any;
 
@@ -66,15 +77,35 @@ export default class InvitationsCard extends Vue {
   @OptionsInvitation.State("status")
   private status!: any;
 
+  /**
+   * Acciones obtenidas del @module Workspace
+   */
+  @MyWorkSpace.Action
+  private fetchMyWorkspace!: (id: string) => Promise<void>;
+
+  /**
+   * Estado obtenidas del @module Workspace
+   */
+  @MyWorkSpace.State("workspace")
+  private workspace!: Workspace;
+
   public getInitials = StringUtils.getInitials;
   public show = false;
 
   async acceptInvitationToWorkspace() {
-    await this.acceptInvitation(this.invitation);
-    if (this.status.showSnackbar && !this.status.showSnackbarError) {
-      this.show = false;
+    await this.fetchMyWorkspace(this.invitation.idEspacioTrabajo);
+    if (this.workspace.usuarios.length < 7) {
+      await this.acceptInvitation(this.invitation);
+      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.show = false;
+      } else {
+        this.show = false;
+      }
     } else {
-      this.show = false;
+      this.setVisibleSnackBarWarning();
+      this.setMessageOnSnackbar(
+        "No hay lugares para unirse a este espacio de trabajo. <br> Contacta al administrador que te invitó."
+      );
     }
   }
 

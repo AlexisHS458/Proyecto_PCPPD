@@ -15,7 +15,7 @@
         ></list-messages>
       </template>
       <template v-else>
-        <v-img src="@/assets/Messages.svg" class="img-not-messages"> </v-img>
+        <img src="@/assets/Messages.svg" class="img-not-messages" />
       </template>
     </v-list>
     <input-message
@@ -238,11 +238,6 @@ export default class MessagesPage extends Vue {
   width: 40rem;
   height: 20rem;
   margin: auto;
-
-  /*  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 7rem; */
 }
 </style>
 

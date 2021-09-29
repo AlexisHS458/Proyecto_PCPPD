@@ -10,7 +10,7 @@
       v-model="dialog"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-btn icon>
+        <v-btn icon v-show="workspace.usuarios.length < 8">
           <v-icon color="white" v-bind="attrs" v-on="on">mdi-plus</v-icon>
         </v-btn>
       </template>

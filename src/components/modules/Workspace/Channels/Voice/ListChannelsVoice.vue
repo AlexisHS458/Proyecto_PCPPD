@@ -45,17 +45,17 @@
                       outlined
                       dense
                       color="primary"
-                      prepend-inner-icon="mdi-forum"
+                      prepend-inner-icon="mdi-account-voice"
                       :rules="[rules.required]"
                       v-model="nameChannel"
-                      @keyup.enter="addChannelText"
+                      @keyup.enter="addChannelVoice"
                     ></v-text-field>
                   </v-col>
                 </v-row>
               </v-form>
             </v-card-text>
             <v-card-actions class="justify-end">
-              <v-btn color="success" :loading="loading" @click="addChannelText"
+              <v-btn color="success" :loading="loading" @click="addChannelVoice"
                 >Crear</v-btn
               >
               <v-btn text @click="dialog = false">Cancelar</v-btn>
@@ -65,14 +65,14 @@
       </v-expansion-panel-header>
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
         <v-list color="primaryDark">
-          <namechannels
+          <namechannelsvoice
             v-for="(channel, index) in channels"
             :key="index"
             :channel="channel"
             :icon="item.icon"
             :users="users"
             :workspaceUID="workspaceUID"
-          ></namechannels>
+          ></namechannelsvoice>
         </v-list>
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -81,17 +81,18 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
-import namechannels from "@/components/modules/Workspace/Channels/NameChannels.vue";
+import namechannelsvoice from "@/components/modules/Workspace/Channels/Voice/NameChannelsVoice.vue";
 import { namespace } from "vuex-class";
-import { TextChannel } from "@/models/textChannel";
+
 import { VForm } from "@/utils/types";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
+import { VoiceChannel } from "@/models/voiceChannel";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 @Component({
   components: {
-    namechannels,
+    namechannelsvoice,
   },
 })
 export default class ListChannels extends Vue {
@@ -124,7 +125,7 @@ export default class ListChannels extends Vue {
    * Accion obtenida del @module Workspace
    */
   @WorkspaceOptions.Action
-  private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
+  private createVoiceChannel!: (voiceChannel: VoiceChannel) => Promise<void>;
 
   @WorkspaceOptions.State("status")
   private status!: any;
@@ -151,23 +152,23 @@ export default class ListChannels extends Vue {
   public loading = false;
   public valid = true;
   public nameChannel = "";
-  public textChannel = {} as TextChannel;
+  public voiceChannel = {} as VoiceChannel;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
 
   /**
-   * Crear nuevo canal de texto
+   * Crear nuevo canal de voz
    */
-  async addChannelText() {
+  async addChannelVoice() {
+    console.log(this.nameChannel);
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
-      this.textChannel = {
+      this.voiceChannel = {
         nombre: this.nameChannel,
         permisos: [],
       };
-      console.log(this.textChannel);
-      await this.createTextChannel(this.textChannel);
+      await this.createVoiceChannel(this.voiceChannel);
       if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.loading = false;
         this.form.reset();
