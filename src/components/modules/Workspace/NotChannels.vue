@@ -14,7 +14,7 @@
 <style scoped>
 .card-center {
   background-color: #0c2a52;
-  height: 101.7vh !important;
+  height: 100vh !important;
 }
 
 .img {

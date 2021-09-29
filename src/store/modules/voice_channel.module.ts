@@ -113,9 +113,7 @@ class VoiceChannelModule extends VuexModule{
             voiceChannelIDs.uidWorkspace,
             voiceChannelIDs.uidVoiceChannel,
             this.peerConnection
-        ).then(()=>{
-
-        })
+        )
         .catch(()=>{
             this.context.commit("setSnackBarMessageError", "Error al crear canal");
             this.context.commit("setShowSnackBarMessageError", true);
