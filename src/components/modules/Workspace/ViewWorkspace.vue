@@ -36,6 +36,12 @@
         </v-list>
       </div>
     </v-col>
+    <v-btn
+      :to="{
+        name: 'codeChannel',
+      }"
+      >Go</v-btn
+    >
     <!--   Peticiones exitosas del modulo de Invitaciones -->
     <snackbar
       :color="'success'"

@@ -8,6 +8,7 @@ import Workspace from "../views/Workspace.vue";
 import MessagesPage from "../components/modules/Workspace/ViewMessages.vue";
 import NotFound from "../views/PageNotFound.vue";
 import NotChannels from "../components/modules/Workspace/NotChannels.vue";
+import CodeChannel from "../components/modules/Workspace/Channels/Code/EditCode.vue";
 /* import { firebase } from "@/utils/firebase"; */
 Vue.use(VueRouter);
 
@@ -54,7 +55,8 @@ const routes: Array<RouteConfig> = [
       {
         path: "",
         component: NotChannels
-      }
+      },
+      { name: "codeChannel", path: "codeChannel", component: CodeChannel }
     ]
     /* meta: {
       auth: true
