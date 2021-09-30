@@ -139,6 +139,72 @@ class ChannelsService {
         );
       });
   }
+
+  /**
+   * Agrega un nuevo canal de codigo
+   * @param workSpaceID ID del espacio de trabajo
+   * @param codeChannel Canal de codigo a agregar a la DB
+   * @returns CodeChannel. Referencia del canal de texto creado.
+   */
+   async createCodeChannel(workSpaceID: string, codeChannel: CodeChannel): Promise<CodeChannel> {
+    const codeChannelRef = (
+      await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workSpaceID)
+        .collection(Collection.CODE_CHANNEL)
+        .add(codeChannel)
+    ).get();
+    return <CodeChannel>(await codeChannelRef).data();
+  }
+
+  /**
+   * Edita un canal de codigo
+   * @param workspaceID ID del espacio de trabajo
+   * @param codeChannel CodeChannel del canal a editar
+   */
+  async editCodeChannel(workspaceID: string, codeChannel: CodeChannel): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.CODE_CHANNEL)
+      .doc(codeChannel.uid)
+      .update(codeChannel);
+  }
+
+  /**
+   * Elimina un canal de codigo
+   * @param workspaceID ID del espacio de trabajo
+   * @param codeChannelID ID del canal de codigo a eliminar
+   */
+  async deleteCodeChannel(workspaceID: string, codeChannelID: string): Promise<void> {
+    await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.CODE_CHANNEL)
+      .doc(codeChannelID)
+      .delete();
+  }
+
+  /**
+   * Recupera los canales de codigo de un espacio de trabajo
+   * @param workSpaceID ID del espacio de trabajo a recuperar sus canales
+   */
+  getCodeChannels(workSpaceID: string, onSnapshot: (codeChannels: CodeChannel[]) => void): void {
+    db.collection(Collection.WORK_SPACE)
+      .doc(workSpaceID)
+      .collection(Collection.CODE_CHANNEL)
+      .onSnapshot(snapshot => {
+        onSnapshot(
+          snapshot.docs.map<CodeChannel>(doc => {
+            const codeChannel = {
+              ...doc.data(),
+              uid: doc.id
+            };
+            return <CodeChannel>codeChannel;
+          })
+        );
+      });
+  }
 }
 
 export default new ChannelsService();
