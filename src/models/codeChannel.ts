@@ -4,8 +4,8 @@ import { Project } from "./project";
  * Modelo de Canales de código
  */
 export interface CodeChannel {
-    id: string,
+    uid?: string,
     nombre: string,
-    permisos: string[],
+    permisos: string[]
     proyecto: Project
 }
