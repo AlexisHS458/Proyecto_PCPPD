@@ -78,9 +78,12 @@ class WorkSpaceService {
    * @param usersID IDs de los usuarios dentro del espacio de trabajo.
    * @param onSnapshot Suscripcion a colección de usuarios.
    */
-  getUsersInWorkspace(usersID: string[], onSnapshot: (users: User[]) => void) {
-    db.collection(Collection.USERS)
-      .where("uid", "in", usersID)
+  getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void) : void {
+    db.collection(Collection.WORK_SPACE).doc(workspaceID)
+    .onSnapshot((snapshot)=>{
+      const workspaceData = <Workspace> snapshot.data();
+      db.collection(Collection.USERS)
+      .where("uid", "in", workspaceData.usuarios)
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<User>(doc => {
@@ -88,6 +91,8 @@ class WorkSpaceService {
           })
         );
       });
+    });
+    
   }
 
   /**
