@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="!isLoading && !isLoadingWorkspace" no-gutters>
+  <v-row v-if="!isLoading && !isLoadingWorkspace" no-gutters class="body">
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto div">
         <info-workspace
@@ -36,12 +36,12 @@
         </v-list>
       </div>
     </v-col>
-    <v-btn
+    <!--  <v-btn
       :to="{
         name: 'codeChannel',
       }"
       >Go</v-btn
-    >
+    > -->
     <!--   Peticiones exitosas del modulo de Invitaciones -->
     <snackbar
       :color="'success'"
@@ -270,5 +270,9 @@ export default class Spacework extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.body {
+  background-color: #0c2a52;
 }
 </style>
