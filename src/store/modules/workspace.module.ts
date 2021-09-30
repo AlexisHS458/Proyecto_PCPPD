@@ -168,7 +168,7 @@ class WorkspaceModule extends VuexModule {
   @Action
   fetchUsersInWorkspace(): void {
     this.context.commit("setLoadingUsersStatus", true);
-    WorkSpaceService.getUsersInWorkspace(this.workspace.usuarios, users => {
+    WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
       this.context.commit("setUsers", users);
       this.context.commit("setLoadingUsersStatus", false);
     });
