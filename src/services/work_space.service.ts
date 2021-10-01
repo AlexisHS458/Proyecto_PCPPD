@@ -2,6 +2,7 @@ import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 import { User } from "@/models/user";
+import UserService from "@/services/user.service";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -82,17 +83,10 @@ class WorkSpaceService {
     db.collection(Collection.WORK_SPACE).doc(workspaceID)
     .onSnapshot((snapshot)=>{
       const workspaceData = <Workspace> snapshot.data();
-      db.collection(Collection.USERS)
-      .where("uid", "in", workspaceData.usuarios)
-      .onSnapshot(snapshot => {
-        onSnapshot(
-          snapshot.docs.map<User>(doc => {
-            return <User>doc.data();
-          })
-        );
+      UserService.getUsersByID(workspaceData.usuarios, users =>{
+        onSnapshot(users);
       });
     });
-    
   }
 
   /**
