@@ -56,7 +56,7 @@ const routes: Array<RouteConfig> = [
         path: "",
         component: NotChannels
       },
-      { name: "codeChannel", path: "codeChannel", component: CodeChannel }
+      { name: "codeChannel", path: ":idChannelCode", component: CodeChannel, props: true }
     ]
     /* meta: {
       auth: true

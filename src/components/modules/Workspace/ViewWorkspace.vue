@@ -12,6 +12,7 @@
           :workspace="workspace"
           :textChannels="textChannel"
           :voiceChannels="voiceChannel"
+          :codeChannels="codeChannel"
         ></channels>
         <info-user :currentUser="currentUser"></info-user>
       </div>
@@ -98,6 +99,7 @@ import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 import { VoiceChannel } from "@/models/voiceChannel";
+import { CodeChannel } from "@/models/codeChannel";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
@@ -148,6 +150,9 @@ export default class Spacework extends Vue {
   private fetchVoiceChannels!: (id: string) => Promise<void>;
 
   @MyWorkSpace.Action
+  private fetchCodeChannels!: (id: string) => Promise<void>;
+
+  @MyWorkSpace.Action
   private fetchUsersInWorkspace!: () => void;
 
   @MyWorkSpace.Action("setNotVisibleSnackBar")
@@ -164,6 +169,9 @@ export default class Spacework extends Vue {
 
   @MyWorkSpace.State("voiceChannels")
   private voiceChannel!: VoiceChannel[];
+
+  @MyWorkSpace.State("codeChannels")
+  private codeChannel!: CodeChannel[];
 
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
@@ -239,10 +247,12 @@ export default class Spacework extends Vue {
     }
     //Obtener información del espacio de trabajo
     await this.fetchMyWorkspace(this.$route.params.id);
-    //Obtener información de los canales de texto espacio de trabajo
+    //Obtener información de los canales de texto del espacio de trabajo
     await this.fetchTextChannels(this.$route.params.id);
-    //Obtener información de los canales de voz espacio de trabajo
+    //Obtener información de los canales de voz del espacio de trabajo
     await this.fetchVoiceChannels(this.$route.params.id);
+    //Obtener información de los canales de código del espacio de trabajo
+    await this.fetchCodeChannels(this.$route.params.id);
     //Obtener usuarios del espacio de trabajo
     this.fetchUsersInWorkspace();
   }
