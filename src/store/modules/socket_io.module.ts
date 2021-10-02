@@ -12,6 +12,7 @@ class SocketIOModule extends VuexModule{
     @Mutation
     public setSocket(socket: any): void {
         this.io = socket;
+        console.log("socket conectado");
     }
 
 
