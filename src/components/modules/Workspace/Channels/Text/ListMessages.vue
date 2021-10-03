@@ -238,11 +238,11 @@ export default class Messages extends Vue {
   border-radius: 10px;
 }
 
-/* .v-list--three-line .v-list-item .v-list-item__subtitle,
+.v-list--three-line .v-list-item .v-list-item__subtitle,
 .v-list-item--three-line .v-list-item__subtitle {
   white-space: initial;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   display: contents;
-} */
+}
 </style>

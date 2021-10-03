@@ -15,7 +15,6 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              v-show="channels.length < 2"
               class="add mx-2"
               icon
               color="white"
@@ -87,7 +86,6 @@ import { namespace } from "vuex-class";
 import { VForm } from "@/utils/types";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
-import { VoiceChannel } from "@/models/voiceChannel";
 import { CodeChannel } from "@/models/codeChannel";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");

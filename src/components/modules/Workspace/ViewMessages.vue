@@ -1,11 +1,7 @@
 <template>
   <div class="mx-auto card-center">
     <app-bar-messages :channelApp="channel"></app-bar-messages>
-    <v-list
-      three-line
-      class="list-background scroll flex-grow-1 flex-shrink-1"
-      ref="vList"
-    >
+    <v-list three-line class="list-background scroll" ref="vList">
       <template v-if="messages.length > 0">
         <list-messages
           v-for="(message, index) in messages"

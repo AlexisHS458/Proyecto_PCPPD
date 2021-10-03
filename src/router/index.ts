@@ -49,14 +49,13 @@ const routes: Array<RouteConfig> = [
     path: "/space/:id",
     name: "Space",
     component: Workspace,
-
     children: [
       { name: "messages", path: ":idChannel", component: MessagesPage, props: true },
       {
         path: "",
         component: NotChannels
       },
-      { name: "codeChannel", path: ":idChannelCode", component: CodeChannel, props: true }
+      { name: "codeChannel", path: "code/:idChannelCode", component: CodeChannel, props: true }
     ]
     /* meta: {
       auth: true

@@ -3,18 +3,22 @@
     <v-col class="flex-grow-0 flex-shrink-1">
       <div class="mx-auto div">
         <info-workspace
+          class="flex-grow-0 flex-shrink-1"
           :currentUser="currentUser"
           :workspace="workspace"
         ></info-workspace>
         <channels
-          class="flex-grow-1"
+          class="overflow-y-auto flex-grow-1"
           :users="users"
           :workspace="workspace"
           :textChannels="textChannel"
           :voiceChannels="voiceChannel"
           :codeChannels="codeChannel"
         ></channels>
-        <info-user :currentUser="currentUser"></info-user>
+        <info-user
+          class="flex-grow-0 flex-shrink-1"
+          :currentUser="currentUser"
+        ></info-user>
       </div>
     </v-col>
     <v-col class="flex-grow-1 flex-shrink-0">
@@ -267,10 +271,10 @@ export default class Spacework extends Vue {
 <style scoped>
 .div {
   height: 100vh;
-  width: 40vh;
   display: flex;
   flex-direction: column;
   background-color: #000029;
+  max-height: 100vh;
 }
 
 .div-progress-circular {
@@ -284,5 +288,23 @@ export default class Spacework extends Vue {
 
 .body {
   background-color: #0c2a52;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #11171a;
+  border-radius: 10px;
+}
+.scroll {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 </style>
