@@ -23,12 +23,13 @@
         class="text-input"
         placeholder="Escribe tu mensaje"
         autocomplete="off"
-        auto-grow
         outlined
         filled
         dense
+        no-resize
+        auto-grow
         rows="1"
-        row-height="15"
+        row-height="4"
         counter="500"
         :rules="[rules.size, rules.required]"
         @click:append="sendMessages"

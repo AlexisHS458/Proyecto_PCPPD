@@ -27,6 +27,10 @@ export enum Collection{
      */
     VOICE_CHANNEL = "canales_voz",
     /**
+     * Colección de canales de voz
+     */
+     CODE_CHANNEL = "canales_codigo",
+    /**
      * Colección de respuestas a candidatos dentro de documentos de llamadas
      */
     ANSWER_CANDIDATES = "answerCandidates",

@@ -1,8 +1,8 @@
-import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 import { User } from "@/models/user";
 import UserService from "@/services/user.service";
+import { db, FieldValue} from "@/utils/firebase";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -95,13 +95,11 @@ class WorkSpaceService {
    * @param IDWorkSpace espacio de trabajo
    */
   async removeUser(IDUser: string, IDWorkSpace: string): Promise<void> {
-    const work_spaceRef: Workspace = await this.getWorkspaceInfo(IDWorkSpace);
-    const index = work_spaceRef.usuarios.indexOf(IDUser);
-    work_spaceRef.usuarios.splice(index, 1);
     return await db
       .collection(Collection.WORK_SPACE)
       .doc(IDWorkSpace)
-      .update(work_spaceRef);
+      .update({
+        'usuarios': FieldValue.arrayRemove(IDUser)});
   }
 }
 

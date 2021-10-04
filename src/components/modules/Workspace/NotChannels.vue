@@ -15,6 +15,7 @@
 .card-center {
   background-color: #0c2a52;
   height: 100vh !important;
+  bottom: 0px;
 }
 
 .img {

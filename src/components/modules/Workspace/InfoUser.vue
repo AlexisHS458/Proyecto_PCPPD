@@ -1,8 +1,13 @@
 <template>
   <v-app-bar color="primaryDark" dense class="toolbar">
-    <v-toolbar-title>
-      {{ currentUser.nombre + " " + currentUser.apellido }}
-    </v-toolbar-title>
+    <v-tooltip top>
+      <template v-slot:activator="{ on, attrs }">
+        <v-toolbar-title v-bind="attrs" v-on="on">
+          {{ currentUser.nombre + " " + currentUser.apellido }}
+        </v-toolbar-title>
+      </template>
+      <span>{{ currentUser.nombre + " " + currentUser.apellido }}</span>
+    </v-tooltip>
     <v-spacer></v-spacer>
     <v-btn icon @click="toggleMicrophone">
       <v-icon v-if="isTalk" color="success">mdi-microphone</v-icon>
@@ -51,5 +56,6 @@ export default class UserInfo extends Vue {
 }
 .v-toolbar__title {
   color: white;
+  font-size: 1.13rem;
 }
 </style>
