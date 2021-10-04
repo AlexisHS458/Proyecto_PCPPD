@@ -5,8 +5,7 @@
         <template v-slot:actions>
           <v-icon color="white" class="icon"> $expand </v-icon>
         </template>
-
-        <span class="header"> {{ item.title }}</span>
+        <span class="header font-weight-bold"> {{ item.title }}</span>
         <v-dialog
           v-if="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
@@ -216,6 +215,7 @@ export default class ListChannels extends Vue {
 }
 
 .header {
+  font-size: 1.13rem !important;
   order: 1;
 }
 

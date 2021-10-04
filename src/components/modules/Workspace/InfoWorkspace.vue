@@ -16,7 +16,9 @@
           contain
         ></v-img>
       </v-btn>
-      <v-toolbar-title> {{ workspace.nombre }} </v-toolbar-title>
+      <v-toolbar-title class="toolbar-title font-weight-bold">
+        {{ workspace.nombre }}
+      </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu
         v-if="workspace.uid_usuario !== currentUser.uid"
@@ -265,5 +267,9 @@ export default class Toolbar extends Vue {
 
 .img {
   border-radius: 90px;
+}
+
+.toolbar-title {
+  font-size: 1.13rem;
 }
 </style>

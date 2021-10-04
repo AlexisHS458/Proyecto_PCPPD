@@ -321,15 +321,13 @@ export default class NameChannels extends Vue {
   color: white;
 }
 
-.list-title {
-  color: white;
-}
 .hidden {
   visibility: hidden;
 }
 
 .title {
   color: white;
+  font-size: 1rem !important;
 }
 .v-list .v-list-item--active .v-icon {
   color: white;

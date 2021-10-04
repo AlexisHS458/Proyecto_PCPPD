@@ -323,6 +323,7 @@ export default class NameChannels extends Vue {
 }
 
 .title {
+  font-size: 1rem !important;
   color: white;
 }
 .v-list .v-list-item--active .v-icon {

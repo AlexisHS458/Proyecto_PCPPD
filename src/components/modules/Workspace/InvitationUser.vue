@@ -206,5 +206,6 @@ export default class ToolbarUsers extends Vue {
 }
 .v-toolbar__title {
   color: white;
+  font-size: 1.13rem;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto card-center">
+  <div class="card-center">
     <app-bar-messages :channelApp="channel"></app-bar-messages>
     <v-list three-line class="list-background scroll" ref="vList">
       <template v-if="messages.length > 0">
@@ -202,7 +202,7 @@ export default class MessagesPage extends Vue {
 
 <style scoped>
 .card-center {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
