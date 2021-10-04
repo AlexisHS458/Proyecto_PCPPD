@@ -5,7 +5,6 @@
         <template v-slot:actions>
           <v-icon color="white" class="icon"> $expand </v-icon>
         </template>
-
         <span class="header font-weight-bold"> {{ item.title }}</span>
         <v-dialog
           v-if="workspace.uid_usuario == currentUser.uid"
@@ -15,7 +14,6 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              v-show="channels.length < 2"
               class="add mx-2"
               icon
               color="white"
@@ -45,17 +43,17 @@
                       outlined
                       dense
                       color="primary"
-                      prepend-inner-icon="mdi-forum"
+                      prepend-inner-icon="mdi-code-tags"
                       :rules="[rules.required]"
                       v-model="nameChannel"
-                      @keyup.enter="addChannelText"
+                      @keyup.enter="addChannelCode"
                     ></v-text-field>
                   </v-col>
                 </v-row>
               </v-form>
             </v-card-text>
             <v-card-actions class="justify-end">
-              <v-btn color="success" :loading="loading" @click="addChannelText"
+              <v-btn color="success" :loading="loading" @click="addChannelCode"
                 >Crear</v-btn
               >
               <v-btn text @click="dialog = false">Cancelar</v-btn>
@@ -65,14 +63,14 @@
       </v-expansion-panel-header>
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
         <v-list color="primaryDark">
-          <namechannels
+          <namechannelscode
             v-for="(channel, index) in channels"
             :key="index"
             :channel="channel"
             :icon="item.icon"
             :users="users"
             :workspaceUID="workspaceUID"
-          ></namechannels>
+          ></namechannelscode>
         </v-list>
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -81,17 +79,18 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Vue } from "vue-property-decorator";
-import namechannels from "@/components/modules/Workspace/Channels/NameChannels.vue";
+import namechannelscode from "@/components/modules/Workspace/Channels/Code/NameChannelsCode.vue";
 import { namespace } from "vuex-class";
-import { TextChannel } from "@/models/textChannel";
+
 import { VForm } from "@/utils/types";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
+import { CodeChannel } from "@/models/codeChannel";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 @Component({
   components: {
-    namechannels,
+    namechannelscode,
   },
 })
 export default class ListChannels extends Vue {
@@ -124,7 +123,7 @@ export default class ListChannels extends Vue {
    * Accion obtenida del @module Workspace
    */
   @WorkspaceOptions.Action
-  private createTextChannel!: (textChannel: TextChannel) => Promise<void>;
+  private createCodeChannel!: (codeChannel: CodeChannel) => Promise<void>;
 
   @WorkspaceOptions.State("status")
   private status!: any;
@@ -151,23 +150,22 @@ export default class ListChannels extends Vue {
   public loading = false;
   public valid = true;
   public nameChannel = "";
-  public textChannel = {} as TextChannel;
+  public codeChannel = {} as CodeChannel;
+
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
 
   /**
-   * Crear nuevo canal de texto
+   * Crear nuevo canal de voz
    */
-  async addChannelText() {
+  async addChannelCode() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
-      this.textChannel = {
-        nombre: this.nameChannel,
-        permisos: [],
-      };
-      console.log(this.textChannel);
-      await this.createTextChannel(this.textChannel);
+      this.codeChannel.nombre = this.nameChannel;
+      this.codeChannel.permisos = [];
+
+      await this.createCodeChannel(this.codeChannel);
       if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.loading = false;
         this.form.reset();
@@ -217,8 +215,8 @@ export default class ListChannels extends Vue {
 }
 
 .header {
-  order: 1;
   font-size: 1.13rem !important;
+  order: 1;
 }
 
 .add {

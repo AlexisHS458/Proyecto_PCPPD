@@ -317,6 +317,7 @@ export default class NameChannels extends Vue {
 
 .title {
   color: white;
+  font-size: 1rem !important;
 }
 .v-list .v-list-item--active .v-icon {
   color: white;

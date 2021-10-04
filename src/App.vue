@@ -11,10 +11,10 @@ export default {};
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Bonheur+Royale&family=Roboto:wght@100&family=Stick+No+Bills:wght@200&display=swap");
-#app {
+/* #app {
   background-color: #edf0f3;
   font-family: "Roboto", sans-serif;
-}
+} */
 
 .application {
   font-family: "Roboto", sans-serif;

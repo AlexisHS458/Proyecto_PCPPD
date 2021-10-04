@@ -1,11 +1,7 @@
 <template>
-  <div class="mx-auto card-center">
+  <div class="card-center">
     <app-bar-messages :channelApp="channel"></app-bar-messages>
-    <v-list
-      three-line
-      class="list-background scroll flex-grow-1 flex-shrink-1"
-      ref="vList"
-    >
+    <v-list three-line class="list-background scroll" ref="vList">
       <template v-if="messages.length > 0">
         <list-messages
           v-for="(message, index) in messages"
@@ -18,11 +14,12 @@
         <img src="@/assets/Messages.svg" class="img-not-messages" />
       </template>
     </v-list>
-    <input-message
-      class="flex-grow-0 flex-shrink-0"
-      :workspace="workspace"
-      :currentUser="currentUser"
-    ></input-message>
+    <v-footer absolute color="transparent">
+      <input-message
+        :workspace="workspace"
+        :currentUser="currentUser"
+      ></input-message>
+    </v-footer>
 
     <!--   Peticiones exitosas del modulo de TextChannel -->
     <snackbar
@@ -224,9 +221,11 @@ export default class MessagesPage extends Vue {
   border-radius: 10px;
 }
 .scroll {
+  padding-bottom: 100px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  max-height: 40vh;
 }
 .list-background {
   background-color: #0c2a52;
@@ -238,6 +237,7 @@ export default class MessagesPage extends Vue {
   width: 40rem;
   height: 20rem;
   margin: auto;
+  margin-bottom: 20%;
 }
 </style>
 

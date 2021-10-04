@@ -100,10 +100,9 @@
           </v-col>
         </v-row>
       </v-list-item-title>
-      <v-list-item-subtitle
-        v-html="message.contenido"
-        class="subtitle"
-      ></v-list-item-subtitle>
+      <v-list-item-subtitle class="subtitle">
+        {{ message.contenido }}
+      </v-list-item-subtitle>
     </v-list-item-content>
   </v-list-item>
 </template>

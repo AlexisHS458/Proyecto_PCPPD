@@ -1,7 +1,7 @@
-import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 import { User } from "@/models/user";
+import { db, FieldValue } from "@/utils/firebase";
 import UserService from "@/services/user.service";
 
 /**
@@ -79,14 +79,15 @@ class WorkSpaceService {
    * @param usersID IDs de los usuarios dentro del espacio de trabajo.
    * @param onSnapshot Suscripcion a colección de usuarios.
    */
-  getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void) : void {
-    db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .onSnapshot((snapshot)=>{
-      const workspaceData = <Workspace> snapshot.data();
-      UserService.getUsersByID(workspaceData.usuarios, users =>{
-        onSnapshot(users);
+  getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void): void {
+    db.collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .onSnapshot(snapshot => {
+        const workspaceData = <Workspace>snapshot.data();
+        UserService.getUsersByID(workspaceData.usuarios, users => {
+          onSnapshot(users);
+        });
       });
-    });
   }
 
   /**
@@ -95,13 +96,12 @@ class WorkSpaceService {
    * @param IDWorkSpace espacio de trabajo
    */
   async removeUser(IDUser: string, IDWorkSpace: string): Promise<void> {
-    const work_spaceRef: Workspace = await this.getWorkspaceInfo(IDWorkSpace);
-    const index = work_spaceRef.usuarios.indexOf(IDUser);
-    work_spaceRef.usuarios.splice(index, 1);
     return await db
       .collection(Collection.WORK_SPACE)
       .doc(IDWorkSpace)
-      .update(work_spaceRef);
+      .update({
+        usuarios: FieldValue.arrayRemove(IDUser)
+      });
   }
 }
 
