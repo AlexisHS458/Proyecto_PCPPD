@@ -73,7 +73,7 @@ class UserService {
 
 
   /**
-   * Recupera los usuarios en la base de datos
+   * Recupera todos los usuarios de la base de datos
    * @param onSnapshot Snapshot de la colección de usuarios
    */
   getUsers(onSnapshot: (user: User[]) => void): void {
@@ -89,6 +89,28 @@ class UserService {
         );
     });
   }
+
+  /**
+   * Recupera la información de los usuarios a partir de una lista de IDs
+   * @param usersIDs ID de los usuarios a consultar información
+   * @param onSnapshot funcion que contiene la lista de usuarios obtenidos
+   */
+  getUsersByID(
+    usersIDs: string[],
+    onSnapshot: (users: User[]) => void
+    ): void {
+      db.collection(Collection.USERS)
+      .where("uid", "in", usersIDs)
+      .onSnapshot(snapshot => {
+        onSnapshot(
+          snapshot.docs.map<User>(doc => {
+            return <User>doc.data();
+          })
+        );
+      });
+  }
+
+
 }
 
 export default new UserService();

@@ -13,4 +13,9 @@ export interface Call{
      * Respuesta a la llamada
      */
     answer: SDP,
+
+    /**
+     * Lista de ID de los participantes dentro de la llamada
+     */
+    peersIDs: string[]
 }
