@@ -1,6 +1,7 @@
 <template>
   <div v-if="!isLoading">
     <app-bar></app-bar>
+    <v-btn @click="connect">Botton para probar socket io</v-btn>
     <v-container class="scroll">
       <own-card :user="currentUser"></own-card>
       <invitation-card :user="currentUser"></invitation-card>
@@ -67,6 +68,7 @@ import { User } from "@/models/user";
 const User = namespace("UserModule");
 const LeaveWorkspace = namespace("MainScreenModule");
 const Invitations = namespace("InvitationsModule");
+const SocketIO = namespace("SocketIO");
 @Component({
   components: {
     AppBar,
@@ -144,6 +146,9 @@ export default class ViewMainScreen extends Vue {
 
   @Invitations.State("snackbarMessageError")
   private snackbarMessageErrorInvitation!: string;
+
+  @SocketIO.Action
+  private connect!: () => void;
 
   public timeout = -1;
 
