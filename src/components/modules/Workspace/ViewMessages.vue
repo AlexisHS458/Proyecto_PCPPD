@@ -14,11 +14,12 @@
         <img src="@/assets/Messages.svg" class="img-not-messages" />
       </template>
     </v-list>
-    <input-message
-      class="flex-grow-0 flex-shrink-0"
-      :workspace="workspace"
-      :currentUser="currentUser"
-    ></input-message>
+    <v-footer absolute color="transparent">
+      <input-message
+        :workspace="workspace"
+        :currentUser="currentUser"
+      ></input-message>
+    </v-footer>
 
     <!--   Peticiones exitosas del modulo de TextChannel -->
     <snackbar
@@ -202,7 +203,7 @@ export default class MessagesPage extends Vue {
 
 <style scoped>
 .card-center {
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -220,9 +221,11 @@ export default class MessagesPage extends Vue {
   border-radius: 10px;
 }
 .scroll {
+  padding-bottom: 100px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  max-height: 40vh;
 }
 .list-background {
   background-color: #0c2a52;
@@ -234,6 +237,7 @@ export default class MessagesPage extends Vue {
   width: 40rem;
   height: 20rem;
   margin: auto;
+  margin-bottom: 20%;
 }
 </style>
 

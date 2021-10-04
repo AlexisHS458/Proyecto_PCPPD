@@ -51,6 +51,7 @@ import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
+
 const Auth = namespace("UserModule");
 @Component
 export default class LoginForm extends Vue {
@@ -99,5 +100,9 @@ export default class LoginForm extends Vue {
 }
 .firebaseui-card-content {
   padding: 0 !important;
+}
+html {
+  overflow-y: hidden; /* Hide scrollbars */
+  overflow: hidden;
 }
 </style>
