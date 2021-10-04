@@ -1,10 +1,14 @@
 import { io } from "socket.io-client";
 
 
-const endpoit = "ws://pcppd.herokuapp.com/";
-const rtcEndpoint = endpoit  + "rtc/";
+const endpoit = "http://pcppd.herokuapp.com/rtc";
 
-const socket = io(endpoit);
-const rtcSocket = io(rtcEndpoint);
 
-export {socket, rtcSocket};
+//const socket = io(endpoit);
+const rtcSocket = io(endpoit,{
+    transports:  ['websocket']
+});
+console.log(rtcSocket);
+
+
+export {rtcSocket};
