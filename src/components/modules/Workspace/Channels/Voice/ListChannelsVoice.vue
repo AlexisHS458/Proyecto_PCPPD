@@ -225,4 +225,9 @@ export default class ListChannels extends Vue {
 .add {
   order: 2;
 }
+
+.v-expansion-panels:not(.v-expansion-panels--accordion):not(.v-expansion-panels--tile)
+  > .v-expansion-panel--active {
+  border-radius: 0px;
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <v-app v-if="!isLoading && !isLoadingWorkspace" id="app">
+  <div v-if="!isLoading && !isLoadingWorkspace" id="app">
     <!-- <v-app-bar app clipped-right flat height="72" color="primaryDark">
       <v-spacer></v-spacer>
 
@@ -15,7 +15,7 @@
       </v-responsive>
     </v-app-bar> -->
 
-    <v-navigation-drawer v-model="drawer" app width="300">
+    <v-navigation-drawer v-model="drawer" app width="300" color="primaryDark">
       <!--     <v-navigation-drawer
         v-model="drawer"
         absolute
@@ -77,12 +77,8 @@
         </v-list>
       </div>
     </v-navigation-drawer>
-    <v-main>
-      <!-- <v-container fluid> -->
-      <router-view> </router-view>
-      <!--   </v-container> -->
-    </v-main>
-  </v-app>
+    <router-view style="height: 100%"> </router-view>
+  </div>
   <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
@@ -292,12 +288,9 @@ export default class Spacework extends Vue {
   background-color: #0c2a52;
 }
 
-::v-deep .v-application--wrap {
-  min-height: fit-content;
-}
-
 #app {
   background-color: #0c2a52;
+  height: 100%;
 }
 
 .scroll-list-channel::-webkit-scrollbar {

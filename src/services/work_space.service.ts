@@ -1,8 +1,8 @@
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
 import { User } from "@/models/user";
+import { db, FieldValue } from "@/utils/firebase";
 import UserService from "@/services/user.service";
-import { db, FieldValue} from "@/utils/firebase";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -79,14 +79,15 @@ class WorkSpaceService {
    * @param usersID IDs de los usuarios dentro del espacio de trabajo.
    * @param onSnapshot Suscripcion a colección de usuarios.
    */
-  getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void) : void {
-    db.collection(Collection.WORK_SPACE).doc(workspaceID)
-    .onSnapshot((snapshot)=>{
-      const workspaceData = <Workspace> snapshot.data();
-      UserService.getUsersByID(workspaceData.usuarios, users =>{
-        onSnapshot(users);
+  getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void): void {
+    db.collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .onSnapshot(snapshot => {
+        const workspaceData = <Workspace>snapshot.data();
+        UserService.getUsersByID(workspaceData.usuarios, users => {
+          onSnapshot(users);
+        });
       });
-    });
   }
 
   /**
@@ -99,7 +100,8 @@ class WorkSpaceService {
       .collection(Collection.WORK_SPACE)
       .doc(IDWorkSpace)
       .update({
-        'usuarios': FieldValue.arrayRemove(IDUser)});
+        usuarios: FieldValue.arrayRemove(IDUser)
+      });
   }
 }
 

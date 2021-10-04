@@ -1,11 +1,12 @@
 <template>
-  <v-container v-if="!isLoading">
-    <v-row>
-      <app-bar></app-bar>
-    </v-row>
-    <own-card :user="currentUser"></own-card>
-    <invitation-card :user="currentUser"></invitation-card>
-    <floating-button></floating-button>
+  <div v-if="!isLoading">
+    <app-bar></app-bar>
+    <v-btn @click="connect">Botton para probar socket io</v-btn>
+    <v-container class="scroll">
+      <own-card :user="currentUser"></own-card>
+      <invitation-card :user="currentUser"></invitation-card>
+      <floating-button></floating-button>
+    </v-container>
     <!--   Peticiones exitosas del modulo de MainScreen -->
     <snackbar
       :color="'success'"
@@ -45,7 +46,7 @@
       :timeout="timeout"
       :method="setNotVisibleSnackBarWarningInvitations"
     ></snackbar-warning>
-  </v-container>
+  </div>
   <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
@@ -67,6 +68,7 @@ import { User } from "@/models/user";
 const User = namespace("UserModule");
 const LeaveWorkspace = namespace("MainScreenModule");
 const Invitations = namespace("InvitationsModule");
+const SocketIO = namespace("SocketIO");
 @Component({
   components: {
     AppBar,
@@ -145,6 +147,9 @@ export default class ViewMainScreen extends Vue {
   @Invitations.State("snackbarMessageError")
   private snackbarMessageErrorInvitation!: string;
 
+  @SocketIO.Action
+  private connect!: () => void;
+
   public timeout = -1;
 
   async created() {
@@ -171,6 +176,25 @@ export default class ViewMainScreen extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.scroll {
+  overflow-y: auto;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: #000029;
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
+}
+.container {
+  max-width: 100%;
 }
 </style>
  
