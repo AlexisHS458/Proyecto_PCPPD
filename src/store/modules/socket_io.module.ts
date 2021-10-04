@@ -1,4 +1,5 @@
-import { Module, Mutation, VuexModule } from "vuex-module-decorators";
+import SocketioService from "@/services/socketio.service";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 /**
  * Modulo para el manejo de conexión con servidor de socket.io
@@ -6,15 +7,10 @@ import { Module, Mutation, VuexModule } from "vuex-module-decorators";
 @Module({namespaced: true})
 class SocketIOModule extends VuexModule{
 
-    public io: any = {}
-
-
-    @Mutation
-    public setSocket(socket: any): void {
-        this.io = socket;
-        console.log("socket conectado");
+    @Action
+    connect(): void {
+        SocketioService.connect();
     }
-
 
 
 }
