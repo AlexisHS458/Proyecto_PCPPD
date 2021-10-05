@@ -1,8 +1,16 @@
 <template>
-  <div class="card-center">
-    <app-bar-messages :channelApp="channel"></app-bar-messages>
+  <div class="card-center d-flex flex-column">
+    <app-bar-messages
+      :channelApp="channel"
+      class="flex-grow-0 flex-shrink-1"
+    ></app-bar-messages>
+
     <template v-if="messages.length > 0">
-      <discord-messages class="background list-background scroll" ref="vList">
+      <discord-messages
+        class="background list-background scroll flex-grow-1"
+        ref="vList"
+      >
+        <!-- <v-hover> -->
         <discord-message
           v-for="(message, index) in messages"
           :key="index"
@@ -12,61 +20,40 @@
         >
           {{ message.contenido }}
         </discord-message>
+        <!-- </v-hover> -->
       </discord-messages>
     </template>
-    <template v-else>
-      <div class="div-image-center">
-        <img src="@/assets/Messages.svg" class="img-not-messages" />
-      </div>
-    </template>
-    <input-message
-      :workspace="workspace"
-      :currentUser="currentUser"
-    ></input-message>
-  </div>
 
-  <!--  <div class="card-center">
-    <app-bar-messages :channelApp="channel"></app-bar-messages>
-    <template v-if="messages.length > 0">
-      <v-list three-line class="list-background scroll" ref="vList">
-        <list-messages
-          v-for="(message, index) in messages"
-          :key="index"
-          :message="message"
-          :currentUser="currentUser"
-        ></list-messages>
-      </v-list>
-    </template>
     <template v-else>
       <div class="div-image-center">
         <img src="@/assets/Messages.svg" class="img-not-messages" />
       </div>
     </template>
-    <v-footer absolute color="transparent">
+    <v-footer app color="primary" inset class="display-footer">
       <input-message
+        class="flex-grow-0 flex-shrink-1"
         :workspace="workspace"
         :currentUser="currentUser"
       ></input-message>
-    </v-footer> -->
-
-  <!--   Peticiones exitosas del modulo de TextChannel -->
-  <!-- <snackbar
+    </v-footer>
+    <!--   Peticiones exitosas del modulo de TextChannel -->
+    <snackbar
       :color="'success'"
       :snackText="snackbarMessage"
       :status="status.showSnackbar"
       :timeout="timeout"
       :method="setNotVisibleSnackBar"
-    ></snackbar> -->
+    ></snackbar>
 
-  <!--   Errores del modulo de TextChannel -->
-  <!--  <snackbar
+    <!--   Errores del modulo de TextChannel -->
+    <snackbar
       :color="'error'"
       :snackText="snackbarMessageError"
       :status="status.showSnackbarError"
       :timeout="timeout"
       :method="setNotVisibleSnackBarError"
-    ></snackbar> -->
-  <!-- </div> -->
+    ></snackbar>
+  </div>
 </template>
 
 <script lang="ts">
@@ -86,6 +73,7 @@ const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 const Invitations = namespace("InvitationsModule");
+const Permissions = namespace("PermissionsModule");
 @Component({
   components: {
     Snackbar,
@@ -174,6 +162,9 @@ export default class MessagesPage extends Vue {
   @Invitations.Action("setNotVisibleSnackBarError")
   setNotVisibleSnackBarErrorInvitations!: () => void;
 
+  @Permissions.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarPermissions!: () => void;
+
   /**
    * Cada que se cambie de canal de texto se mandara a llamar la función de obtener mensajes
    */
@@ -200,6 +191,7 @@ export default class MessagesPage extends Vue {
     this.setNotVisibleSnackBarError();
     this.setNotVisibleSnackBarErrorWorkspace();
     this.setNotVisibleSnackBarErrorInvitations();
+    this.setNotVisibleSnackBarPermissions();
   }
 
   /**
@@ -212,6 +204,7 @@ export default class MessagesPage extends Vue {
     this.setNotVisibleSnackBarError();
     this.setNotVisibleSnackBarErrorWorkspace();
     this.setNotVisibleSnackBarErrorInvitations();
+    this.setNotVisibleSnackBarPermissions();
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
     this.channel = this.textChannel.find(
@@ -233,7 +226,7 @@ export default class MessagesPage extends Vue {
 .card-center {
   /* display: flex; */
   flex-direction: column;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   background-color: #0c2a52;
 }
 .div-image-center {
@@ -277,6 +270,9 @@ export default class MessagesPage extends Vue {
 }
 .discord-message:hover {
   background-color: #46606f;
+}
+.display-footer {
+  display: block;
 }
 </style>
 
