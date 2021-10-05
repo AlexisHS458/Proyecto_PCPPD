@@ -4,6 +4,7 @@
       slot-scope="{ hover }"
       :class="`${hover ? 'select-item' : 'no-select-item'}`"
       color="white"
+      class="mb-1"
     >
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
