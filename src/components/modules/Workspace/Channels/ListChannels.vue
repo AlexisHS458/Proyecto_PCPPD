@@ -6,7 +6,10 @@
         class="title d-flex flex-row"
       >
         <template v-slot:actions>
-          <v-icon color="white" class="icon mr-2 flex-shrink-1 flex-grow-0">
+          <v-icon
+            color="white"
+            class="icon mr-2 flex-shrink-1 flex-grow-0 mb-1"
+          >
             $expand
           </v-icon>
         </template>

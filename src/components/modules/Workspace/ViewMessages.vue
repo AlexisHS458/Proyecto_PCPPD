@@ -2,6 +2,32 @@
   <div class="card-center">
     <app-bar-messages :channelApp="channel"></app-bar-messages>
     <template v-if="messages.length > 0">
+      <discord-messages class="background list-background scroll" ref="vList">
+        <discord-message
+          v-for="(message, index) in messages"
+          :key="index"
+          :author="message.usuarioNombre"
+          :avatar="message.fotoURL"
+          :timestamp="new Date(message.fecha)"
+        >
+          {{ message.contenido }}
+        </discord-message>
+      </discord-messages>
+    </template>
+    <template v-else>
+      <div class="div-image-center">
+        <img src="@/assets/Messages.svg" class="img-not-messages" />
+      </div>
+    </template>
+    <input-message
+      :workspace="workspace"
+      :currentUser="currentUser"
+    ></input-message>
+  </div>
+
+  <!--  <div class="card-center">
+    <app-bar-messages :channelApp="channel"></app-bar-messages>
+    <template v-if="messages.length > 0">
       <v-list three-line class="list-background scroll" ref="vList">
         <list-messages
           v-for="(message, index) in messages"
@@ -21,26 +47,26 @@
         :workspace="workspace"
         :currentUser="currentUser"
       ></input-message>
-    </v-footer>
+    </v-footer> -->
 
-    <!--   Peticiones exitosas del modulo de TextChannel -->
-    <snackbar
+  <!--   Peticiones exitosas del modulo de TextChannel -->
+  <!-- <snackbar
       :color="'success'"
       :snackText="snackbarMessage"
       :status="status.showSnackbar"
       :timeout="timeout"
       :method="setNotVisibleSnackBar"
-    ></snackbar>
+    ></snackbar> -->
 
-    <!--   Errores del modulo de TextChannel -->
-    <snackbar
+  <!--   Errores del modulo de TextChannel -->
+  <!--  <snackbar
       :color="'error'"
       :snackText="snackbarMessageError"
       :status="status.showSnackbarError"
       :timeout="timeout"
       :method="setNotVisibleSnackBarError"
-    ></snackbar>
-  </div>
+    ></snackbar> -->
+  <!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -244,6 +270,13 @@ export default class MessagesPage extends Vue {
   border-radius: 1rem;
   width: 18rem !important;
   height: 18rem !important;
+}
+.background {
+  background-color: transparent;
+  border: 0px;
+}
+.discord-message:hover {
+  background-color: #46606f;
 }
 </style>
 

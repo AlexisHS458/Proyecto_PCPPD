@@ -129,6 +129,7 @@ export default class InputMessage extends Vue {
   async sendMessages() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.messageModel = {
+        fotoURL: this.currentUser.fotoURL,
         uid_usuario: this.currentUser.uid!,
         usuarioNombre:
           this.currentUser.nombre + " " + this.currentUser.apellido,

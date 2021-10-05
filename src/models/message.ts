@@ -26,4 +26,9 @@ export interface Message {
    * Fecha en la que fue enviada el mensaje
    */
   fecha: number;
+
+  /**
+   * URL de la imagen de perfil del usuario
+   */
+  fotoURL: string;
 }

@@ -8,6 +8,7 @@
       }"
       color="white"
       :class="`${hover ? 'select-item' : 'no-select-item'}`"
+      class="mb-1"
     >
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
