@@ -9,7 +9,7 @@ import "@/assets/global.css";
 export default Vue.extend({
   name: "Home",
   beforeCreate: function () {
-    document.body.className = "home";
+    document.body.className = "homes";
   },
   components: {
     LoginForm,

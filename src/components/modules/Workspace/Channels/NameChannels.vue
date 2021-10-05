@@ -6,6 +6,8 @@
         name: 'messages',
         params: { idChannel: channel.uid },
       }"
+      :class="`${hover ? 'select-item' : 'no-select-item'}`"
+      color="white"
     >
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
@@ -335,5 +337,13 @@ export default class NameChannels extends Vue {
 
 .black--text /deep/ label {
   color: white;
+}
+
+.select-item {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.no-select-item {
+  background-color: #000029;
 }
 </style>

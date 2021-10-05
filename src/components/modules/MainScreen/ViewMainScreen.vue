@@ -1,12 +1,16 @@
-<template>
+<template >
   <div v-if="!isLoading">
     <app-bar></app-bar>
-    <v-btn @click="connect">Botton para probar socket io</v-btn>
-    <v-container class="scroll">
-      <own-card :user="currentUser"></own-card>
-      <invitation-card :user="currentUser"></invitation-card>
-      <floating-button></floating-button>
+    <!--   <v-btn @click="connect">Botton para probar socket io</v-btn> -->
+    <!-- <div class="scroll"> -->
+    <v-container fluid class="scroll">
+      <v-container class="mb-16">
+        <own-card :user="currentUser"></own-card>
+        <invitation-card :user="currentUser"></invitation-card>
+        <floating-button></floating-button>
+      </v-container>
     </v-container>
+    <!--    </div> -->
     <!--   Peticiones exitosas del modulo de MainScreen -->
     <snackbar
       :color="'success'"
@@ -180,6 +184,7 @@ export default class ViewMainScreen extends Vue {
 
 .scroll {
   overflow-y: auto;
+  height: 100vh;
 }
 
 .scroll::-webkit-scrollbar {
@@ -193,9 +198,9 @@ export default class ViewMainScreen extends Vue {
   background-color: #3e527e;
   border-radius: 10px;
 }
-.container {
+/* .container {
   max-width: 100%;
-}
+} */
 </style>
  
 

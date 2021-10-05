@@ -1,11 +1,18 @@
 <template>
-  <v-expansion-panels v-model="panel" class="expansion-panels" multiple>
+  <v-expansion-panels v-model="panel" class="expansion-panels" multiple dark>
     <v-expansion-panel>
-      <v-expansion-panel-header color="primaryDark" class="title">
+      <v-expansion-panel-header
+        color="primaryDark"
+        class="title d-flex flex-row"
+      >
         <template v-slot:actions>
-          <v-icon color="white" class="icon"> $expand </v-icon>
+          <v-icon color="white" class="icon mr-2 flex-shrink-1 flex-grow-0">
+            $expand
+          </v-icon>
         </template>
-        <span class="header font-weight-bold"> {{ item.title }}</span>
+        <span class="header font-weight-bold flex-shrink-0 flex-grow-1">
+          {{ item.title }}</span
+        >
         <v-dialog
           v-if="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
@@ -14,7 +21,8 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              class="add mx-2"
+              v-show="channels.length < 2"
+              class="add mx-2 flex-shrink-1 flex-grow-0"
               icon
               color="white"
               small
@@ -61,8 +69,11 @@
           </v-card>
         </v-dialog>
       </v-expansion-panel-header>
-      <v-expansion-panel-content color="primaryDark" class="expansion-content">
-        <v-list color="primaryDark">
+      <v-expansion-panel-content
+        color="primaryDark"
+        class="expansion-content p-0"
+      >
+        <v-list color="primaryDark" shaped>
           <namechannelscode
             v-for="(channel, index) in channels"
             :key="index"
@@ -180,51 +191,39 @@ export default class ListChannels extends Vue {
 }
 </script>
 
-<style scoped>
-.list-title {
-  color: white;
-}
-.hidden {
-  visibility: hidden;
-}
+<style scoped lang="sass">
+@import '@/sass/variables.scss'
+.list-title
+  color: white
 
-.title {
-  color: white;
-}
-.v-list .v-list-item--active .v-icon {
-  color: white;
-}
+.hidden
+  visibility: hidden
 
-.expansion-panels {
-  z-index: auto;
-  border-radius: 0px;
-}
+.title
+  color: white
 
-.expansion-content {
-  padding-bottom: 0px;
-  flex: 1 1 auto;
-  max-width: 100%;
-}
+.v-list .v-list-item--active .v-icon
+  color: white
 
-.v-expansion-panel-content__wrap {
-  padding-bottom: 0px !important;
-}
+.expansion-panels
+  z-index: auto
+  border-radius: 0px
 
-.icon {
-  order: 0;
-}
+.expansion-content
+  padding-bottom: 0px
+  flex: 1 1 auto
+  max-width: 100%
 
-.header {
-  font-size: 1.13rem !important;
-  order: 1;
-}
+.v-expansion-panel-content__wrap
+  padding-bottom: 0px !important
 
-.add {
-  order: 2;
-}
+.icon
+  order: 0
 
-.v-expansion-panels:not(.v-expansion-panels--accordion):not(.v-expansion-panels--tile)
-  > .v-expansion-panel--active {
-  border-radius: 0px;
-}
+.header
+  font-size: 1.13rem !important
+  order: 1
+
+.add
+  order: 2
 </style>

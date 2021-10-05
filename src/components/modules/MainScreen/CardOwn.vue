@@ -1,6 +1,12 @@
 <template>
   <v-row>
-    <v-col v-for="(workspace, index) in workSpacesList" :key="index" cols="4">
+    <v-col
+      v-for="(workspace, index) in workSpacesList"
+      :key="index"
+      lg="4"
+      cols="12"
+      md="6"
+    >
       <collaboration-card
         v-if="workspace.uid_usuario !== user.uid"
         :currentUser="currentUser"

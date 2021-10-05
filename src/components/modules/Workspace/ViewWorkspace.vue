@@ -15,7 +15,7 @@
       </v-responsive>
     </v-app-bar> -->
 
-    <v-navigation-drawer v-model="drawer" app width="300" color="primaryDark">
+    <v-navigation-drawer v-model="drawer" app width="300">
       <!--     <v-navigation-drawer
         v-model="drawer"
         absolute

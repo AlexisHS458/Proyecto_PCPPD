@@ -1,5 +1,5 @@
 import SocketioService from "@/services/socketio.service";
-import { Action, Module, VuexModule } from "vuex-module-decorators";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 /**
  * Modulo para el manejo de conexión con servidor de socket.io
@@ -9,6 +9,7 @@ class SocketIOModule extends VuexModule {
   @Action
   connect(): void {
     SocketioService.connect();
+    console.log("Hola");
   }
 }
 
