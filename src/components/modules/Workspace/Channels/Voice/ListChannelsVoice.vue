@@ -1,12 +1,19 @@
 <template>
-  <v-expansion-panels v-model="panel" class="expansion-panels" multiple>
+  <v-expansion-panels v-model="panel" class="expansion-panels" multiple dark>
     <v-expansion-panel>
-      <v-expansion-panel-header color="primaryDark" class="title d-flex flex-row">
+      <v-expansion-panel-header
+        color="primaryDark"
+        class="title d-flex flex-row"
+      >
         <template v-slot:actions>
-          <v-icon color="white" class="icon mr-2 flex-shrink-1 flex-grow-0"> $expand </v-icon>
+          <v-icon color="white" class="icon mr-2 flex-shrink-1 flex-grow-0">
+            $expand
+          </v-icon>
         </template>
 
-        <span class="header font-weight-bold flex-shrink-0 flex-grow-1" > {{ item.title }}</span>
+        <span class="header font-weight-bold flex-shrink-0 flex-grow-1">
+          {{ item.title }}</span
+        >
         <v-dialog
           v-if="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
@@ -224,10 +231,5 @@ export default class ListChannels extends Vue {
 
 .add {
   order: 2;
-}
-
-.v-expansion-panels:not(.v-expansion-panels--accordion):not(.v-expansion-panels--tile)
-  > .v-expansion-panel--active {
-  border-radius: 0px;
 }
 </style>

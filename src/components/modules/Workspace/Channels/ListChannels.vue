@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels v-model="panel" class="expansion-panels" multiple>
+  <v-expansion-panels v-model="panel" class="expansion-panels" multiple dark>
     <v-expansion-panel>
       <v-expansion-panel-header
         color="primaryDark"
@@ -232,10 +232,5 @@ export default class ListChannels extends Vue {
   order: 2;
   width: 24px;
   height: 24px;
-}
-
-.v-expansion-panels:not(.v-expansion-panels--accordion):not(.v-expansion-panels--tile)
-  > .v-expansion-panel--active {
-  border-radius: 0px;
 }
 </style>
