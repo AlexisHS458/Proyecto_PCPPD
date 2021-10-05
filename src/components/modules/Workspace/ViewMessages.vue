@@ -1,19 +1,21 @@
 <template>
   <div class="card-center">
     <app-bar-messages :channelApp="channel"></app-bar-messages>
-    <v-list three-line class="list-background scroll" ref="vList">
-      <template v-if="messages.length > 0">
+    <template v-if="messages.length > 0">
+      <v-list three-line class="list-background scroll" ref="vList">
         <list-messages
           v-for="(message, index) in messages"
           :key="index"
           :message="message"
           :currentUser="currentUser"
         ></list-messages>
-      </template>
-      <template v-else>
+      </v-list>
+    </template>
+    <template v-else>
+      <div class="div-image-center">
         <img src="@/assets/Messages.svg" class="img-not-messages" />
-      </template>
-    </v-list>
+      </div>
+    </template>
     <v-footer absolute color="transparent">
       <input-message
         :workspace="workspace"
@@ -203,11 +205,17 @@ export default class MessagesPage extends Vue {
 
 <style scoped>
 .card-center {
-  height: 100vh;
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   justify-content: space-between;
   background-color: #0c2a52;
+}
+.div-image-center {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .scroll::-webkit-scrollbar {
   width: 5px;
@@ -221,7 +229,6 @@ export default class MessagesPage extends Vue {
   border-radius: 10px;
 }
 .scroll {
-  padding-bottom: 100px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -230,14 +237,13 @@ export default class MessagesPage extends Vue {
 .list-background {
   background-color: #0c2a52;
   color: white;
-  max-height: 100vh;
+  max-height: 80vh;
   overflow-x: auto;
 }
 .img-not-messages {
-  width: 40rem;
-  height: 20rem;
-  margin: auto;
-  margin-bottom: 20%;
+  border-radius: 1rem;
+  width: 18rem !important;
+  height: 18rem !important;
 }
 </style>
 
