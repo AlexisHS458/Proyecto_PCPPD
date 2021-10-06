@@ -87,6 +87,10 @@ export default class LoginForm extends Vue {
       signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
     };
     ui.start("#firebaseui-auth-container", uiConfig);
+    /* await this.fetchCurrentUser();
+    if (this.isLoggedIn) {
+      this.$router.push("/Mainscreen");
+    } */
   }
 }
 </script>

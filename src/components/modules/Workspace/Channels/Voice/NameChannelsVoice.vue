@@ -55,18 +55,19 @@
                   </template>
                   <v-list color="secondaryDark">
                     <v-list-item
-                      v-for="(user, index) in users"
-                      :key="index"
+                      v-for="user in users"
+                      :key="user.uid"
                       class="list-title"
                       color="secondaryDark"
                     >
                       <v-checkbox
+                        v-model="channel.permisos"
                         class="black--text"
                         color="infoDark"
-                        v-model="model"
                         :label="user.nombre"
-                        :value="user"
                         @click.stop="() => {}"
+                        @change="check($event, user.uid, user.nombre)"
+                        :value="user.uid"
                       ></v-checkbox>
                     </v-list-item>
                   </v-list>
@@ -183,6 +184,7 @@
 </template>
 
 <script lang="ts">
+import { PermissionsPath } from "@/models/permissions";
 import { User } from "@/models/user";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { Workspace } from "@/models/workspace";
@@ -191,6 +193,7 @@ import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
+const Permissions = namespace("PermissionsModule");
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -239,6 +242,18 @@ export default class NameChannels extends Vue {
   @User.State("user")
   private currentUser!: User;
 
+  /**
+   * Acciones obtenidas del @module Permissions
+   */
+  @Permissions.Action
+  private AddVoicePermission!: (
+    permissionsPath: PermissionsPath
+  ) => Promise<void>;
+  @Permissions.Action
+  private RemoveVoicePermission!: (
+    permissionsPath: PermissionsPath
+  ) => Promise<void>;
+
   @Ref("form") readonly form!: VForm;
 
   public menu = false;
@@ -250,6 +265,7 @@ export default class NameChannels extends Vue {
   public model = [];
   public valid = true;
   public newNameChannel = "";
+  public permissions = {} as PermissionsPath;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
@@ -287,6 +303,21 @@ export default class NameChannels extends Vue {
       this.$router.replace({ path: "/space/" + this.workspaceUID }); */
     /* } */
     /* } */
+  }
+
+  async check(e: string[], userUID: string, userName: string) {
+    this.permissions = {
+      uidUser: userUID,
+      uidWorkSpace: this.workspaceUID,
+      uidChannel: this.channel.uid!,
+      nameUser: userName,
+      nameChannel: this.channel.nombre,
+    };
+    if (e.includes(userUID)) {
+      await this.AddVoicePermission(this.permissions);
+    } else {
+      await this.RemoveVoicePermission(this.permissions);
+    }
   }
 }
 </script>

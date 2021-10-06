@@ -9,7 +9,12 @@ import MessagesPage from "../components/modules/Workspace/ViewMessages.vue";
 import NotFound from "../views/PageNotFound.vue";
 import NotChannels from "../components/modules/Workspace/NotChannels.vue";
 import CodeChannel from "../components/modules/Workspace/Channels/Code/EditCode.vue";
-/* import { firebase } from "@/utils/firebase"; */
+/* import firebase from "firebase/app"; */
+/* import "firebase/app";
+import "firebase/auth";
+import store from "@/store"; */
+import { auth } from "@/utils/firebase";
+
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
@@ -17,49 +22,65 @@ const routes: Array<RouteConfig> = [
     path: "/",
     name: "Home",
     component: Home
-    /* meta: {
-      guest: true
+    /*  meta: {
+      requiresAuth: true
     } */
   },
   {
     path: "/register",
     name: "Register",
-    component: Register
-    /*  meta: {
-      auth: true
-    } */
+    component: Register,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: "/Mainscreen",
     name: "MainScreen",
-    component: MainScreen
-    /*   meta: {
-      auth: true
-    } */
+    component: MainScreen,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: "/Editinformation",
     name: "Edit",
-    component: EditInformation
-    /* meta: {
-      auth: true
-    } */
+    component: EditInformation,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: "/space/:id",
     name: "Space",
     component: Workspace,
+    meta: {
+      requiresAuth: true
+    },
     children: [
-      { name: "messages", path: ":idChannel", component: MessagesPage, props: true },
+      {
+        name: "messages",
+        path: ":idChannel",
+        component: MessagesPage,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      },
       {
         path: "",
         component: NotChannels
       },
-      { name: "codeChannel", path: "code/:idChannelCode", component: CodeChannel, props: true }
+      {
+        name: "codeChannel",
+        path: "code/:idChannelCode",
+        component: CodeChannel,
+        props: true,
+        meta: {
+          requiresAuth: true
+        }
+      }
     ]
-    /* meta: {
-      auth: true
-    } */
   },
   {
     path: "*",
@@ -73,33 +94,16 @@ const router = new VueRouter({
   routes
 });
 
-/* router.beforeEach((to, from, next) => {
-
-  if (to.matched.some(record => record.meta.auth)) {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        next()
-      } else {
-        next({
-          path: "/",
-        })
-      }
-    })
-  } else if (to.matched.some(record => record.meta.guest)) {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        next({
-          path: "/dashboard",
-        })
-      } else {
-        next()
-      }
-    })
-
-  } else {
-    next()
-  }
-
-}) */
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
+  auth.onAuthStateChanged(user => {
+    if (!user && requiresAuth) {
+      next({ name: "Home" });
+    } else if (!requiresAuth && user) {
+      next("/Mainscreen");
+    } else if (!requiresAuth && !user) next();
+    else next();
+  });
+});
 
 export default router;
