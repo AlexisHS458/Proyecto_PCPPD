@@ -59,18 +59,19 @@
                   </template>
                   <v-list color="secondaryDark">
                     <v-list-item
-                      v-for="(user, index) in users"
-                      :key="index"
+                      v-for="user in users"
+                      :key="user.uid"
                       class="list-title"
                       color="secondaryDark"
                     >
                       <v-checkbox
+                        v-model="channel.permisos"
                         class="black--text"
                         color="infoDark"
-                        v-model="model"
                         :label="user.nombre"
-                        :value="user"
                         @click.stop="() => {}"
+                        @change="check($event, user.uid, user.nombre)"
+                        :value="user.uid"
                       ></v-checkbox>
                     </v-list-item>
                   </v-list>
@@ -187,6 +188,7 @@
 </template>
 
 <script lang="ts">
+import { PermissionsPath } from "@/models/permissions";
 import { TextChannel } from "@/models/textChannel";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
@@ -195,6 +197,7 @@ import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
+const Permissions = namespace("PermissionsModule");
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -242,6 +245,15 @@ export default class NameChannels extends Vue {
 
   @User.State("user")
   private currentUser!: User;
+  /**
+   * Acciones obtenidas del @module Permissions
+   */
+  @Permissions.Action
+  private AddPermission!: (permissionsPath: PermissionsPath) => Promise<void>;
+  @Permissions.Action
+  private RemovePermission!: (
+    permissionsPath: PermissionsPath
+  ) => Promise<void>;
 
   @Ref("form") readonly form!: VForm;
 
@@ -251,12 +263,14 @@ export default class NameChannels extends Vue {
   public dialogDelete = false;
   public loadingDelete = false;
   public loadingRenameChanel = false;
-  public model = [];
+  public userUID = "";
   public valid = true;
   public newNameChannel = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
+  public permissions = {} as PermissionsPath;
+  public statusCheckbox = false;
 
   /**
    * Editar información de un canal de texto
@@ -297,6 +311,21 @@ export default class NameChannels extends Vue {
     if (this.$route.path != "/space/" + this.workspaceUID) {
       this.$router.replace({ path: "/space/" + this.workspaceUID });
       /* } */
+    }
+  }
+
+  async check(e: string[], userUID: string, userName: string) {
+    this.permissions = {
+      uidUser: userUID,
+      uidWorkSpace: this.workspaceUID,
+      uidChannel: this.channel.uid!,
+      nameUser: userName,
+      nameChannel: this.channel.nombre
+    };
+    if (e.includes(userUID)) {
+      await this.AddPermission(this.permissions);
+    } else {
+      await this.RemovePermission(this.permissions);
     }
   }
 }

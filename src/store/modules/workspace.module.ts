@@ -6,7 +6,7 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { User } from "@/models/user";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { CodeChannel } from "@/models/codeChannel";
-
+import UserService from "@/services/user.service";
 /**
  * Modulo de acceso a información de un solo espacio de trabajo
  */
@@ -16,6 +16,11 @@ class WorkspaceModule extends VuexModule {
    * Datos del espacio de trabajo
    */
   public workspace!: Workspace;
+
+  /**
+   * Usuario actual autenticado
+   */
+  public user?: User = undefined;
 
   /**
    * Usuarios pertenecientes al espacio de trabajo
@@ -35,7 +40,7 @@ class WorkspaceModule extends VuexModule {
   /**
    * Canales de voz en el espacio de trabajo
    */
-   public codeChannels: CodeChannel[] = [];
+  public codeChannels: CodeChannel[] = [];
 
   /**
    * Mensaje a mostrar en snackbar
@@ -113,7 +118,15 @@ class WorkspaceModule extends VuexModule {
 
   @Mutation
   public setUsers(users: Array<User>): void {
-    this.users = users;
+    this.users = /*  users;  */ users.filter(user => {
+      return user.uid !== this.user!.uid;
+    });
+    console.table(this.users);
+  }
+
+  @Mutation
+  public setUser(user: User): void {
+    this.user = user;
   }
 
   @Mutation
@@ -178,21 +191,23 @@ class WorkspaceModule extends VuexModule {
    * Obtiene los canales de codigo del espacio de trabajo
    * @param uid ID único del espacio de trabajo a consultar
    */
-   @Action
-   async fetchCodeChannels(uid: string): Promise<void> {
-     this.context.commit("setLoadingStatus", true);
-     ChannelsService.getCodeChannels(uid, codeChannels => {
-       this.context.commit("setCodeChannels", codeChannels);
-       this.context.commit("setLoadingStatus", false);
-     });
-   }
+  @Action
+  async fetchCodeChannels(uid: string): Promise<void> {
+    this.context.commit("setLoadingStatus", true);
+    ChannelsService.getCodeChannels(uid, codeChannels => {
+      this.context.commit("setCodeChannels", codeChannels);
+      this.context.commit("setLoadingStatus", false);
+    });
+  }
 
   /**
    * Obtiene los usuarios dentro del espacio de trabajo.
    */
   @Action
-  fetchUsersInWorkspace(): void {
+  async fetchUsersInWorkspace() {
     this.context.commit("setLoadingUsersStatus", true);
+    const user = await UserService.getUserAuthInfo();
+    this.context.commit("setUser", user);
     WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
       this.context.commit("setUsers", users);
       this.context.commit("setLoadingUsersStatus", false);
@@ -325,62 +340,62 @@ class WorkspaceModule extends VuexModule {
    * Crea un canal de codigo en el espacio de trabajo
    * @param codeChannel Canal de voz a agregar al espacio de trabajo
    */
-   @Action
-   async createCodeChannel(codeChannel: CodeChannel): Promise<void> {
-     this.context.commit("setChannelCreatedStatus", false);
-     console.log(codeChannel);
-     ChannelsService.createCodeChannel(this.workspace.uid, codeChannel)
-       .then(() => {
-         this.context.commit("setChannelCreatedStatus", true);
-         this.context.commit("setSnackBarMessage", "Exito al crear canal");
-         this.context.commit("setShowSnackBarMessage", true);
-       })
-       .catch(() => {
-         this.context.commit("setChannelCreatedStatus", false);
-         this.context.commit("setSnackBarMessageError", "Error al crear canal");
-         this.context.commit("setShowSnackBarMessageError", true);
-       });
-   }
- 
-   /**
-    * Editar un canal de codigo
-    * @param codeChannel Información del nuevo canal de codigo
-    */
-   @Action
-   async editCodeChannel(codeChannel: CodeChannel): Promise<void> {
-     this.context.commit("setChannelEditedStatus", false);
-     ChannelsService.editCodeChannel(this.workspace.uid, codeChannel)
-       .then(() => {
-         this.context.commit("setChannelEditedStatus", true);
-         this.context.commit("setSnackBarMessage", "Exito al editar canal");
-         this.context.commit("setShowSnackBarMessage", true);
-       })
-       .catch(() => {
-         this.context.commit("setChannelEditedStatus", false);
-         this.context.commit("setSnackBarMessageError", "Error al editar canal");
-         this.context.commit("setShowSnackBarMessageError", true);
-       });
-   }
- 
-   /**
-    * Elimina un canal de codigo del espacio de trabajo
-    * @param codeChannelID ID del canal de codigo a eliminar
-    */
-   @Action
-   async deleteCodeChannel(codeChannelID: string): Promise<void> {
-     this.context.commit("setChannelDeletedStatus", false);
-     ChannelsService.deleteCodeChannel(this.workspace.uid, codeChannelID)
-       .then(() => {
-         this.context.commit("setChannelDeletedStatus", true);
-         this.context.commit("setSnackBarMessage", "Exito al eliminar canal");
-         this.context.commit("setShowSnackBarMessage", true);
-       })
-       .catch(() => {
-         this.context.commit("setChannelDeletedStatus", false);
-         this.context.commit("setSnackBarMessageError", "Error al eliminar canal");
-         this.context.commit("setShowSnackBarMessageError", true);
-       });
-   }
+  @Action
+  async createCodeChannel(codeChannel: CodeChannel): Promise<void> {
+    this.context.commit("setChannelCreatedStatus", false);
+    console.log(codeChannel);
+    ChannelsService.createCodeChannel(this.workspace.uid, codeChannel)
+      .then(() => {
+        this.context.commit("setChannelCreatedStatus", true);
+        this.context.commit("setSnackBarMessage", "Exito al crear canal");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("setChannelCreatedStatus", false);
+        this.context.commit("setSnackBarMessageError", "Error al crear canal");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
+  }
+
+  /**
+   * Editar un canal de codigo
+   * @param codeChannel Información del nuevo canal de codigo
+   */
+  @Action
+  async editCodeChannel(codeChannel: CodeChannel): Promise<void> {
+    this.context.commit("setChannelEditedStatus", false);
+    ChannelsService.editCodeChannel(this.workspace.uid, codeChannel)
+      .then(() => {
+        this.context.commit("setChannelEditedStatus", true);
+        this.context.commit("setSnackBarMessage", "Exito al editar canal");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("setChannelEditedStatus", false);
+        this.context.commit("setSnackBarMessageError", "Error al editar canal");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
+  }
+
+  /**
+   * Elimina un canal de codigo del espacio de trabajo
+   * @param codeChannelID ID del canal de codigo a eliminar
+   */
+  @Action
+  async deleteCodeChannel(codeChannelID: string): Promise<void> {
+    this.context.commit("setChannelDeletedStatus", false);
+    ChannelsService.deleteCodeChannel(this.workspace.uid, codeChannelID)
+      .then(() => {
+        this.context.commit("setChannelDeletedStatus", true);
+        this.context.commit("setSnackBarMessage", "Exito al eliminar canal");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("setChannelDeletedStatus", false);
+        this.context.commit("setSnackBarMessageError", "Error al eliminar canal");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
+  }
 
   /**
    * Elimina un usuario del espacio de trabajo.
