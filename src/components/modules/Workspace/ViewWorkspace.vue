@@ -28,7 +28,10 @@
           :user="currentUser"
           :workspace="workspace"
         ></invitation-user>
-        <v-list color="primaryDark">
+        <!-- <v-list color="primaryDark"> -->
+        <user-info-in-list :currentUser="currentUser"></user-info-in-list>
+        <!-- </v-list> -->
+        <v-list color="primaryDark mt-0 pt-0">
           <list-user
             v-for="(user, index) in users"
             :user="user"
@@ -100,6 +103,7 @@ import Channels from "@/components/modules/Workspace/Channels/ViewChannels.vue";
 import InvitationUser from "@/components/modules/Workspace/InvitationUser.vue";
 import ListUser from "@/components/modules/Workspace/ListUsers.vue";
 import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
+import UserInfoInList from "@/components/modules/Workspace/UserInfoInList.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
@@ -119,6 +123,7 @@ const Permissions = namespace("PermissionsModule");
     InvitationUser,
     ListUser,
     Snackbar,
+    UserInfoInList,
   },
 })
 export default class Spacework extends Vue {

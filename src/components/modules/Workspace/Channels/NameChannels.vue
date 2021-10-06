@@ -70,7 +70,7 @@
                         color="infoDark"
                         :label="user.nombre"
                         @click.stop="() => {}"
-                        @change="check($event, user.uid)"
+                        @change="check($event, user.uid, user.nombre)"
                         :value="user.uid"
                       ></v-checkbox>
                     </v-list-item>
@@ -314,11 +314,13 @@ export default class NameChannels extends Vue {
     }
   }
 
-  async check(e: string[], userUID: string) {
+  async check(e: string[], userUID: string, userName: string) {
     this.permissions = {
       uidUser: userUID,
       uidWorkSpace: this.workspaceUID,
       uidChannel: this.channel.uid!,
+      nameUser: userName,
+      nameChannel: this.channel.nombre
     };
     if (e.includes(userUID)) {
       await this.AddPermission(this.permissions);

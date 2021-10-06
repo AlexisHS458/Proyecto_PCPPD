@@ -73,11 +73,11 @@ class PermissionsModule extends VuexModule {
           "setSnackBarMessage",
           "Se ha otorgado permisos de" +
             " " +
-            permissionsPath.uidChannel +
+            permissionsPath.nameChannel +
             " " +
             "a" +
             " " +
-            permissionsPath.uidUser
+            permissionsPath.nameUser
         );
         this.context.commit("setShowSnackBarMessage", true);
       });
@@ -101,11 +101,11 @@ class PermissionsModule extends VuexModule {
           "setSnackBarMessage",
           "Se ha removido permiso de" +
             " " +
-            permissionsPath.uidChannel +
+            permissionsPath.nameChannel +
             " " +
             "a" +
             " " +
-            permissionsPath.uidUser
+            permissionsPath.nameUser
         );
         this.context.commit("setShowSnackBarMessage", true);
       });

@@ -126,6 +126,7 @@ export default class UserList extends Vue {
   public menu = false;
   public model = 1;
   public status = Status.OFFLINE;
+  public statusCurrent = Status.OFFLINE;
   public dialog = false;
   public isValid = true;
 
@@ -136,6 +137,11 @@ export default class UserList extends Vue {
     if (this.user.uid) {
       presenceServices.getPresence(this.user.uid, (status) => {
         this.status = status;
+      });
+    }
+    if (this.currentUser.uid) {
+      presenceServices.getPresence(this.currentUser.uid, (status) => {
+        this.statusCurrent = status;
       });
     }
   }
@@ -168,6 +174,10 @@ export default class UserList extends Vue {
 
 .card-list {
   padding: 0 0 0 0 !important;
+}
+
+.list-margin {
+  margin-bottom: -4;
 }
 
 .btn {

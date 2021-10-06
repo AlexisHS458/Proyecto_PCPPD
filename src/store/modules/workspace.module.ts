@@ -118,7 +118,7 @@ class WorkspaceModule extends VuexModule {
 
   @Mutation
   public setUsers(users: Array<User>): void {
-    this.users = users.filter(user => {
+    this.users = /*  users;  */ users.filter(user => {
       return user.uid !== this.user!.uid;
     });
     console.table(this.users);
