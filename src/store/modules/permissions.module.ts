@@ -56,7 +56,7 @@ class PermissionsModule extends VuexModule {
   }
 
   /**
-   *
+   * Añadir permiso de un canal de texto a un usuario de un espacio de trabajo.
    */
   @Action
   async AddPermission(permissionsPath: PermissionsPath): Promise<void> {
@@ -84,13 +84,125 @@ class PermissionsModule extends VuexModule {
   }
 
   /**
-   *
+   * Remover permiso de un canal de texto a un usuario de un espacio de trabajo.
    */
   @Action
   async RemovePermission(permissionsPath: PermissionsPath): Promise<void> {
     this.context.commit("setRemovepermissionStatus", false);
     permissionsService
       .RemovePermission(
+        permissionsPath.uidWorkSpace,
+        permissionsPath.uidChannel,
+        permissionsPath.uidUser
+      )
+      .then(() => {
+        this.context.commit("setRemovepermissionStatus", true);
+        this.context.commit(
+          "setSnackBarMessage",
+          "Se ha removido permiso de" +
+            " " +
+            permissionsPath.nameChannel +
+            " " +
+            "a" +
+            " " +
+            permissionsPath.nameUser
+        );
+        this.context.commit("setShowSnackBarMessage", true);
+      });
+  }
+
+  /**
+   * Añadir permiso de un canal de voz a un usuario de un espacio de trabajo.
+   */
+   @Action
+   async AddVoicePermission(permissionsPath: PermissionsPath): Promise<void> {
+     this.context.commit("setAddpermissionStatus", false);
+     permissionsService
+       .AddVoicePermission(
+         permissionsPath.uidWorkSpace,
+         permissionsPath.uidChannel,
+         permissionsPath.uidUser
+       )
+       .then(() => {
+         this.context.commit("setAddpermissionStatus", true);
+         this.context.commit(
+           "setSnackBarMessage",
+           "Se ha otorgado permisos de" +
+             " " +
+             permissionsPath.nameChannel +
+             " " +
+             "a" +
+             " " +
+             permissionsPath.nameUser
+         );
+         this.context.commit("setShowSnackBarMessage", true);
+       });
+   }
+ 
+   /**
+    * Remover permiso de un canal de voz a un usuario de un espacio de trabajo.
+    */
+   @Action
+   async RemoveVoicePermission(permissionsPath: PermissionsPath): Promise<void> {
+     this.context.commit("setRemovepermissionStatus", false);
+     permissionsService
+       .RemoveVoicePermission(
+         permissionsPath.uidWorkSpace,
+         permissionsPath.uidChannel,
+         permissionsPath.uidUser
+       )
+       .then(() => {
+         this.context.commit("setRemovepermissionStatus", true);
+         this.context.commit(
+           "setSnackBarMessage",
+           "Se ha removido permiso de" +
+             " " +
+             permissionsPath.nameChannel +
+             " " +
+             "a" +
+             " " +
+             permissionsPath.nameUser
+         );
+         this.context.commit("setShowSnackBarMessage", true);
+       });
+   }
+
+   /**
+   * Añadir permiso de un canal de código a un usuario de un espacio de trabajo.
+   */
+  @Action
+  async AddCodePermission(permissionsPath: PermissionsPath): Promise<void> {
+    this.context.commit("setAddpermissionStatus", false);
+    permissionsService
+      .AddCodePermission(
+        permissionsPath.uidWorkSpace,
+        permissionsPath.uidChannel,
+        permissionsPath.uidUser
+      )
+      .then(() => {
+        this.context.commit("setAddpermissionStatus", true);
+        this.context.commit(
+          "setSnackBarMessage",
+          "Se ha otorgado permisos de" +
+            " " +
+            permissionsPath.nameChannel +
+            " " +
+            "a" +
+            " " +
+            permissionsPath.nameUser
+        );
+        this.context.commit("setShowSnackBarMessage", true);
+      });
+  }
+
+  /**
+   * Remover permiso de un canal de código a un usuario de un espacio de trabajo.
+   */
+  @Action
+  async RemoveCodePermission(permissionsPath: PermissionsPath): Promise<void> {
+    this.context.commit("setRemovepermissionStatus", false);
+    permissionsService
+      .RemoveCodePermission(
         permissionsPath.uidWorkSpace,
         permissionsPath.uidChannel,
         permissionsPath.uidUser

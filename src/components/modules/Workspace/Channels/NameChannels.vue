@@ -245,6 +245,7 @@ export default class NameChannels extends Vue {
 
   @User.State("user")
   private currentUser!: User;
+
   /**
    * Acciones obtenidas del @module Permissions
    */
@@ -320,7 +321,7 @@ export default class NameChannels extends Vue {
       uidWorkSpace: this.workspaceUID,
       uidChannel: this.channel.uid!,
       nameUser: userName,
-      nameChannel: this.channel.nombre
+      nameChannel: this.channel.nombre,
     };
     if (e.includes(userUID)) {
       await this.AddPermission(this.permissions);
