@@ -76,8 +76,8 @@
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
         <v-list color="primaryDark" shaped>
           <namechannelsvoice
-            v-for="(channel, index) in channels"
-            :key="index"
+            v-for="channel in channels"
+            :key="channel.uid"
             :channel="channel"
             :icon="item.icon"
             :users="users"

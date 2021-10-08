@@ -17,6 +17,9 @@
       <v-icon v-if="isListening" color="success">mdi-headphones</v-icon>
       <v-icon v-else color="error">mdi-headphones-off</v-icon>
     </v-btn>
+    <v-btn icon>
+      <v-icon color="errorLight">mdi-phone-remove</v-icon>
+    </v-btn>
   </v-app-bar>
 </template>
 

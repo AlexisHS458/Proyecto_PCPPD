@@ -245,7 +245,7 @@ export default class MessagesPage extends Vue {
   background-color: #0c2a52;
 }
 .div-image-center {
-  height: 80vh;
+  height: 86vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -271,7 +271,7 @@ export default class MessagesPage extends Vue {
 .list-background {
   background-color: #0c2a52;
   color: white;
-  max-height: 78vh;
+  max-height: 79.8vh;
   overflow-x: auto;
 }
 .img-not-messages {
