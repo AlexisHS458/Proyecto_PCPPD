@@ -6,22 +6,33 @@
     ></app-bar-messages>
 
     <template v-if="messages.length > 0">
-      <discord-messages
+      <messages-list
         class="background list-background scroll flex-grow-1"
         ref="vList"
       >
-        <!-- <v-hover> -->
+        <messages-in-messages
+          v-for="message in messages"
+          :key="message.uid"
+          :message="message"
+          :currentUser="currentUser"
+        >
+          {{ message.contenido }}
+        </messages-in-messages>
+      </messages-list>
+      <!--   <discord-messages
+        class="background list-background scroll flex-grow-1"
+        ref="vList"
+      >
         <discord-message
-          v-for="(message, index) in messages"
-          :key="index"
+          v-for="message in messages"
+          :key="message.uid"
           :author="message.usuarioNombre"
           :avatar="message.fotoURL"
           :timestamp="new Date(message.fecha)"
         >
           {{ message.contenido }}
         </discord-message>
-        <!-- </v-hover> -->
-      </discord-messages>
+      </discord-messages> -->
     </template>
 
     <template v-else>
@@ -64,6 +75,8 @@ import AppBarMessages from "@/components/modules/Workspace/Channels/Text/AppBarM
 import InputMessage from "@/components/modules/Workspace/Channels/Text/InputMessage.vue";
 import ListMessages from "@/components/modules/Workspace/Channels/Text/ListMessages.vue";
 import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
+import MessagesList from "@/components/modules/Workspace/Channels/Text/Messages.vue";
+import MessagesInMessages from "@/components/modules/Workspace/Channels/Text/Message.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
@@ -80,6 +93,8 @@ const Permissions = namespace("PermissionsModule");
     AppBarMessages,
     InputMessage,
     ListMessages,
+    MessagesList,
+    MessagesInMessages,
   },
 })
 export default class MessagesPage extends Vue {
@@ -222,7 +237,7 @@ export default class MessagesPage extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss" >
 .card-center {
   /* display: flex; */
   flex-direction: column;
@@ -256,7 +271,7 @@ export default class MessagesPage extends Vue {
 .list-background {
   background-color: #0c2a52;
   color: white;
-  max-height: 80vh;
+  max-height: 78vh;
   overflow-x: auto;
 }
 .img-not-messages {
@@ -264,13 +279,10 @@ export default class MessagesPage extends Vue {
   width: 18rem !important;
   height: 18rem !important;
 }
-.background {
+/* .background {
   background-color: transparent;
   border: 0px;
-}
-.discord-message:hover {
-  background-color: #46606f;
-}
+} */
 .display-footer {
   display: block;
 }

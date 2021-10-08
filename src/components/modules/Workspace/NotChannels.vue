@@ -1,6 +1,6 @@
 <template>
   <div class="card-center">
-    <img src="@/assets/NotMessages.svg" class="img" />
+    <img src="@/assets/Coworking-amico.svg" class="img" />
     <h1 class="h">Selecciona un canal</h1>
   </div>
 </template>

@@ -5,9 +5,9 @@ import store from "./store";
 import vuetify from "./plugins/vuetify";
 /* eslint-disable */
 // @ts-ignore
-import VueDiscordMessage from "vue-discord-message";
+/* import VueDiscordMessage from "vue-discord-message"; */
 /* eslint-enable */
-Vue.use(VueDiscordMessage);
+/* Vue.use(VueDiscordMessage); */
 
 Vue.config.productionTip = false;
 
