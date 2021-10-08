@@ -1,14 +1,10 @@
-import { io } from "socket.io-client";
+import { io, Socket} from "socket.io-client";
 
+const endpoit = "http://pcppd.herokuapp.com/voiceChannel";
 
-const endpoit = "http://pcppd.herokuapp.com/rtc";
-
-
-//const socket = io(endpoit);
-const rtcSocket = io(endpoit,{
-    transports:  ['websocket']
+const voiceChannelSocket = (uid:string): Socket => io(endpoit,{
+    transports:  ['websocket'],
+    auth: {uid}
 });
-console.log(rtcSocket);
 
-
-export {rtcSocket};
+export {voiceChannelSocket};
