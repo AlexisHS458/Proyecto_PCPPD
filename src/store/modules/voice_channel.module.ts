@@ -16,9 +16,12 @@ class VoiceChannelModule extends VuexModule{
 
 
     @Action
-    public initVoiceService(payloadAction:{htmlAudioElement: HTMLDivElement, userID: string}): void{
+    public initVoiceService(payloadAction:{htmlDivElement: HTMLDivElement, userID: string}): void{
+        console.log("Afuera", payloadAction.htmlDivElement);
+        
         VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
-            payloadAction.htmlAudioElement.innerHTML = '';
+            console.log("Adentro", payloadAction.htmlDivElement);
+            payloadAction.htmlDivElement.innerHTML = '';
             if(!channelID){
                 return;
             }
@@ -34,7 +37,7 @@ class VoiceChannelModule extends VuexModule{
                                     user.socketID,
                                     stream,
                                     payloadAction.userID,
-                                    payloadAction.htmlAudioElement
+                                    payloadAction.htmlDivElement
                                 )
                             ])
                         )

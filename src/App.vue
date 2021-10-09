@@ -43,10 +43,14 @@ export default class AppVue extends Vue {
     if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
     }
-    this.initVoiceService({
-      htmlDivElement: this.$refs.audioContainer as HTMLDivElement,
-      userID: this.currentUser.uid!,
-    });
+    console.log(this.$refs.audioContainer as HTMLDivElement);
+    if(this.$refs.audioContainer){
+      this.initVoiceService({
+        htmlDivElement: this.$refs.audioContainer as HTMLDivElement,
+        userID: this.currentUser.uid!,
+      });
+    }
+    
   }
 }
 </script>

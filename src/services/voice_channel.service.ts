@@ -31,8 +31,8 @@ class VoiceChannelService {
     uid: string,
     onEvent: (channelID: string | undefined) => void
     ){
-      voiceChannelSocket(uid).on(ResponseEventName.USER_STATUS, (channelID) => {
-        onEvent(channelID)
+      voiceChannelSocket(uid).on(ResponseEventName.USER_STATUS, (payload) => {
+        onEvent(payload.channelID)
       });
   }
 
