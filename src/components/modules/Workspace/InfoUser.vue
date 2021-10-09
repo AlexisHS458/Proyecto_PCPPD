@@ -59,7 +59,7 @@ export default class UserInfo extends Vue {
 
   mounted() {
     VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
-      this.isConnected = isConnected;
+      this.isConnected = !!isConnected;
     });
   }
 }

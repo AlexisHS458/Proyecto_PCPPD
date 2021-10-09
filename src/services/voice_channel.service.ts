@@ -1,5 +1,6 @@
+import { SignalPayload } from "@/models/signalpayload";
 import { SocketUser } from "@/models/socketUser";
-import { voiceChannelSocket } from "@/socketio";
+import { voiceChannelSocket} from "@/socketio";
 import { EventName } from "@/utils/event_name";
 import { ResponseEventName } from "@/utils/response_event_name";
 
@@ -28,12 +29,39 @@ class VoiceChannelService {
 
   userStatus(
     uid: string,
-    onEvent: (isConnected: boolean) => void
+    onEvent: (channelID: string | undefined) => void
     ){
-      voiceChannelSocket(uid).on(ResponseEventName.USER_STATUS, (isConnected) => {
-        onEvent(isConnected)
+      voiceChannelSocket(uid).on(ResponseEventName.USER_STATUS, (channelID) => {
+        onEvent(channelID)
       });
   }
+
+  sendingSignal(
+    uid: string,
+    payload: SignalPayload
+  ): void{
+    voiceChannelSocket(uid).emit(EventName.SENDING_SIGNAL, payload);
+  }
+
+  returningSignal(
+    uid: string,
+    payload: SignalPayload
+  ): void{
+    voiceChannelSocket(uid).emit(EventName.RETURNING_SIGNAL, payload);
+  }
+
+  listenReturningSignal(
+    uid: string,
+    onEvent: (signalPayload: SignalPayload) => void
+  ){
+    const socket = voiceChannelSocket(uid);
+
+    socket.on(`${socket.id}-${ResponseEventName.RETURNED_SIGNAL}`,(payload)=>{
+      onEvent(payload);
+    });
+  }
+
+
 }
 
 export default new VoiceChannelService();
