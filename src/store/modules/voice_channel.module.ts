@@ -18,6 +18,36 @@ class VoiceChannelModule extends VuexModule{
     @Action
     public initVoiceService(payloadAction:{htmlDivElement: HTMLDivElement, userID: string}): void{
         console.log("Afuera", payloadAction.htmlDivElement);
+        const createPeer =(
+            userID: string,
+            socketID: string,
+            stream: MediaStream,
+            currentUserID: string,
+            htmlDivElement: HTMLDivElement
+        ): Peer.Instance => {
+            const peer = new Peer({
+                initiator: true,
+                trickle: false,
+                stream,
+            });
+    
+            peer.on("signal", signal => {
+                VoiceChannelService.sendingSignal(currentUserID,{
+                    signal: signal,
+                    socketID: socketID,
+                    uid: userID
+                });
+            });
+    
+            peer.on('stream', (stream) =>{
+                const audio = document.createElement('audio');
+                audio.srcObject = stream;
+                htmlDivElement.appendChild(audio);
+    
+            });
+    
+            return peer;
+        }
         
         VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
             console.log("Adentro", payloadAction.htmlDivElement);
@@ -32,7 +62,7 @@ class VoiceChannelModule extends VuexModule{
                         new Map<string, Peer.Instance>(
                             users.map((user) => [
                                 user.uid,
-                                this.createPeer(
+                                createPeer(
                                     user.uid,
                                     user.socketID,
                                     stream,
@@ -52,36 +82,7 @@ class VoiceChannelModule extends VuexModule{
         }); 
     }
 
-    createPeer(
-        userID: string,
-        socketID: string,
-        stream: MediaStream,
-        currentUserID: string,
-        htmlDivElement: HTMLDivElement
-    ): Peer.Instance {
-        const peer = new Peer({
-            initiator: true,
-            trickle: false,
-            stream,
-        });
-
-        peer.on("signal", signal => {
-            VoiceChannelService.sendingSignal(currentUserID,{
-                signal: signal,
-                socketID: socketID,
-                uid: userID
-            });
-        });
-
-        peer.on('stream', (stream) =>{
-            const audio = document.createElement('audio');
-            audio.srcObject = stream;
-            htmlDivElement.appendChild(audio);
-
-        });
-
-        return peer;
-    }
+    
 
     addPeer(incomingSignal: Peer.SignalData, socketID: string, stream: MediaStream, currentUserID: string): Peer.Instance {
         const peer = new Peer({
