@@ -25,6 +25,15 @@ class VoiceChannelService {
   leaveVoiceChannel(uid: string){
     voiceChannelSocket(uid).emit(EventName.LEAVE);
   }
+
+  userStatus(
+    uid: string,
+    onEvent: (isConnected: boolean) => void
+    ){
+      voiceChannelSocket(uid).on(ResponseEventName.USER_STATUS, (isConnected) => {
+        onEvent(isConnected)
+      });
+  }
 }
 
 export default new VoiceChannelService();
