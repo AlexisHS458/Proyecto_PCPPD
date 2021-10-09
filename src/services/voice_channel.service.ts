@@ -17,6 +17,14 @@ class VoiceChannelService {
       }
     );
   }
+  
+  emitUsers(uid: string, voiceChannelID: string){
+    voiceChannelSocket(uid).emit(EventName.EMIT_USERS,voiceChannelID);
+  }
+
+  leaveVoiceChannel(uid: string){
+    voiceChannelSocket(uid).emit(EventName.LEAVE);
+  }
 }
 
 export default new VoiceChannelService();
