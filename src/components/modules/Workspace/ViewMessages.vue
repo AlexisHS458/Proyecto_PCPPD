@@ -271,7 +271,7 @@ export default class MessagesPage extends Vue {
 .list-background {
   background-color: #0c2a52;
   color: white;
-  max-height: 79.8vh;
+  max-height: 80vh;
   overflow-x: auto;
 }
 .img-not-messages {

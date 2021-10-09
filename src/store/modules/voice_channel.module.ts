@@ -30,8 +30,10 @@ class VoiceChannelModule extends VuexModule{
                 trickle: false,
                 stream,
             });
-    
+            
+
             peer.on("signal", signal => {
+                console.log("Estoy dentro de signal");
                 VoiceChannelService.sendingSignal(currentUserID,{
                     signal: signal,
                     socketID: socketID,
@@ -39,10 +41,12 @@ class VoiceChannelModule extends VuexModule{
                 });
             });
     
-            peer.on('stream', (stream) =>{
+            peer.on('track', (track,stream) =>{
+                console.log("OnStream");
                 const audio = document.createElement('audio');
                 audio.srcObject = stream;
                 htmlDivElement.appendChild(audio);
+                audio.play();
     
             });
     

@@ -105,7 +105,6 @@ router.beforeEach(
 
     /* console.log(store.state["UserModule/user"]); */
     auth.onAuthStateChanged(user => {
-      console.log(user);
       if (!user && requiresAuth) {
         next({ name: "Home" });
       } else if (!requiresAuth && user) {

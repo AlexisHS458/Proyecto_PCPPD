@@ -347,7 +347,6 @@ export default class NameChannels extends Vue {
   }
 
   conectToVoiceChannel() {
-    console.log(this.channel.uid);
     VoiceService.joinToVoiceChannel(this.currentUser.uid!, this.channel.uid!);
   }
 
