@@ -211,7 +211,6 @@
 
 <script lang="ts">
 import { PermissionsPath } from "@/models/permissions";
-import { SocketUser } from "@/models/socketUser";
 import { User } from "@/models/user";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { Workspace } from "@/models/workspace";
@@ -300,15 +299,6 @@ export default class NameChannels extends Vue {
   };
   public usersDisplay: User[] = [];
 
-  /* { text: "Alexis", avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg" },
-    {
-      text: "Zamudio",
-      avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg",
-    },
-    { text: "Ramiro", avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg" }, */
-  /**
-   * Editar información de un canal de voz
-   */
   editChannel(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingRenameChanel = true;
@@ -371,6 +361,7 @@ export default class NameChannels extends Vue {
         );
       }
     );
+    VoiceService.emitUsers(this.currentUser.uid!, this.channel.uid!);
   }
 }
 </script>
