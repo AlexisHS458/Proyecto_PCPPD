@@ -1,27 +1,22 @@
 <template>
-  <v-app id="app">
+  <v-app>
     <v-main>
       <router-view />
     </v-main>
   </v-app>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-
-export default Vue.extend({
-  name: "App",
-
-  data: () => ({
-    //
-  }),
-});
+<script>
+export default {};
 </script>
-
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bonheur+Royale&family=Roboto:wght@100&family=Stick+No+Bills:wght@200&display=swap");
 #app {
-  background-color: #46606f;
+  background-color: #edf0f3;
+  font-family: "Roboto", sans-serif;
+}
+
+.application {
+  font-family: "Roboto", sans-serif;
 }
 </style>
-
-

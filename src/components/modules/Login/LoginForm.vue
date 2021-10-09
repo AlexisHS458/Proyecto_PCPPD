@@ -12,27 +12,7 @@
                   height="50%"
                   width="25%"
                 />
-
-                <v-row align="center" justify="center" class="mt-15" no-gutters>
-                  <v-col cols="2">
-                    <v-img
-                      class="mt-8"
-                      :src="require('@/assets/google.png')"
-                      height="30%"
-                      width="30%"
-                    />
-                  </v-col>
-                  <v-col cols="4">
-                    <v-btn color="#F2F2F2" elevation="0" class="mt-8">
-                      inicio de sesión
-                    </v-btn>
-                  </v-col>
-                </v-row>
-                <!-- <router-link to="/register"> -->
-                <v-btn plain class="mt-10" to="/register">
-                  Regístrate con google
-                </v-btn>
-                <!--      </router-link> -->
+                <section id="firebaseui-auth-container" class="mt-10"></section>
               </v-card-text>
             </v-col>
             <v-col cols="5">
@@ -42,11 +22,11 @@
                 width="100%"
               >
                 <p
-                  class="text-h4 white--text text-center pa"
+                  class="text-h4 white--text text-center margin-p"
                   align="center"
                   justify="center"
                 >
-                  Bienvenido a <strong>Kun</strong>
+                  <strong> Bienvenido a Kun </strong>
                 </p>
                 <p
                   class="text-h5 white--text text-center"
@@ -64,22 +44,50 @@
   </v-container>
 </template>
 
-<script>
-export default {
-  data: () => ({}),
-};
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { firebase } from "@/utils/firebase";
+import * as firebaseui from "firebaseui";
+import "firebaseui/dist/firebaseui.css";
+import { namespace } from "vuex-class";
+
+const Auth = namespace("UserModule");
+@Component
+export default class LoginForm extends Vue {
+  /**
+   * Inicia sesión a la plataforma
+   */
+  async mounted() {
+    let ui = firebaseui.auth.AuthUI.getInstance();
+    if (!ui) {
+      ui = new firebaseui.auth.AuthUI(firebase.auth());
+    }
+    var uiConfig = {
+      signInSuccessUrl: "/register",
+
+      signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+    };
+    ui.start("#firebaseui-auth-container", uiConfig);
+    /* await this.fetchCurrentUser();
+    if (this.isLoggedIn) {
+      this.$router.push("/Mainscreen");
+    } */
+  }
+}
 </script>
 
 <style scoped>
 .img {
   border-radius: 25px;
 }
-.imm {
-  background: url(../assets/background.jpg);
-  width: 100%;
-  height: 100%;
-}
-.pa {
+.margin-p {
   margin-top: 300px;
+}
+.firebaseui-card-content {
+  padding: 0 !important;
+}
+html {
+  overflow-y: hidden; /* Hide scrollbars */
+  overflow: hidden;
 }
 </style>
