@@ -1,19 +1,4 @@
 <template>
-  <!--   <v-text-field
-    prepend-inner-icon="mdi-paperclip"
-    append-icon="mdi-send"
-    placeholder="Escribe tu mensaje"
-    filled
-    rounded
-    light
-    dense
-    counter="500"
-    class="text-input my-text-style form-input"
-    background-color="primaryDark"
-    color="white"
-    autocomplete="off"
-    :rules="[rules.lenght]"
-  ></v-text-field> -->
   <v-flex>
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
       <v-textarea
@@ -27,11 +12,11 @@
         filled
         dense
         no-resize
+        maxlength="500"
         auto-grow
-        rows="1"
-        row-height="4"
-        counter="500"
-        :rules="[rules.size, rules.required]"
+        rows="2"
+        counter
+        :rules="[rules.required]"
         @click:append="sendMessages"
         background-color="primaryDark"
         dark
@@ -117,9 +102,11 @@ export default class InputMessage extends Vue {
   public isSelecting = false;
   public selectedFile = "";
   public rules = {
-    size: (v: string): string | boolean =>
-      v.length <= 500 || "Haz alcanzado el límite de caracteres",
+    /* size: (v: string): string | boolean =>
+      v.length <= 500 || "Haz alcanzado el límite de caracteres", */
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    counter: (v: string): string | boolean =>
+      v.length <= 20 || "Campo requerido",
   };
   public valid = true;
 

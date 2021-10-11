@@ -13,6 +13,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@types/simple-peer": "^9.11.3",
     "@types/socket.io": "^3.0.2",
     "core-js": "^3.6.5",
     "firebase": "^8.7.0",
@@ -20,6 +21,7 @@
     "monaco-editor-vue": "^1.0.10",
     "prismjs": "^1.25.0",
     "serve": "^12.0.0",
+    "simple-peer": "^9.11.0",
     "socket.io-client": "^4.2.0",
     "vue": "^2.6.14",
     "vue-body-class": "^3.0.2",

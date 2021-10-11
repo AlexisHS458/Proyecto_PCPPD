@@ -176,7 +176,7 @@ export default class ListChannels extends Vue {
         nombre: this.nameChannel,
         permisos: [],
       };
-      console.log(this.textChannel);
+   
       await this.createTextChannel(this.textChannel);
       if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.loading = false;

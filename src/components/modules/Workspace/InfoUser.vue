@@ -17,6 +17,9 @@
       <v-icon v-if="isListening" color="success">mdi-headphones</v-icon>
       <v-icon v-else color="error">mdi-headphones-off</v-icon>
     </v-btn>
+    <v-btn icon @click="disconnect" v-if="isConnected">
+      <v-icon color="errorLight">mdi-phone-remove</v-icon>
+    </v-btn>
   </v-app-bar>
 </template>
 
@@ -26,6 +29,7 @@ import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 import { Prop } from "vue-property-decorator";
+import VoiceService from "@/services/voice_channel.service";
 const User = namespace("UserModule");
 
 @Component
@@ -38,6 +42,7 @@ export default class UserInfo extends Vue {
   public loading = false;
   public isTalk = true;
   public isListening = true;
+  public isConnected = false;
 
   toggleMicrophone() {
     this.isTalk = !this.isTalk;
@@ -46,6 +51,17 @@ export default class UserInfo extends Vue {
   toggleHeadphones() {
     this.isListening = !this.isListening;
     this.isTalk = !this.isTalk;
+  }
+
+  disconnect() {
+    VoiceService.leaveVoiceChannel(this.currentUser.uid!);
+  }
+
+  mounted() {
+    VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
+
+      this.isConnected = !!isConnected;
+    });
   }
 }
 </script>

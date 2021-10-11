@@ -118,10 +118,9 @@ class WorkspaceModule extends VuexModule {
 
   @Mutation
   public setUsers(users: Array<User>): void {
-    this.users = /*  users;  */ users.filter(user => {
+    this.users = users.filter(user => {
       return user.uid !== this.user!.uid;
     });
-    console.table(this.users);
   }
 
   @Mutation
@@ -282,7 +281,6 @@ class WorkspaceModule extends VuexModule {
   @Action
   async createVoiceChannel(voiceChannel: VoiceChannel): Promise<void> {
     this.context.commit("setChannelCreatedStatus", false);
-    console.log(voiceChannel);
     ChannelsService.createVoiceChannel(this.workspace.uid, voiceChannel)
       .then(() => {
         this.context.commit("setChannelCreatedStatus", true);
@@ -343,7 +341,7 @@ class WorkspaceModule extends VuexModule {
   @Action
   async createCodeChannel(codeChannel: CodeChannel): Promise<void> {
     this.context.commit("setChannelCreatedStatus", false);
-    console.log(codeChannel);
+   
     ChannelsService.createCodeChannel(this.workspace.uid, codeChannel)
       .then(() => {
         this.context.commit("setChannelCreatedStatus", true);

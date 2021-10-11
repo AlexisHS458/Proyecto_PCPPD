@@ -1,141 +1,113 @@
-import { VoiceChannelsIDs } from "@/models/voiceChannelsIds";
-import RTCService from "@/services/rtc.service";
-import { servers } from "@/utils/rtc";
-import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import Peer from 'simple-peer'
+import { VuexModule, Module, Action, Mutation } from "vuex-module-decorators";
+import VoiceChannelService from '@/services/voice_channel.service';
 
-@Module({namespaced: true})
+
+@Module({ namespaced: true })
 class VoiceChannelModule extends VuexModule{
-    /**
-     * Conexión WebRTC
-     */
-    public peerConnection = new RTCPeerConnection(servers);
 
-    /**
-     * Stream de audio local
-     */
-    public localStream: MediaStream | undefined = undefined;
+    public peers: Map<string, Peer.Instance> = new Map<string, Peer.Instance>();
 
-    /**
-     * Stream de audio remoto
-     */
-    public remoteStream: MediaStream | undefined = undefined;
-
-    /**
-     * Mensaje a mostrar error en snackbar
-     */
-    public snackbarMessageError = "";
-
-    /**
-     * Status del canal de voz
-     */
-    public status = {
-        /**
-         * Status de mostrar el snackbar de error
-         */
-        showSnackbarError: false
-    }
-
-
-    @Mutation 
-    public setLocalStream(stream: MediaStream): void {
-        this.localStream = stream;
-    }
-
-    @Mutation 
-    public setRemoteStream(stream: MediaStream): void {
-        this.remoteStream = stream;
-    }
 
     @Mutation
-    public addTrack(track: MediaStreamTrack): void {
-        this.peerConnection?.addTrack(track, this.localStream!);
+    public setPeers(peers: Map<string, Peer.Instance>): void {
+        this.peers = peers;
     }
 
-    @Mutation
-    public remoteAddTrack(track: MediaStreamTrack): void {
-        this.remoteStream?.addTrack(track);
-    }
 
-    @Mutation
-    public setRemoteDescription(answerDescription: RTCSessionDescription): void {
-        this.peerConnection.setRemoteDescription(answerDescription);
-    }
-
-    @Mutation
-    public setSnackBarMessageError(message: string): void {
-      this.snackbarMessageError = message;
-    }
-
-    @Mutation
-    public setShowSnackBarMessageError(status: boolean): void {
-        this.status.showSnackbarError = status;
-    }
-
-    /**
-     * Configura el stream del microfono al stream local
-     * @param stream stream de sonido del usuario
-     */
     @Action
-    public setupLocalStream(stream: MediaStream): void {
-        this.context.commit("setLocalStream",stream);
-    }
-
-    /**
-     * Del stream local hace push de los track hacia la peer connection
-     */
-    @Action
-    public pushTracks(): void{
-        this.localStream?.getTracks().forEach((track) => {
-            this.context.commit("addTrack",track);
-        })
-    }
-
-    /**
-     * Del stream remoto hace pull y lo agrega al stream de audio
-     */
-    @Action
-    public pullTracks(): void {
-        this.peerConnection.ontrack = (event) => {
-            event.streams[0].getTracks().forEach((track) => {
-                this.context.commit("remoteAddTrack",track);
+    public initVoiceService(payloadAction:{htmlDivElement: HTMLDivElement, userID: string}): void{
+        console.log("Afuera", payloadAction.htmlDivElement);
+        const createPeer =(
+            userID: string,
+            socketID: string,
+            stream: MediaStream,
+            currentUserID: string,
+            htmlDivElement: HTMLDivElement
+        ): Peer.Instance => {
+            const peer = new Peer({
+                initiator: true,
+                trickle: false,
+                stream,
             });
+            
+
+            peer.on("signal", signal => {
+                console.log("Estoy dentro de signal");
+                VoiceChannelService.sendingSignal(currentUserID,{
+                    signal: signal,
+                    socketID: socketID,
+                    uid: userID
+                });
+            });
+    
+            peer.on('track', (track,stream) =>{
+                console.log("OnStream");
+                const audio = document.createElement('audio');
+                audio.srcObject = stream;
+                htmlDivElement.appendChild(audio);
+                audio.play();
+    
+            });
+    
+            return peer;
         }
-    }
-
-
-    /**
-     * Inicia la llamda creando una oferta de llamada
-     * @param voiceChannelIDs IDs para localizar el canal de voz especificado
-     */
-    @Action
-    public startCall(voiceChannelIDs: VoiceChannelsIDs): void {
-        RTCService.createAnOffer(
-            voiceChannelIDs.uidWorkspace,
-            voiceChannelIDs.uidVoiceChannel,
-            this.peerConnection
-        )
-        .catch(()=>{
-            this.context.commit("setSnackBarMessageError", "Error al crear canal");
-            this.context.commit("setShowSnackBarMessageError", true);
-        });
-    }
-
-
-    /**
-     * Inicia la escucha a respuestas en la llamada de voz
-     * @param voiceChannelIDs IDs para localizar el canal de voz especificado
-     */
-    @Action
-    public listenForRemoteAnswer(voiceChannelIDs: VoiceChannelsIDs): void {
-        RTCService.listenForRemoteAnswer(
-            voiceChannelIDs.uidWorkspace,
-            voiceChannelIDs.uidVoiceChannel,
-            this.peerConnection,
-            answer => {
-                this.context.commit("setRemoteDescription", answer);
+        
+        VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
+            console.log("Adentro", payloadAction.htmlDivElement);
+            payloadAction.htmlDivElement.innerHTML = '';
+            if(!channelID){
+                return;
             }
-        );
+            navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
+                VoiceChannelService.usersInVoiceChannel(payloadAction.userID, channelID, (users) =>{
+                    this.context.commit(
+                        "setPeers",
+                        new Map<string, Peer.Instance>(
+                            users.map((user) => [
+                                user.uid,
+                                createPeer(
+                                    user.uid,
+                                    user.socketID,
+                                    stream,
+                                    payloadAction.userID,
+                                    payloadAction.htmlDivElement
+                                )
+                            ])
+                        )
+                    );
+                });
+                VoiceChannelService.listenReturningSignal(payloadAction.userID, (payloadSignal) => {
+                    if(this.peers.has(payloadAction.userID)){
+                        this.peers.get(payloadAction.userID)?.signal(payloadSignal.signal);
+                    }
+                });
+            });
+        }); 
     }
+
+    
+
+    addPeer(incomingSignal: Peer.SignalData, socketID: string, stream: MediaStream, currentUserID: string): Peer.Instance {
+        const peer = new Peer({
+            initiator: false,
+            trickle: false,
+            stream,
+        })
+
+        peer.on("signal", signal => {
+            VoiceChannelService.returningSignal(currentUserID, {
+                signal: signal,
+                socketID: socketID,
+                uid: ''
+            })
+        })
+
+        peer.signal(incomingSignal);
+
+        return peer;
+    }
+
 
 
 
