@@ -16,5 +16,20 @@ const voiceChannelSocket = (uid: string): Socket => {
     return socket;
   }
 };
-
 export { voiceChannelSocket };
+
+const endpoitCC = "http://pcppd.herokuapp.com/codeChannel";
+const codeChannelSocket = (uid: string): Socket => {
+  if (vcSocket && vcUID === uid) {
+    return vcSocket;
+  } else {
+    const socket = io(endpoitCC, {
+      transports: ["websocket"],
+      auth: { uid }
+    });
+    vcSocket = socket;
+    vcUID = uid;
+    return socket;
+  }
+};
+export { codeChannelSocket };
