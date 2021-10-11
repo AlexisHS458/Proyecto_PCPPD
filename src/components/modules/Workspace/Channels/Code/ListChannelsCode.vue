@@ -78,8 +78,8 @@
       >
         <v-list color="primaryDark" shaped>
           <namechannelscode
-            v-for="(channel, index) in channels"
-            :key="index"
+            v-for="channel in channels"
+            :key="channel.uid"
             :channel="channel"
             :icon="item.icon"
             :users="users"

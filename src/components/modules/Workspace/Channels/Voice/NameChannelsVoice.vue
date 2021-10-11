@@ -8,16 +8,6 @@
         slot-scope="{ hover }"
         :class="`${hover ? 'select-item' : 'no-select-item'}`"
       >
-        <!--   <v-list-group :value="true" :prepend-icon="icon" sub-group no-action>
-      <template v-slot:activator>
-        <v-list-item-content>
-          <v-list-item-title>{{ channel.nombre }}</v-list-item-title>
-        </v-list-item-content>
-      </template>
-      <v-list-item>
-        <v-list-item-title>{{ channel.nombre }}</v-list-item-title>
-      </v-list-item>
-    </v-list-group> -->
         <v-list-item-icon>
           <v-icon color="white">{{ icon }}</v-icon>
         </v-list-item-icon>
@@ -196,12 +186,12 @@
       </v-list-item>
     </v-hover>
     <v-list class="ml-10 mt-0">
-      <v-list-item v-for="item in usersDisplay" :key="item.uid">
+      <v-list-item v-for="user in usersDisplay" :key="user.uid">
         <v-list-item-avatar size="25">
-          <v-img :src="item.fotoURL"></v-img>
+          <v-img :src="user.fotoURL"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title v-text="item.nombre"></v-list-item-title>
+          <v-list-item-title v-text="user.nombre"></v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>

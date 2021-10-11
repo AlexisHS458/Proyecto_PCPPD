@@ -22,15 +22,13 @@
       </div>
     </v-navigation-drawer>
 
-    <v-navigation-drawer app clipped right color="primaryDark">
+    <!--   <v-navigation-drawer app clipped right color="primaryDark">
       <div class="flex-column d-flex">
         <invitation-user
           :user="currentUser"
           :workspace="workspace"
         ></invitation-user>
-        <!-- <v-list color="primaryDark"> -->
         <user-info-in-list :currentUser="currentUser"></user-info-in-list>
-        <!-- </v-list> -->
         <v-list color="primaryDark mt-0 pt-0">
           <list-user
             v-for="(user, index) in users"
@@ -41,8 +39,13 @@
           ></list-user>
         </v-list>
       </div>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
     <router-view style="height: 100%"> </router-view>
+    <router-view name="Navigation"></router-view>
+    <router-view name="NavigationDrawer"></router-view>
+    <router-view name="tree"></router-view>
+    <!-- <router-view name="tree"></router-view> -->
+    <!--     <router-view name="b"></router-view> -->
     <!--   Peticiones exitosas del modulo de Invitaciones -->
     <snackbar
       :color="'success'"
