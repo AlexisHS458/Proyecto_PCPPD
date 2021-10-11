@@ -5,7 +5,7 @@ import { ResponseEventName } from "@/utils/response_event_name";
 
 class CodeChannelService {
   joinToCodeChannel(uid: string, codeChannelID: string) {
-    codeChannelSocket(uid).emit(EventName.JOIN, codeChannelID);
+    codeChannelSocket(uid).emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
   }
 
   usersInCodeChannel(uid: string, codeChannelID: string, onEvent: (users: SocketUser[]) => void) {
@@ -23,7 +23,7 @@ class CodeChannelService {
   }
 
   leaveCodeChannel(uid: string){
-    codeChannelSocket(uid).emit(EventName.LEAVE);
+    codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
   }
 
   userStatus(

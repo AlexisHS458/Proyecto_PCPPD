@@ -6,7 +6,7 @@ import { ResponseEventName } from "@/utils/response_event_name";
 
 class VoiceChannelService {
   joinToVoiceChannel(uid: string, voiceChannelID: string) {
-    voiceChannelSocket(uid).emit(EventName.JOIN, voiceChannelID);
+    voiceChannelSocket(uid).emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
   }
 
   usersInVoiceChannel(uid: string, voiceChannelID: string, onEvent: (users: SocketUser[]) => void) {
@@ -24,7 +24,7 @@ class VoiceChannelService {
   }
 
   leaveVoiceChannel(uid: string){
-    voiceChannelSocket(uid).emit(EventName.LEAVE);
+    voiceChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
   }
 
   userStatus(
