@@ -77,7 +77,7 @@ class UserService {
    * @param onSnapshot Snapshot de la colección de usuarios
    */
   getUsers(onSnapshot: (user: User[]) => void): void {
-    db.collection(Collection.USERS).onSnapshot(snapshot => {
+    db.collection(Collection.USERS).get().then(snapshot => {
         onSnapshot(
             snapshot.docs.map<User>(doc => {
                 const user = {
