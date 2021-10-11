@@ -41,7 +41,6 @@
       </div>
     </v-navigation-drawer> -->
     <router-view style="height: 100%"> </router-view>
-    <router-view name="Navigation"></router-view>
     <router-view name="NavigationDrawer"></router-view>
     <router-view name="tree"></router-view>
     <!-- <router-view name="tree"></router-view> -->

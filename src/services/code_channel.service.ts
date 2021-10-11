@@ -1,10 +1,11 @@
 import { SocketUser } from "@/models/socketUser";
-import { codeChannelSocket} from "@/socketio";
+import { codeChannelSocket } from "@/socketio";
 import { EventName } from "@/utils/event_name";
 import { ResponseEventName } from "@/utils/response_event_name";
 
 class CodeChannelService {
   joinToCodeChannel(uid: string, codeChannelID: string) {
+    console.log(uid, codeChannelID);
     codeChannelSocket(uid).emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
   }
 
@@ -17,22 +18,19 @@ class CodeChannelService {
       }
     );
   }
-  
-  emitUsers(uid: string, codeChannelID: string){
-    codeChannelSocket(uid).emit(EventName.EMIT_USERS,codeChannelID);
+
+  emitUsers(uid: string, codeChannelID: string) {
+    codeChannelSocket(uid).emit(EventName.EMIT_USERS, codeChannelID);
   }
 
-  leaveCodeChannel(uid: string){
+  leaveCodeChannel(uid: string) {
     codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
   }
 
-  userStatus(
-    uid: string,
-    onEvent: (channelID: string | undefined) => void
-    ){
-      codeChannelSocket(uid).on(ResponseEventName.USER_STATUS, (payload) => {
-        onEvent(payload.channelID)
-      });
+  userStatus(uid: string, onEvent: (channelID: string | undefined) => void) {
+    codeChannelSocket(uid).on(ResponseEventName.USER_STATUS, payload => {
+      onEvent(payload.channelID);
+    });
   }
 }
 

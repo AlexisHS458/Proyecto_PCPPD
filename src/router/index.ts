@@ -49,17 +49,13 @@ const routes: Array<RouteConfig> = [
   {
     path: "/space/:id",
     name: "Space",
-    components: { default: Workspace, Navigation: NavigationDrawer },
-    props: {
-      default: false,
-      Navigation: false
-    },
+    component: Workspace /* { default: Workspace, Navigation: NavigationDrawer } */,
+
     meta: {
       requiresAuth: true
     },
-    /*   children: [{ name: "navigationDrawer", component: NavigationDrawer, path: "" }] */
+
     children: [
-      /* { name: "navigationDrawer", component: NavigationDrawer, path: "" }, */
       {
         name: "messages",
         path: ":idChannel",
@@ -78,7 +74,11 @@ const routes: Array<RouteConfig> = [
 
       {
         path: "",
-        component: NotChannels
+        /* component: NotChannels, */
+        components: /*  MessagesPage */ {
+          default: NotChannels,
+          NavigationDrawer: NavigationDrawer
+        }
       },
       {
         name: "codeChannel",

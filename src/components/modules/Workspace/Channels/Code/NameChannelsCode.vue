@@ -343,6 +343,7 @@ export default class NameChannels extends Vue {
 
   conectToCodeChannel() {
     CodeService.joinToCodeChannel(this.currentUser.uid!, this.channel.uid!);
+    console.log(this.usersDisplay);
   }
 
   mounted() {
