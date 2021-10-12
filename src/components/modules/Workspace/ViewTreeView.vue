@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app clipped right v-model="drawer" color="primaryDark">
+  <v-navigation-drawer app clipped right v-model="drawer" color="primaryDark" dark>
     <v-treeview
       v-model="tree"
       :open="initiallyOpen"

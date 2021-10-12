@@ -1,4 +1,4 @@
-<template >
+<template>
   <div v-if="!isLoading">
     <app-bar></app-bar>
     <!--   <v-btn @click="connect">Botton para probar socket io</v-btn> -->
@@ -175,6 +175,9 @@ export default class ViewMainScreen extends Vue {
 </script>
 
 <style scoped>
+.body {
+  background-color: #edf0f3;
+}
 .div-progress-circular {
   margin: auto;
   width: 100%;

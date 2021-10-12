@@ -44,13 +44,12 @@ export default class AppVue extends Vue {
       await this.fetchCurrentUser();
     }
     console.log(this.$refs.audioContainer as HTMLDivElement);
-    if(this.$refs.audioContainer){
+    if (this.$refs.audioContainer) {
       this.initVoiceService({
         htmlDivElement: this.$refs.audioContainer as HTMLDivElement,
         userID: this.currentUser.uid!,
       });
     }
-    
   }
 }
 </script>

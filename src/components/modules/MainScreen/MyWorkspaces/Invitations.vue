@@ -90,7 +90,7 @@ export default class InvitationsCard extends Vue {
   private workspace!: Workspace;
 
   public getInitials = StringUtils.getInitials;
-  public show = false;
+  public show = true;
 
   async acceptInvitationToWorkspace() {
     await this.fetchMyWorkspace(this.invitation.idEspacioTrabajo);

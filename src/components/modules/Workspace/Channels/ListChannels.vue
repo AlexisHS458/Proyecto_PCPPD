@@ -76,8 +76,8 @@
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
         <v-list color="primaryDark" shaped>
           <namechannels
-            v-for="(channel, index) in channels"
-            :key="index"
+            v-for="channel in channels"
+            :key="channel.uid"
             :channel="channel"
             :icon="item.icon"
             :users="users"
@@ -176,7 +176,7 @@ export default class ListChannels extends Vue {
         nombre: this.nameChannel,
         permisos: [],
       };
-   
+
       await this.createTextChannel(this.textChannel);
       if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.loading = false;
