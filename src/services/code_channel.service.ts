@@ -34,6 +34,24 @@ class CodeChannelService {
         onEvent(payload.channelID)
       });
   }
+
+  sentCoordinates(uid: string, 
+    coordinates:{
+      x:number
+      y:number }) {
+    codeChannelSocket(uid).emit(EventName.SENT_COORDINATES, coordinates);
+  }
+
+  getCoordinates(uid: string, codeChannelID: string, onEvent: (coordinates:{
+    x:number
+    y:number }[]) => void) {
+    codeChannelSocket(uid).on(`${codeChannelID}-${ResponseEventName.GET_COORDINAES}`,
+      payload => {
+        console.log(Object.values(payload));
+        onEvent(Object.values(payload));
+      }
+    );
+  }
 }
 
 export default new CodeChannelService();
