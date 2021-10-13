@@ -6,7 +6,8 @@ import WorkspaceModule from "./modules/workspace.module";
 import TextChannelModule from "./modules/text_channel.module";
 import InvitationsModule from "./modules/invitations.module";
 import PermissionsModule from "./modules/permissions.module";
-import VoiceChannelModule from "./modules/voice_channel.module"
+import VoiceChannelModule from "./modules/voice_channel.module";
+import CodeChannelModule from "./modules/code_channel.module";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -20,6 +21,7 @@ export default new Vuex.Store({
     TextChannelModule,
     InvitationsModule,
     PermissionsModule,
-    VoiceChannelModule
+    VoiceChannelModule,
+    CodeChannelModule
   }
 });

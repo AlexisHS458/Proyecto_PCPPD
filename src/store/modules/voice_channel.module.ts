@@ -11,33 +11,39 @@ class VoiceChannelModule extends VuexModule{
 
     @Mutation
     public setPeers(peers: Map<string, Peer.Instance>): void {
+        console.log("@Mutation setPeers()");
         this.peers = peers;
     }
 
 
     @Action
     public initVoiceService(payloadAction:{htmlDivElement: HTMLDivElement, userID: string}): void{
-        console.log("Afuera", payloadAction.htmlDivElement);
+        console.log("initVoiceService");
         const createPeer =(
-            userID: string,
-            socketID: string,
-            stream: MediaStream,
-            currentUserID: string,
+            userID: string, // ID de la persona que estamos creando un Peer
+            callerID: string, // Nuestro ID(socket.id) como iniciador
+            stream: MediaStream, // Nuestro stream de datos
+            currentUserID: string, // UID Firebase
             htmlDivElement: HTMLDivElement
         ): Peer.Instance => {
+            console.log("createPeer");
+
             const peer = new Peer({
                 initiator: true,
                 trickle: false,
                 stream,
             });
+
+            console.log("peer");
+            console.log(peer);
             
 
             peer.on("signal", signal => {
-                console.log("Estoy dentro de signal");
+                console.log("on signal");
                 VoiceChannelService.sendingSignal(currentUserID,{
-                    signal: signal,
-                    socketID: socketID,
-                    uid: userID
+                    signal: signal, // Signal que crea el peer
+                    socketID: userID, 
+                    uid: currentUserID 
                 });
             });
     
@@ -52,15 +58,21 @@ class VoiceChannelModule extends VuexModule{
     
             return peer;
         }
+
+
         
         VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
+            console.log("VoiceChannelService.userStatus");
             console.log("Adentro", payloadAction.htmlDivElement);
             payloadAction.htmlDivElement.innerHTML = '';
             if(!channelID){
                 return;
             }
             navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
-                VoiceChannelService.usersInVoiceChannel(payloadAction.userID, channelID, (users) =>{
+                console.log("getUserMedia");
+                console.table(payloadAction.userID)
+                console.table(channelID)
+                VoiceChannelService.usersInVoiceChannel(payloadAction.userID, channelID,  (users) =>{
                     this.context.commit(
                         "setPeers",
                         new Map<string, Peer.Instance>(
@@ -77,6 +89,7 @@ class VoiceChannelModule extends VuexModule{
                         )
                     );
                 });
+
                 VoiceChannelService.listenReturningSignal(payloadAction.userID, (payloadSignal) => {
                     if(this.peers.has(payloadAction.userID)){
                         this.peers.get(payloadAction.userID)?.signal(payloadSignal.signal);

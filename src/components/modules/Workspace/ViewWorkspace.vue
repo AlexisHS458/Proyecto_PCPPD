@@ -21,7 +21,7 @@
         ></info-user>
       </div>
     </v-navigation-drawer>
-    <router-view style="height: 90vh"> </router-view>
+    <router-view style="height: 92vh"> </router-view>
     <router-view name="NavigationDrawer"></router-view>
     <router-view name="tree"></router-view>
     <snackbar
