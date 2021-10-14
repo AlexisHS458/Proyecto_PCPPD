@@ -7,7 +7,7 @@
       dense
       class="toolbar"
     >
-      <v-btn depressed text fab small class="mr-4" :to="'/mainscreen'">
+      <v-btn depressed text fab small class="mr-4" @click="changeStatus">
         <v-img
           class="img"
           src="@/assets/logo.png"
@@ -141,8 +141,15 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const LeaveWorkspace = namespace("MainScreenModule");
 import { LeaveWorkspace } from "@/models/leaveWorkspace";
+const CodeChannel = namespace("CodeChannelModule");
 @Component
 export default class Toolbar extends Vue {
+  @CodeChannel.State("status")
+  private status!: any;
+
+  @CodeChannel.Action
+  private toggleShowTreeView!: () => void;
+
   @Prop({
     required: true,
   })
@@ -231,6 +238,13 @@ export default class Toolbar extends Vue {
     await this.leaveWorkSpace(this.userLeave);
     this.dialogLeave = false;
     this.$router.replace({ path: "/mainscreen" });
+  }
+
+  changeStatus() {
+    this.$router.replace({ path: "/mainscreen" });
+    if (!this.status.showTreeView) {
+      this.toggleShowTreeView();
+    }
   }
 }
 </script>

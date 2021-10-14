@@ -1,5 +1,12 @@
 <template>
-  <v-navigation-drawer app clipped right v-model="drawer" color="primaryDark" dark>
+  <v-navigation-drawer
+    app
+    clipped
+    right
+    v-model="status.showTreeView"
+    color="primaryDark"
+    dark
+  >
     <v-treeview
       v-model="tree"
       :open="initiallyOpen"
@@ -21,79 +28,87 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-export default {
-  data: () => ({
-    drawer: null,
-    initiallyOpen: ["public"],
-    files: {
-      html: "mdi-language-html5",
-      js: "mdi-nodejs",
-      json: "mdi-code-json",
-      md: "mdi-language-markdown",
-      pdf: "mdi-file-pdf",
-      png: "mdi-file-image",
-      txt: "mdi-file-document-outline",
-      xls: "mdi-file-excel",
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { namespace } from "vuex-class";
+const CodeChannel = namespace("CodeChannelModule");
+
+@Component
+export default class ViewTreeViwe extends Vue {
+  @CodeChannel.State("status")
+  private status!: any;
+
+  public drawer = null;
+  public initiallyOpen = ["public"];
+  public files = {
+    html: "mdi-language-html5",
+    js: "mdi-nodejs",
+    json: "mdi-code-json",
+    md: "mdi-language-markdown",
+    pdf: "mdi-file-pdf",
+    png: "mdi-file-image",
+    txt: "mdi-file-document-outline",
+    xls: "mdi-file-excel",
+  };
+  public tree = [];
+  public items = [
+    {
+      name: ".git",
     },
-    tree: [],
-    items: [
-      {
-        name: ".git",
-      },
-      {
-        name: "node_modules",
-      },
-      {
-        name: "public",
-        children: [
-          {
-            name: "static",
-            children: [
-              {
-                name: "logo.png",
-                file: "png",
-              },
-            ],
-          },
-          {
-            name: "favicon.ico",
-            file: "png",
-          },
-          {
-            name: "index.html",
-            file: "html",
-          },
-        ],
-      },
-      {
-        name: ".gitignore",
-        file: "txt",
-      },
-      {
-        name: "babel.config.js",
-        file: "js",
-      },
-      {
-        name: "package.json",
-        file: "json",
-      },
-      {
-        name: "README.md",
-        file: "md",
-      },
-      {
-        name: "vue.config.js",
-        file: "js",
-      },
-      {
-        name: "yarn.lock",
-        file: "txt",
-      },
-    ],
-  }),
-};
+    {
+      name: "node_modules",
+    },
+    {
+      name: "public",
+      children: [
+        {
+          name: "static",
+          children: [
+            {
+              name: "logo.png",
+              file: "png",
+            },
+          ],
+        },
+        {
+          name: "favicon.ico",
+          file: "png",
+        },
+        {
+          name: "index.html",
+          file: "html",
+        },
+      ],
+    },
+    {
+      name: ".gitignore",
+      file: "txt",
+    },
+    {
+      name: "babel.config.js",
+      file: "js",
+    },
+    {
+      name: "package.json",
+      file: "json",
+    },
+    {
+      name: "README.md",
+      file: "md",
+    },
+    {
+      name: "vue.config.js",
+      file: "js",
+    },
+    {
+      name: "yarn.lock",
+      file: "txt",
+    },
+  ];
+}
 </script>
+
+
 
 <style scoped>
 .f {
