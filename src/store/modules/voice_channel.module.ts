@@ -68,6 +68,33 @@ class VoiceChannelModule extends VuexModule{
             
             return peer;
         }
+
+        /**
+        * Agrega un peer a partir de los usuarios dentro del canal
+        * @param incomingSignal signal en camino
+        * @param callerID uid de la persona con quien estamos llamando
+        * @param stream stream de datos
+        * @param voiceChannelID uid del canal de voz de la llamada
+        * @returns 
+        */
+        const addPeer =(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream, voiceChannelID: string): Peer.Instance => {
+           const peer = new Peer({
+               initiator: false,
+               trickle: false,
+               stream,
+           });
+   
+           peer.on("signal", signal => {
+               VoiceChannelService.returningSignal(voiceChannelID, {
+                   signal: signal,
+                   callerID: callerID
+               })
+           });
+   
+           peer.signal(incomingSignal);
+   
+           return peer;
+       }
         
         VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
             payloadAction.htmlDivElement.innerHTML = '';
@@ -93,7 +120,7 @@ class VoiceChannelModule extends VuexModule{
                     );
                     
                     VoiceChannelService.listenSignalSent(payloadAction.userID, channelID, (payloadSignal) => {
-                        const peer = this.addPeer(
+                        const peer = addPeer(
                             payloadSignal.signal,
                             payloadSignal.callerID,
                             stream,
@@ -115,33 +142,6 @@ class VoiceChannelModule extends VuexModule{
         }); 
     }
     
-    /**
-     * 
-     * @param incomingSignal signal en camino
-     * @param callerID uid de la persona con quien estamos llamando
-     * @param stream stream de datos
-     * @param voiceChannelID uid del canal de voz de la llamada
-     * @returns 
-     */
-    addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream, voiceChannelID: string): Peer.Instance {
-        const peer = new Peer({
-            initiator: false,
-            trickle: false,
-            stream,
-        });
-
-        peer.on("signal", signal => {
-            VoiceChannelService.returningSignal(voiceChannelID, {
-                signal: signal,
-                callerID: callerID
-            })
-        });
-
-        peer.signal(incomingSignal);
-
-        return peer;
-    }
-
 }
 
 export default VoiceChannelModule;
