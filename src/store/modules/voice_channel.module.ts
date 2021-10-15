@@ -6,24 +6,40 @@ import VoiceChannelService from '@/services/voice_channel.service';
 @Module({ namespaced: true })
 class VoiceChannelModule extends VuexModule{
 
+    /**
+     * Referencia de los peers
+     * Map['uid' => Peer]
+     */
     public peers: Map<string, Peer.Instance> = new Map<string, Peer.Instance>();
-
 
     @Mutation
     public setPeers(peers: Map<string, Peer.Instance>): void {
-        console.log("@Mutation setPeers()");
         this.peers = peers;
     }
 
+    @Mutation
+    public addPeerToState(peer: Map<string, Peer.Instance>): void {
+        peer.forEach((value,key) => {
+            this.peers.set(key,value);
+        });
+
+    }
 
     @Action
-    public initVoiceService(payloadAction:{htmlDivElement: HTMLDivElement, userID: string}): void{
-        console.log("initVoiceService");
+    public initVoiceService(payloadAction:{htmlDivElement: HTMLDivElement, userID: string}): void {
+        
+        /**
+         * Crea un nuevo peer como iniciador de la llamada
+         * @param userSocketIDToSignal uid de la persona con la vamos a signalizar
+         * @param callerID uid de la persona iniciadora de signalización
+         * @param stream stream de datos
+         * @param htmlDivElement 
+         * @returns 
+         */
         const createPeer =(
-            userID: string, // ID de la persona que estamos creando un Peer
-            callerID: string, // Nuestro ID(socket.id) como iniciador
-            stream: MediaStream, // Nuestro stream de datos
-            currentUserID: string, // UID Firebase
+            userSocketIDToSignal: string,
+            callerID: string, 
+            stream: MediaStream, 
             htmlDivElement: HTMLDivElement
         ): Peer.Instance => {
             console.log("createPeer");
@@ -34,95 +50,97 @@ class VoiceChannelModule extends VuexModule{
                 stream,
             });
 
-            console.log("peer");
-            console.log(peer);
-            
-
             peer.on("signal", signal => {
-                console.log("on signal");
-                VoiceChannelService.sendingSignal(currentUserID,{
-                    signal: signal, // Signal que crea el peer
-                    socketID: userID, 
-                    uid: currentUserID 
+                VoiceChannelService.sendingSignal(callerID,{
+                    signal: signal,
+                    callerID: callerID,
+                    userIDToSignal: userSocketIDToSignal
                 });
             });
+                
+            // peer.on('track', (track,stream) =>{
+            //     const audio = document.createElement('audio');
+            //     audio.srcObject = stream;
+            //     htmlDivElement.appendChild(audio);
+            //     audio.play();
     
-            peer.on('track', (track,stream) =>{
-                console.log("OnStream");
-                const audio = document.createElement('audio');
-                audio.srcObject = stream;
-                htmlDivElement.appendChild(audio);
-                audio.play();
-    
-            });
-    
+            // });
+            
             return peer;
         }
-
-
         
         VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
-            console.log("VoiceChannelService.userStatus");
-            console.log("Adentro", payloadAction.htmlDivElement);
             payloadAction.htmlDivElement.innerHTML = '';
             if(!channelID){
                 return;
             }
             navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
-                console.log("getUserMedia");
-                console.table(payloadAction.userID)
-                console.table(channelID)
-                VoiceChannelService.usersInVoiceChannel(payloadAction.userID, channelID,  (users) =>{
+                VoiceChannelService.usersInVoiceChannel(payloadAction.userID, channelID, (users) =>{
+                    
                     this.context.commit(
                         "setPeers",
                         new Map<string, Peer.Instance>(
                             users.map((user) => [
                                 user.uid,
                                 createPeer(
-                                    user.uid,
-                                    user.socketID,
-                                    stream,
-                                    payloadAction.userID,
-                                    payloadAction.htmlDivElement
+                                   user.uid,
+                                   payloadAction.userID,
+                                   stream,
+                                   payloadAction.htmlDivElement
                                 )
                             ])
                         )
                     );
-                });
+                    
+                    VoiceChannelService.listenSignalSent(payloadAction.userID, channelID, (payloadSignal) => {
+                        const peer = this.addPeer(
+                            payloadSignal.signal,
+                            payloadSignal.callerID,
+                            stream,
+                            channelID);
+                        this.context.commit("addPeerToState", peer);
+                    });
 
-                VoiceChannelService.listenReturningSignal(payloadAction.userID, (payloadSignal) => {
-                    if(this.peers.has(payloadAction.userID)){
-                        this.peers.get(payloadAction.userID)?.signal(payloadSignal.signal);
-                    }
+
+                    VoiceChannelService.listenReturningSignal(payloadAction.userID,channelID, (payloadSignal) => {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        if(payloadSignal.userIDToSignal){
+                            const item = this.peers.get(payloadSignal.userIDToSignal);
+                            item?.signal(payloadSignal.signal);
+                        }    
+                    });
+
                 });
             });
         }); 
     }
-
     
-
-    addPeer(incomingSignal: Peer.SignalData, socketID: string, stream: MediaStream, currentUserID: string): Peer.Instance {
+    /**
+     * 
+     * @param incomingSignal signal en camino
+     * @param callerID uid de la persona con quien estamos llamando
+     * @param stream stream de datos
+     * @param voiceChannelID uid del canal de voz de la llamada
+     * @returns 
+     */
+    addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream, voiceChannelID: string): Peer.Instance {
         const peer = new Peer({
             initiator: false,
             trickle: false,
             stream,
-        })
+        });
 
         peer.on("signal", signal => {
-            VoiceChannelService.returningSignal(currentUserID, {
+            VoiceChannelService.returningSignal(voiceChannelID, {
                 signal: signal,
-                socketID: socketID,
-                uid: ''
+                callerID: callerID
             })
-        })
+        });
 
         peer.signal(incomingSignal);
 
         return peer;
     }
-
-
-
 
 }
 

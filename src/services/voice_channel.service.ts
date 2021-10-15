@@ -46,22 +46,33 @@ class VoiceChannelService {
   returningSignal(
     uid: string,
     payload: SignalPayload
-  ): void{
+  ): void {
     voiceChannelSocket(uid).emit(EventName.RETURNING_SIGNAL, payload);
   }
 
-  listenReturningSignal(
-    uid: string,
-    onEvent: (signalPayload: SignalPayload) => void
-  ){
-    const socket = voiceChannelSocket(uid);
 
-    socket.on(`${socket.id}-${ResponseEventName.RETURNED_SIGNAL}`,(payload)=>{
+  listenSignalSent(
+    uid: string,
+    voiceChannelID: string,
+    onEvent: (signalPayload: SignalPayload) => void
+  ): void {
+    const socket = voiceChannelSocket(uid);
+    socket.on(`${voiceChannelID}-${ResponseEventName.SIGNAL_SENT}`,(payload)=>{
       onEvent(payload);
     });
   }
 
+  listenReturningSignal(
+    uid: string,
+    voiceChannelID: string,
+    onEvent: (signalPayload: SignalPayload) => void
+  ): void {
+    const socket = voiceChannelSocket(uid);
 
+    socket.on(`${voiceChannelID}-${ResponseEventName.RETURNED_SIGNAL}`,(payload)=>{
+      onEvent(payload);
+    });
+  }
 }
 
 export default new VoiceChannelService();
