@@ -20,10 +20,7 @@ import { Component, Vue } from "vue-property-decorator";
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
-/* eslint-disable */
-// @ts-ignore
-import MonacoEditor from "monaco-editor-vue";
-/* eslint-enable */
+
 @Component({
   components: {
     /* MonacoEditor, */
@@ -64,7 +61,7 @@ export default class EditCode extends Vue {
       document.getElementById("container") as HTMLElement,
       {
         value: 'console.log("Hello, world")',
-        language: "java",
+        language: "javascript",
         theme: "vs-dark",
         automaticLayout: true,
       }

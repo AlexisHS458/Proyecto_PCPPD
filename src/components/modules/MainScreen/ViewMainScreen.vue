@@ -1,18 +1,15 @@
 <template>
   <div v-if="!isLoading">
     <app-bar></app-bar>
-    <!--   <v-btn @click="connect">Botton para probar socket io</v-btn> -->
-    <!-- <div class="scroll"> -->
     <v-container fluid class="scroll">
       <v-container class="mb-16">
         <template>
           <own-card :user="currentUser"></own-card>
-          <!-- <invitation-card :user="currentUser"></invitation-card> -->
         </template>
         <floating-button></floating-button>
       </v-container>
     </v-container>
-    <!--    </div> -->
+
     <!--   Peticiones exitosas del modulo de MainScreen -->
     <snackbar
       :color="'success'"
