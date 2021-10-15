@@ -1,6 +1,6 @@
 <template>
   <div id="edit-code">
-    <!-- <app-bar-options ref="codeappbar"></app-bar-options> -->
+    <app-bar-options ref="codeappbar"></app-bar-options>
     <!-- <MonacoEditor
       :height="calculatedHeight"
       ref="editor"
@@ -9,8 +9,8 @@
       @change="onChange"
     >
     </MonacoEditor> -->
-    <div id="container" :style="calculatedHeight"></div>
-    <!-- <footer-options-code></footer-options-code> -->
+    <div id="container" :style="calculatedHeight" @change="onChange"></div>
+    <footer-options-code></footer-options-code>
   </div>
 </template>
 
@@ -64,8 +64,9 @@ export default class EditCode extends Vue {
       document.getElementById("container") as HTMLElement,
       {
         value: 'console.log("Hello, world")',
-        language: "javascript",
+        language: "java",
         theme: "vs-dark",
+        automaticLayout: true,
       }
     );
   }

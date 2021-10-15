@@ -1,5 +1,10 @@
-/* const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin"); */
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 module.exports = {
-  transpileDependencies: ["vuetify"]
+  transpileDependencies: ["vuetify"],
+  configureWebpack: {
+    plugins: [
+      new MonacoWebpackPlugin() // Place it here
+    ]
+  }
   /* plugins: [new MonacoWebpackPlugin()] */
 };
