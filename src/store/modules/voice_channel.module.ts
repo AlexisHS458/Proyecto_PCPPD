@@ -18,11 +18,8 @@ class VoiceChannelModule extends VuexModule{
     }
 
     @Mutation
-    public addPeerToState(peer: Map<string, Peer.Instance>): void {
-        peer.forEach((value,key) => {
-            this.peers.set(key,value);
-        });
-
+    public addPeerToState(peer: {id: string, peer: Peer.Instance}): void {
+        this.peers.set(peer.id, peer.peer);
     }
 
     @Action
@@ -78,6 +75,7 @@ class VoiceChannelModule extends VuexModule{
         * @returns 
         */
         const addPeer =(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream, voiceChannelID: string): Peer.Instance => {
+           console.log("addPeer");
            const peer = new Peer({
                initiator: false,
                trickle: false,
@@ -92,6 +90,7 @@ class VoiceChannelModule extends VuexModule{
            });
    
            peer.signal(incomingSignal);
+           
    
            return peer;
        }
@@ -125,7 +124,10 @@ class VoiceChannelModule extends VuexModule{
                             payloadSignal.callerID,
                             stream,
                             channelID);
-                        this.context.commit("addPeerToState", peer);
+                        this.context.commit("addPeerToState", {
+                            id: payloadAction.userID,
+                            peer: peer
+                        });
                     });
 
 

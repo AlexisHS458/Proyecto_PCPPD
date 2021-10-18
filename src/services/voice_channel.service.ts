@@ -13,7 +13,6 @@ class VoiceChannelService {
     voiceChannelSocket(uid).on(
       `${voiceChannelID}-${ResponseEventName.USERS_IN_VOICE_CHANNEL}`,
       payload => {
-        console.log(Object.values(payload));
         onEvent(Object.values(payload));
       }
     );
@@ -24,7 +23,6 @@ class VoiceChannelService {
   }
 
   leaveVoiceChannel(uid: string){
-    console.log(`servicio de leaveVoiceChannel uid: ${uid}`);
     voiceChannelSocket(uid).emit(EventName.LEAVE_VOICE_CHANNEL);
   }
 

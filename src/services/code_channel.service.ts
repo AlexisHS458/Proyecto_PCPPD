@@ -5,7 +5,6 @@ import { ResponseEventName } from "@/utils/response_event_name";
 
 class CodeChannelService {
   joinToCodeChannel(uid: string, codeChannelID: string) {
-    console.log(uid, codeChannelID);
     codeChannelSocket(uid).emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
   }
 
@@ -13,7 +12,6 @@ class CodeChannelService {
     codeChannelSocket(uid).on(
       `${codeChannelID}-${ResponseEventName.USERS_IN_CODE_CHANNEL}`,
       payload => {
-        console.log(Object.values(payload));
         onEvent(Object.values(payload));
       }
     );
@@ -45,7 +43,6 @@ class CodeChannelService {
     y:number }[]) => void) {
     codeChannelSocket(uid).on(`${codeChannelID}-${ResponseEventName.GET_COORDINAES}`,
       payload => {
-        console.log(Object.values(payload));
         onEvent(Object.values(payload));
       }
     );
