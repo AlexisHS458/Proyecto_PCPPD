@@ -54,11 +54,19 @@ export default class UserInfo extends Vue {
   }
 
   disconnect() {
+    console.log("Boton presionado");
+    console.log(this.currentUser.uid!);
+    
+
+    
     VoiceService.leaveVoiceChannel(this.currentUser.uid!);
   }
 
   mounted() {
+    
+    
     VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
+      console.log(`isConnected: ${isConnected}`);
       this.isConnected = !!isConnected;
     });
   }

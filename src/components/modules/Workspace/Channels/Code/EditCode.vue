@@ -61,7 +61,7 @@ export default class EditCode extends Vue {
       document.getElementById("container") as HTMLElement,
       {
         value: 'console.log("Hello, world")',
-        language: "javascript",
+        language: "cpp",
         theme: "vs-dark",
         automaticLayout: true,
       }

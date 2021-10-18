@@ -24,7 +24,8 @@ class VoiceChannelService {
   }
 
   leaveVoiceChannel(uid: string){
-    voiceChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
+    console.log(`servicio de leaveVoiceChannel uid: ${uid}`);
+    voiceChannelSocket(uid).emit(EventName.LEAVE_VOICE_CHANNEL);
   }
 
   userStatus(
