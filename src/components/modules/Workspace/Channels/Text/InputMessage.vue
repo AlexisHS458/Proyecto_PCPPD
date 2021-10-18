@@ -1,7 +1,7 @@
 <template>
-  <v-flex>
+  <v-container>
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
-      <v-textarea
+      <!--  <v-textarea
         v-model="message"
         append-icon="mdi-send"
         rounded
@@ -24,7 +24,26 @@
         <template v-slot:prepend-inner>
           <v-file-input accept="image/*" hide-input></v-file-input>
         </template>
-      </v-textarea>
+      </v-textarea> -->
+      <v-textarea
+        no-resize
+        dark
+        rows="1"
+        auto-grow
+        rounded
+        filled
+        dense
+        outlined
+        autocomplete="off"
+        maxlength="500"
+        counter
+        background-color="primaryDark"
+        placeholder="Escribe tu mensaje"
+        v-model="message"
+        append-icon="mdi-send"
+        @keydown="inputHandler"
+        class="chat-compose-input"
+      ></v-textarea>
       <!--    <input
       ref="uploader"
       class="d-none"
@@ -33,7 +52,7 @@
       @change="onFileChanged"
     /> -->
     </v-form>
-  </v-flex>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -130,16 +149,43 @@ export default class InputMessage extends Vue {
       this.form.resetValidation();
     }
   }
+
+  inputHandler(e: KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      this.sendMessages();
+    }
+  }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .text-input {
   padding-left: 20px !important;
   padding-right: 20px !important;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
-  flex: none;
+  /*   flex: none; */
+  max-height: 115px;
+  overflow-y: auto;
+}
+
+.chat-compose-input::v-deep {
+  textarea {
+    max-height: 7rem;
+    overflow: auto;
+  }
+  textarea::-webkit-scrollbar {
+    width: 5px;
+  }
+  textarea::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+  textarea::-webkit-scrollbar-thumb {
+    background-color: #11171a;
+    border-radius: 10px;
+  }
 }
 
 /* .my-text-style >>> .v-text-field__slot input {
@@ -164,7 +210,7 @@ export default class InputMessage extends Vue {
   color: white;
 } */
 
-.theme--light.v-input textarea {
-  /* color: red; */
-}
+/* .theme--light.v-input textarea {
+  color: red;
+} */
 </style>

@@ -11,7 +11,7 @@
       </v-card-text>
 
       <v-card-text v-show="showConsole">
-        <p class="white--text mb-0">Resultado</p>
+        <p class="white--text mb-0">Resultado {{ line }}</p>
         <v-textarea
           no-resize
           solo
@@ -66,16 +66,24 @@
           Stdin
         </v-btn>
         <v-spacer></v-spacer>
-        <strong class="subheading" style="color: white">Línea: 24</strong>
+        <strong class="subheading" style="color: white"
+          >Línea: {{ line }}</strong
+        >
       </v-card-title>
     </v-card>
   </v-footer>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Position } from "monaco-editor";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class EditCode extends Vue {
+  @Prop({
+    required: true,
+  })
+  public line!: number;
+
   public showStdin = false;
   public showArgs = false;
   public showConsole = false;
@@ -106,7 +114,6 @@ export default class EditCode extends Vue {
 </script>
 
 <style scoped>
-
 .v-card__subtitle,
 .v-card__text,
 .v-card__title {

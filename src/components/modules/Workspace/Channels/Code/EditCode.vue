@@ -9,8 +9,17 @@
       @change="onChange"
     >
     </MonacoEditor> -->
-    <div id="container" :style="calculatedHeight" @change="onChange"></div>
-    <footer-options-code></footer-options-code>
+    <div
+      id="container"
+      :style="calculatedHeight"
+      @change="onChange"
+      @mouseenter="mouseEnter"
+      @keydown="get"
+      @keyup="get"
+      @mousedown="get"
+    ></div>
+
+    <footer-options-code :line="line"></footer-options-code>
   </div>
 </template>
 
@@ -20,6 +29,7 @@ import { Component, Vue } from "vue-property-decorator";
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
+import { Position } from "monaco-editor";
 
 @Component({
   components: {
@@ -31,10 +41,11 @@ import * as monaco from "monaco-editor";
 export default class EditCode extends Vue {
   public calculatedHeight = "height: 50px";
   public options!: monaco.editor.IStandaloneCodeEditor;
+  public line = 1;
+
   onChange(value: any) {
     console.log(value);
   }
-
   mounted() {
     this.initEditor();
     const code = this.$refs.codeappbar as any;
@@ -64,12 +75,29 @@ export default class EditCode extends Vue {
         language: "cpp",
         theme: "vs-dark",
         automaticLayout: true,
+        columnSelection: true,
       }
     );
   }
   getValue() {
     console.log(this.options.getValue());
     this.options.getValue();
+    this.options.getPosition();
+  }
+  get() {
+    this.line = this.options.getPosition()!.lineNumber;
+    console.log(this.line);
+  }
+
+  mouseIsMoving(e: any) {
+    var x = e.pageX;
+    var y = e.pageY;
+    this.line = this.options.getPosition()!.lineNumber;
+    /*  console.log(x, y); */
+  }
+
+  mouseEnter() {
+    this.$el.addEventListener("mousemove", this.mouseIsMoving);
   }
 }
 </script>
