@@ -250,6 +250,8 @@ export default class Messages extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import url("https://fonts.googleapis.com/css?family=Roboto Mono");
+
 .discord-message {
   color: #dcddde;
   display: flex;
@@ -318,6 +320,8 @@ export default class Messages extends Vue {
 
 .discord-message .discord-message-body {
   position: relative;
+  white-space: pre-wrap;
+  font-family: "Roboto Mono";
 }
 
 .discord-light-theme .discord-message .discord-message-timestamp,

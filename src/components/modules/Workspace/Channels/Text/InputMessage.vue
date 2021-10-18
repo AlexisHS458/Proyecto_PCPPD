@@ -1,58 +1,33 @@
 <template>
-  <v-container>
-    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
-      <!--  <v-textarea
-        v-model="message"
-        append-icon="mdi-send"
-        rounded
-        class="text-input"
-        placeholder="Escribe tu mensaje"
-        autocomplete="off"
-        outlined
-        filled
-        dense
-        no-resize
-        maxlength="500"
-        auto-grow
-        rows="2"
-        counter
-        :rules="[rules.required]"
-        @click:append="sendMessages"
-        background-color="primaryDark"
-        dark
-      >
-        <template v-slot:prepend-inner>
-          <v-file-input accept="image/*" hide-input></v-file-input>
-        </template>
-      </v-textarea> -->
-      <v-textarea
-        no-resize
-        dark
-        rows="1"
-        auto-grow
-        rounded
-        filled
-        dense
-        outlined
-        autocomplete="off"
-        maxlength="500"
-        counter
-        background-color="primaryDark"
-        placeholder="Escribe tu mensaje"
-        v-model="message"
-        append-icon="mdi-send"
-        @keydown="inputHandler"
-        class="chat-compose-input"
-      ></v-textarea>
-      <!--    <input
+  <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+    <v-textarea
+      no-resize
+      dark
+      rows="1"
+      auto-grow
+      rounded
+      filled
+      dense
+      outlined
+      autocomplete="off"
+      maxlength="500"
+      counter
+      background-color="primaryDark"
+      placeholder="Escribe tu mensaje"
+      v-model.trim="message"
+      append-icon="mdi-send"
+      class="chat-input"
+      @keydown="inputHandler"
+      @click:append="sendMessages"
+    ></v-textarea>
+    <!--    <input
       ref="uploader"
       class="d-none"
       type="file"
       accept="image/*"
       @change="onFileChanged"
     /> -->
-    </v-form>
-  </v-container>
+  </v-form>
 </template>
 
 <script lang="ts">
@@ -121,11 +96,8 @@ export default class InputMessage extends Vue {
   public isSelecting = false;
   public selectedFile = "";
   public rules = {
-    /* size: (v: string): string | boolean =>
-      v.length <= 500 || "Haz alcanzado el límite de caracteres", */
-    required: (v: string): string | boolean => !!v || "Campo requerido",
-    counter: (v: string): string | boolean =>
-      v.length <= 20 || "Campo requerido",
+    size: (v: string): string | boolean =>
+      v.length <= 500 || "Haz alcanzado el límite de caracteres",
   };
   public valid = true;
 
@@ -133,7 +105,11 @@ export default class InputMessage extends Vue {
    * Mandar mensaje al canal de texto seleccionado
    */
   async sendMessages() {
-    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+    if (
+      this.message &&
+      this.message.length > 0 /* &&
+      !/^\s*$/.test(this.message) */
+    ) {
       this.messageModel = {
         fotoURL: this.currentUser.fotoURL,
         uid_usuario: this.currentUser.uid!,
@@ -144,9 +120,9 @@ export default class InputMessage extends Vue {
       };
       this.setTextChannelIDtoModule(this.$route.params.id);
       this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-      await this.sendMessage(this.messageModel);
       this.form.reset();
       this.form.resetValidation();
+      await this.sendMessage(this.messageModel);
     }
   }
 
@@ -156,6 +132,13 @@ export default class InputMessage extends Vue {
       this.sendMessages();
     }
   }
+
+  /*   preventEnter(event: KeyboardEvent) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      return false;
+    }
+  } */
 }
 </script>
 
@@ -170,20 +153,22 @@ export default class InputMessage extends Vue {
   overflow-y: auto;
 }
 
-.chat-compose-input::v-deep {
+.chat-input::v-deep {
   textarea {
     max-height: 7rem;
     overflow: auto;
+    margin-bottom: 6px;
   }
   textarea::-webkit-scrollbar {
     width: 5px;
+    margin-right: 200px;
   }
   textarea::-webkit-scrollbar-track {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
   }
   textarea::-webkit-scrollbar-thumb {
-    background-color: #11171a;
+    background-color: #3e527e;
     border-radius: 10px;
   }
 }
