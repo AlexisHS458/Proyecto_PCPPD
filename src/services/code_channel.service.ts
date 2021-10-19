@@ -33,12 +33,14 @@ class CodeChannelService {
 
   sentCoordinates(uid: string, 
     coordinates:{
+      userID: string
       x:number
       y:number }) {
     codeChannelSocket(uid).emit(EventName.SENT_COORDINATES, coordinates);
   }
 
   getCoordinates(uid: string, codeChannelID: string, onEvent: (coordinates:{
+    userID: string
     x:number
     y:number }[]) => void) {
     codeChannelSocket(uid).on(`${codeChannelID}-${ResponseEventName.GET_COORDINAES}`,
