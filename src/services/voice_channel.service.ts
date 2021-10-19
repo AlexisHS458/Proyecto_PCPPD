@@ -5,8 +5,14 @@ import { EventName } from "@/utils/event_name";
 import { ResponseEventName } from "@/utils/response_event_name";
 
 class VoiceChannelService {
+
   joinToVoiceChannel(uid: string, voiceChannelID: string) {
     voiceChannelSocket(uid).emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
+  }
+
+
+  leaveVoiceChannel(uid: string){
+    voiceChannelSocket(uid).emit(EventName.LEAVE_VOICE_CHANNEL);
   }
 
   usersInVoiceChannel(uid: string, voiceChannelID: string, onEvent: (users: SocketUser[]) => void) {
@@ -17,15 +23,11 @@ class VoiceChannelService {
       }
     );
   }
-  
+
   emitUsers(uid: string, voiceChannelID: string){
-    voiceChannelSocket(uid).emit(EventName.EMIT_USERS,voiceChannelID);
+    voiceChannelSocket(uid).emit(EventName.EMIT_USERS,voiceChannelID)
   }
-
-  leaveVoiceChannel(uid: string){
-    voiceChannelSocket(uid).emit(EventName.LEAVE_VOICE_CHANNEL);
-  }
-
+  
   userStatus(
     uid: string,
     onEvent: (channelID: string | undefined) => void
@@ -50,25 +52,23 @@ class VoiceChannelService {
   }
 
 
-  listenSignalSent(
+  listenUserJoined(
     uid: string,
-    voiceChannelID: string,
     onEvent: (signalPayload: SignalPayload) => void
   ): void {
     const socket = voiceChannelSocket(uid);
-    socket.on(`${voiceChannelID}-${ResponseEventName.SIGNAL_SENT}`,(payload)=>{
+    socket.on(`${uid}-${ResponseEventName.USER_JOINED}`,(payload)=>{
       onEvent(payload);
     });
   }
 
   listenReturningSignal(
     uid: string,
-    voiceChannelID: string,
     onEvent: (signalPayload: SignalPayload) => void
   ): void {
     const socket = voiceChannelSocket(uid);
 
-    socket.on(`${voiceChannelID}-${ResponseEventName.RETURNED_SIGNAL}`,(payload)=>{
+    socket.on(`${uid}-${ResponseEventName.RECEIVING_RETURNED_SIGNAL}`,(payload)=>{
       onEvent(payload);
     });
   }

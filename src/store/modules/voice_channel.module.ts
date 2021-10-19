@@ -118,7 +118,7 @@ class VoiceChannelModule extends VuexModule{
                         )
                     );
                     
-                    VoiceChannelService.listenSignalSent(payloadAction.userID, channelID, (payloadSignal) => {
+                    VoiceChannelService.listenUserJoined(payloadAction.userID, (payloadSignal) => {
                         const peer = addPeer(
                             payloadSignal.signal,
                             payloadSignal.callerID,
@@ -130,9 +130,7 @@ class VoiceChannelModule extends VuexModule{
                         });
                     });
 
-
-                    VoiceChannelService.listenReturningSignal(payloadAction.userID,channelID, (payloadSignal) => {
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    VoiceChannelService.listenReturningSignal(payloadAction.userID, (payloadSignal) => {
                         if(payloadSignal.userIDToSignal){
                             const item = this.peers.get(payloadSignal.userIDToSignal);
                             item?.signal(payloadSignal.signal);
