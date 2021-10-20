@@ -2,7 +2,11 @@
   <v-hover>
     <div class="discord-message" slot-scope="{ hover }">
       <div class="discord-author-avatar">
-        <img :src="message.fotoURL" :alt="message.usuarioNombre" />
+        <img
+          :src="message.fotoURL"
+          :alt="message.usuarioNombre"
+          onerror="this.onerror=null;this.src='../../../../../assets/userProfile.png';"
+        />
       </div>
       <div class="discord-message-content">
         <div class="div">
@@ -112,6 +116,7 @@
 
 <script lang="ts">
 import { Component, Prop, Ref } from "vue-property-decorator";
+
 import Vue from "vue";
 import { namespace } from "vuex-class";
 import { Message } from "@/models/message";

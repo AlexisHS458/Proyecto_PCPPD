@@ -30,7 +30,10 @@ import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/Foot
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
 import { Position } from "monaco-editor";
-
+import CodeService from "@/services/code_channel.service";
+import { namespace } from "vuex-class";
+const User = namespace("UserModule");
+import { User } from "@/models/user";
 @Component({
   components: {
     /* MonacoEditor, */
@@ -39,6 +42,12 @@ import { Position } from "monaco-editor";
   },
 })
 export default class EditCode extends Vue {
+  /**
+   * Estado obtenido del @module User
+   */
+  @User.State("user")
+  private currentUser!: User;
+
   public calculatedHeight = "height: 50px";
   public options!: monaco.editor.IStandaloneCodeEditor;
   public line = 1;
@@ -80,20 +89,23 @@ export default class EditCode extends Vue {
     );
   }
   getValue() {
-    console.log(this.options.getValue());
     this.options.getValue();
     this.options.getPosition();
   }
   get() {
     this.line = this.options.getPosition()!.lineNumber;
-    console.log(this.line);
   }
 
   mouseIsMoving(e: any) {
     var x = e.pageX;
     var y = e.pageY;
-    this.line = this.options.getPosition()!.lineNumber;
-    /*  console.log(x, y); */
+    /* this.line = this.options.getPosition()!.lineNumber; */
+
+    CodeService.sentCoordinates(this.currentUser.uid!, {
+      userID: this.currentUser.uid!,
+      x: x,
+      y: y,
+    });
   }
 
   mouseEnter() {
