@@ -99,13 +99,18 @@ export default class EditCode extends Vue {
   mouseIsMoving(e: any) {
     var x = e.pageX;
     var y = e.pageY;
-    /* this.line = this.options.getPosition()!.lineNumber; */
-
     CodeService.sentCoordinates(this.currentUser.uid!, {
       userID: this.currentUser.uid!,
       x: x,
       y: y,
     });
+    CodeService.getCoordinates(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode,
+      (coordinates) => {
+        console.log(coordinates);
+      }
+    );
   }
 
   mouseEnter() {

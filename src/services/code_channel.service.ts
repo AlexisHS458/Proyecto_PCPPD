@@ -39,7 +39,7 @@ class CodeChannelService {
       y: number;
     }
   ) {
-    console.log(coordinates);
+
     codeChannelSocket(uid).emit(EventName.SENT_COORDINATES, coordinates);
   }
 
