@@ -1,14 +1,6 @@
 <template>
   <div>
     <div id="editCode" @mousemove="mouseIsMoving">
-      <div 
-        id="tooltip" 
-        v-for="cursor in userPointers" 
-        :key="cursor.userID"
-        :style="{top: ((cursor.scroll + cursor.y)- getMyScroll()) + 'px', left: cursor.x + 'px'}"
-      >
-        {{ cursor.nombre }}
-      </div>
       <app-bar-options ref="codeappbar"></app-bar-options>
       <div
         id="container"
@@ -17,6 +9,14 @@
         @keyup="getLine"
         @mousedown="getLine"
       ></div>
+      <div 
+        id="tooltip"
+        v-for="cursor in userPointers" 
+        :key="cursor.userID"
+        :style="{top: ((getMyScroll() + cursor.y)-cursor.scroll ) + 'px', left: cursor.x + 'px'}"
+      >
+        {{ cursor.nombre }}
+      </div>
       <footer-options-code :line="line"></footer-options-code>
     </div>
   </div>
@@ -72,7 +72,9 @@ export default class EditCode extends Vue {
       this.currentUser.uid!,
       this.$route.params.idChannelCode,
       (coordinates) => {
-        this.userPointers = coordinates;
+        this.userPointers = coordinates.filter((cursor)=>{
+          return cursor.userID !== this.currentUser.uid
+        });
       }
     );
 
@@ -152,7 +154,7 @@ export default class EditCode extends Vue {
   text-transform: uppercase;
   padding: 10px 15px;
   border: 2px solid #ccc;
-  z-index: 6;
+  pointer-events: none;
 }
 
 </style>
