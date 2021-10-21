@@ -5,7 +5,7 @@
         id="tooltip" 
         v-for="cursor in userPointers" 
         :key="cursor.userID"
-        :style="{top: (cursor.y + cursor.scroll) + 'px', left: cursor.x + 'px'}"
+        :style="{top: ((cursor.scroll + cursor.y)- getMyScroll()) + 'px', left: cursor.x + 'px'}"
       >
         {{ cursor.nombre }}
       </div>
@@ -117,12 +117,17 @@ export default class EditCode extends Vue {
       userID: this.currentUser.uid!,
       nombre: this.currentUser.nombre ,
       x,y,
-      scroll: target.style.top
+      scroll: parseInt(target.style.top.replace('px',''))
     });
   }
 
   sendMouseCoordinates(coordinates: CursorCoordinates): void{
     CodeService.sentCoordinates(this.currentUser.uid!, coordinates);
+  }
+
+  getMyScroll(): number {
+    const target: any = document.getElementsByClassName('monaco-editor-background')[0];
+    return parseInt(target.style.top.replace('px',''))
   }
 }
 </script>
