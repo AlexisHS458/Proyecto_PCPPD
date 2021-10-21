@@ -9,18 +9,29 @@
         @keyup="getLine"
         @mousedown="getLine"
       ></div>
-      <div
+      <!--     <div
         id="tooltip"
         v-for="cursor in userPointers"
         :key="cursor.userID"
         :style="{
           top: getMyScroll() + cursor.y - cursor.scroll + 'px',
-          left: (cursor.x + getOffSet()) + 'px',
+          left: cursor.x + getOffSet() + 'px',
           background: getColor(cursor.userID),
         }"
       >
         {{ cursor.nombre }}
-      </div>
+      </div> -->
+      <cursor-component
+        class="tooltip"
+        v-for="cursor in userPointers"
+        :key="cursor.userID"
+        :style="{
+          top: getMyScroll() + cursor.y - cursor.scroll + 'px',
+          left: cursor.x + getOffSet() + 'px',
+          
+        }"
+        :cursor="cursor"
+      ></cursor-component>
       <footer-options-code :line="line"></footer-options-code>
     </div>
   </div>
@@ -28,12 +39,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-
+import CursorComponent from "@/components/modules/Workspace/Channels/Code/CursorComponent.vue";
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
-import { Colors } from "@/utils/colors";
-import { StringUtils } from "@/utils/stringsUtils";
+
 import CodeService from "@/services/code_channel.service";
 import { namespace } from "vuex-class";
 const User = namespace("UserModule");
@@ -42,6 +52,7 @@ import { CursorCoordinates } from "@/models/cursorCoordinates";
 @Component({
   components: {
     /* MonacoEditor, */
+    CursorComponent,
     FooterOptionsCode,
     AppBarOptions,
   },
@@ -137,10 +148,12 @@ export default class EditCode extends Vue {
       "monaco-editor-background"
     )[0];
 
-    const editor = document.getElementById("container")!.getBoundingClientRect();
-    const x = e.clientX - editor.left ;
+    const editor = document
+      .getElementById("container")!
+      .getBoundingClientRect();
+    const x = e.clientX - editor.left;
     const y = e.clientY - editor.top;
-    
+
     this.sendMouseCoordinates({
       userID: this.currentUser.uid!,
       nombre: this.currentUser.nombre,
@@ -151,7 +164,6 @@ export default class EditCode extends Vue {
   }
 
   sendMouseCoordinates(coordinates: CursorCoordinates): void {
-
     CodeService.sentCoordinates(this.currentUser.uid!, coordinates);
   }
 
@@ -162,26 +174,20 @@ export default class EditCode extends Vue {
     return parseInt(target.style.top.replace("px", ""));
   }
 
-  getColor(userID: string): string {
-    return Colors.toColor(StringUtils.getHashCode(userID));
-  }
 
-  getOffSet(): number{
-    const editor = document.getElementById("container")!.getBoundingClientRect();
-    return editor.left ;
+  getOffSet(): number {
+    const editor = document
+      .getElementById("container")!
+      .getBoundingClientRect();
+    return editor.left;
   }
 }
 </script>
 
 <style scoped>
-#tooltip {
+.tooltip {
   position: fixed;
   display: block;
-  border-radius: 7.5px;
-  color: black;
-  text-transform: uppercase;
-  padding: 10px 15px;
-  border: 2px solid #ccc;
   pointer-events: none;
 }
 </style>
