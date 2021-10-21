@@ -1,9 +1,15 @@
 <template>
   <div>
-    <div id="editCode" @mousemove="mouseEnter">
-      <div id="tooltip">{{ currentUser.nombre }}</div>
-      <div id="holis">holis</div>
-      <app-bar-options ref="codeappbar" id="hola"></app-bar-options>
+    <div id="editCode" @mousemove="mouseIsMoving">
+      <div 
+        id="tooltip" 
+        v-for="cursor in userPointers" 
+        :key="cursor.userID"
+        :style="{top: (cursor.y + cursor.scroll) + 'px', left: cursor.x + 'px'}"
+      >
+        {{ cursor.nombre }}
+      </div>
+      <app-bar-options ref="codeappbar"></app-bar-options>
       <div
         id="container"
         :style="calculatedHeight"
@@ -27,6 +33,7 @@ import CodeService from "@/services/code_channel.service";
 import { namespace } from "vuex-class";
 const User = namespace("UserModule");
 import { User } from "@/models/user";
+import { CursorCoordinates } from "@/models/cursorCoordinates";
 @Component({
   components: {
     /* MonacoEditor, */
@@ -45,6 +52,8 @@ export default class EditCode extends Vue {
   public options!: monaco.editor.IStandaloneCodeEditor;
   public line = 1;
 
+  public userPointers: CursorCoordinates[] = [];
+
   mounted() {
     this.initEditor();
     const code = this.$refs.codeappbar as any;
@@ -58,6 +67,15 @@ export default class EditCode extends Vue {
       window.innerHeight - code.$el.offsetHeight
     }px;`;
     this.options.layout();
+
+    CodeService.getCoordinates(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode,
+      (coordinates) => {
+        this.userPointers = coordinates;
+      }
+    );
+
   }
 
   updated() {
@@ -84,42 +102,27 @@ export default class EditCode extends Vue {
     this.options.getValue();
     this.options.getPosition();
   } */
-  getLine() {
+  getLine(): void {
     this.line = this.options.getPosition()!.lineNumber;
   }
 
-  mouseIsMoving(e: any) {
-    var x = e.clientX;
-    var y = e.clientY;
+  mouseIsMoving(e: MouseEvent): void {
 
-    document.getElementById("tooltip")!.style.left = x + "px";
-    document.getElementById("tooltip")!.style.top = y + "px";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const target: any = document.getElementsByClassName('monaco-editor-background')[0];
+    const x = e.clientX;
+    const y = e.clientY;
 
-    CodeService.sentCoordinates(this.currentUser.uid!, {
+    this.sendMouseCoordinates({
       userID: this.currentUser.uid!,
-      x: x,
-      y: y,
+      nombre: this.currentUser.nombre ,
+      x,y,
+      scroll: target.style.top
     });
-    CodeService.getCoordinates(
-      this.currentUser.uid!,
-      this.$route.params.idChannelCode,
-      (coordinates) => {
-        console.log(coordinates[0].x);
-
-        /*    console.log(
-          coordinates.map((c) => {
-            return c.userID;
-          })
-        ); */
-
-        /*  document.getElementById("holis")!.style.left = coordinates[0].x + "px";
-        document.getElementById("holis")!.style.top = coordinates[0].y + "px"; */
-      }
-    );
   }
 
-  mouseEnter() {
-    this.$el.addEventListener("mousemove", this.mouseIsMoving);
+  sendMouseCoordinates(coordinates: CursorCoordinates): void{
+    CodeService.sentCoordinates(this.currentUser.uid!, coordinates);
   }
 }
 </script>
@@ -146,17 +149,5 @@ export default class EditCode extends Vue {
   border: 2px solid #ccc;
   z-index: 6;
 }
-#holis {
-  position: fixed;
-  display: block;
-  opacity: 0;
-  visibility: hidden;
-  background: white;
-  border-radius: 7.5px;
-  color: black;
-  text-transform: uppercase;
-  padding: 10px 15px;
-  border: 2px solid #ccc;
-  z-index: 6;
-}
+
 </style>

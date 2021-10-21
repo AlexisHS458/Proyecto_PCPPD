@@ -1,3 +1,4 @@
+import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { SocketUser } from "@/models/socketUser";
 import { codeChannelSocket } from "@/socketio";
 import { EventName } from "@/utils/event_name";
@@ -46,15 +47,11 @@ class CodeChannelService {
     uid: string,
     codeChannelID: string,
     onEvent: (
-      coordinates: {
-        userID: string;
-        x: number;
-        y: number;
-      }[]
+      coordinates: CursorCoordinates[]
     ) => void
   ) {
     codeChannelSocket(uid).on(`${codeChannelID}-${ResponseEventName.GET_COORDINAES}`, payload => {
-      onEvent(Object.values(payload));
+      onEvent(payload);
     });
   }
 }
