@@ -1,25 +1,18 @@
 <template>
-  <div id="edit-code">
-    <app-bar-options ref="codeappbar"></app-bar-options>
-    <!-- <MonacoEditor
-      :height="calculatedHeight"
-      ref="editor"
-      theme="vs-dark"
-      language="cpp"
-      @change="onChange"
-    >
-    </MonacoEditor> -->
-    <div
-      id="container"
-      :style="calculatedHeight"
-      @change="onChange"
-      @mouseenter="mouseEnter"
-      @keydown="get"
-      @keyup="get"
-      @mousedown="get"
-    ></div>
-
-    <footer-options-code :line="line"></footer-options-code>
+  <div>
+    <div id="editCode" @mousemove="mouseEnter">
+      <div id="tooltip">{{ currentUser.nombre }}</div>
+      <div id="holis">holis</div>
+      <app-bar-options ref="codeappbar" id="hola"></app-bar-options>
+      <div
+        id="container"
+        :style="calculatedHeight"
+        @keydown="getLine"
+        @keyup="getLine"
+        @mousedown="getLine"
+      ></div>
+      <footer-options-code :line="line"></footer-options-code>
+    </div>
   </div>
 </template>
 
@@ -52,9 +45,6 @@ export default class EditCode extends Vue {
   public options!: monaco.editor.IStandaloneCodeEditor;
   public line = 1;
 
-  onChange(value: any) {
-    console.log(value);
-  }
   mounted() {
     this.initEditor();
     const code = this.$refs.codeappbar as any;
@@ -69,6 +59,7 @@ export default class EditCode extends Vue {
     }px;`;
     this.options.layout();
   }
+
   updated() {
     const code = this.$refs.codeappbar as any;
     this.calculatedHeight = `height: ${
@@ -76,6 +67,7 @@ export default class EditCode extends Vue {
     }px;`;
     this.options.layout();
   }
+
   initEditor() {
     this.options = monaco.editor.create(
       document.getElementById("container") as HTMLElement,
@@ -88,17 +80,21 @@ export default class EditCode extends Vue {
       }
     );
   }
-  getValue() {
+  /*   getValue() {
     this.options.getValue();
     this.options.getPosition();
-  }
-  get() {
+  } */
+  getLine() {
     this.line = this.options.getPosition()!.lineNumber;
   }
 
   mouseIsMoving(e: any) {
-    var x = e.pageX;
-    var y = e.pageY;
+    var x = e.clientX;
+    var y = e.clientY;
+
+    document.getElementById("tooltip")!.style.left = x + "px";
+    document.getElementById("tooltip")!.style.top = y + "px";
+
     CodeService.sentCoordinates(this.currentUser.uid!, {
       userID: this.currentUser.uid!,
       x: x,
@@ -108,7 +104,16 @@ export default class EditCode extends Vue {
       this.currentUser.uid!,
       this.$route.params.idChannelCode,
       (coordinates) => {
-        console.log(coordinates);
+        console.log(coordinates[0].x);
+
+        /*    console.log(
+          coordinates.map((c) => {
+            return c.userID;
+          })
+        ); */
+
+        /*  document.getElementById("holis")!.style.left = coordinates[0].x + "px";
+        document.getElementById("holis")!.style.top = coordinates[0].y + "px"; */
       }
     );
   }
@@ -118,3 +123,40 @@ export default class EditCode extends Vue {
   }
 }
 </script>
+
+<style scoped>
+#editCode:hover #tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+#editCode:hover #holis {
+  opacity: 1;
+  visibility: visible;
+}
+#tooltip {
+  position: fixed;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  background: white;
+  border-radius: 7.5px;
+  color: black;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  border: 2px solid #ccc;
+  z-index: 6;
+}
+#holis {
+  position: fixed;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  background: white;
+  border-radius: 7.5px;
+  color: black;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  border: 2px solid #ccc;
+  z-index: 6;
+}
+</style>

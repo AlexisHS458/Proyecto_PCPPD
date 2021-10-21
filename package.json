@@ -13,6 +13,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@syncfusion/ej2-vue-popups": "^19.3.43",
     "@types/simple-peer": "^9.11.3",
     "@types/socket.io": "^3.0.2",
     "core-js": "^3.6.5",

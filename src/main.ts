@@ -8,7 +8,9 @@ import vuetify from "./plugins/vuetify";
 // @ts-ignore
 /* import vueSiteGuide from "vue-site-guide"; */
 /* eslint-enable */
+import { TooltipPlugin } from "@syncfusion/ej2-vue-popups";
 
+Vue.use(TooltipPlugin);
 Vue.config.productionTip = false;
 
 new Vue({
