@@ -1,101 +1,184 @@
 <template>
-  <div id="edit-code">
-    <v-app-bar
-      app
-      clipped-right
-      flat
-      height="48px"
-      ref="codeappbar"
-      color="primary"
-    >
-      <v-icon color="white" class="pr-4">mdi-message-processing-outline</v-icon>
-      <v-toolbar-title class="font-weight-medium">Equipo</v-toolbar-title>
-      <v-spacer></v-spacer>
-
-      <v-responsive max-width="180">
-        <v-row justify="space-around">
-          <v-icon color="info" size="25px"> mdi-alert-circle-outline </v-icon>
-          <v-icon size="25px" color="info"> mdi-content-save </v-icon>
-          <v-icon size="25px" color="info"> mdi-github </v-icon>
-          <v-icon size="25px" color="info"> mdi-folder-open </v-icon>
-          <v-icon size="25px" color="success"> mdi-play-outline </v-icon>
-        </v-row>
-      </v-responsive>
-    </v-app-bar>
-    <MonacoEditor
-      :height="calculatedHeight"
-      ref="editor"
-      theme="vs-dark"
-      language="cpp"
-      :options="options"
-      @change="onChange"
-    ></MonacoEditor>
-    <v-app-bar
-      color="white"
-      elevate-on-scroll
-      scroll-target="#scrolling-techniques-7"
-    >
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-      <v-toolbar-title>Title</v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
-    </v-app-bar>
+  <div>
+    <div id="editCode" @mousemove="mouseIsMoving">
+      <app-bar-options ref="codeappbar"></app-bar-options>
+      <div
+        id="container"
+        :style="calculatedHeight"
+        @keydown="getLine"
+        @keyup="getLine"
+        @mousedown="getLine"
+      ></div>
+      <div
+        id="tooltip"
+        v-for="cursor in userPointers"
+        :key="cursor.userID"
+        :style="{
+          top: getMyScroll() + cursor.y - cursor.scroll + 'px',
+          left: cursor.x + 'px',
+        }"
+      >
+        {{ cursor.nombre }}
+      </div>
+      <footer-options-code :line="line"></footer-options-code>
+    </div>
   </div>
 </template>
 
-<script>
-import MonacoEditor from "monaco-editor-vue";
-export default {
-  name: "App",
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+
+import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
+import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
+import * as monaco from "monaco-editor";
+import { Position } from "monaco-editor";
+import CodeService from "@/services/code_channel.service";
+import { namespace } from "vuex-class";
+const User = namespace("UserModule");
+import { User } from "@/models/user";
+import { CursorCoordinates } from "@/models/cursorCoordinates";
+@Component({
   components: {
-    MonacoEditor,
+    /* MonacoEditor, */
+    FooterOptionsCode,
+    AppBarOptions,
   },
-  data() {
-    return {
-      options: {
-        //Monaco Editor Options
-      },
-      calculatedHeight: 0,
-    };
-  },
-  methods: {
-    onChange(value) {
-      console.log(value);
-    },
-  },
-  mounted: function () {
-    this.calculatedHeight =
-      window.innerHeight - this.$refs.codeappbar.$el.offsetHeight;
-  },
-};
+})
+export default class EditCode extends Vue {
+  @Prop({
+    required: true,
+  })
+  public idChannelCode!: string;
+
+  @Watch("idChannelCode")
+  onChildChanged() {
+    this.changeView();
+  }
+
+  /**
+   * Estado obtenido del @module User
+   */
+  @User.State("user")
+  private currentUser!: User;
+
+  public calculatedHeight = "height: 50px";
+  public options!: monaco.editor.IStandaloneCodeEditor;
+  public line = 1;
+
+  public userPointers: CursorCoordinates[] = [];
+
+  mounted() {
+    this.changeView();
+  }
+
+  changeView() {
+    CodeService.joinToCodeChannel(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode
+    );
+
+    this.initEditor();
+    const code = this.$refs.codeappbar as any;
+    window.visualViewport.addEventListener("resize", () => {
+      this.calculatedHeight = `height: ${
+        window.innerHeight - code.$el.offsetHeight
+      }px;`;
+      this.options.layout();
+    });
+    this.calculatedHeight = `height: ${
+      window.innerHeight - code.$el.offsetHeight
+    }px;`;
+    this.options.layout();
+
+    CodeService.getCoordinates(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode,
+      (coordinates) => {
+        this.userPointers = coordinates.filter((cursor) => {
+          return cursor.userID !== this.currentUser.uid;
+        });
+      }
+    );
+  }
+
+  updated() {
+    const code = this.$refs.codeappbar as any;
+    this.calculatedHeight = `height: ${
+      window.innerHeight - code.$el.offsetHeight
+    }px;`;
+    this.options.layout();
+  }
+
+  initEditor() {
+    this.options = monaco.editor.create(
+      document.getElementById("container") as HTMLElement,
+      {
+        value: 'console.log("Hello, world")',
+        language: "cpp",
+        theme: "vs-dark",
+        automaticLayout: true,
+        columnSelection: true,
+      }
+    );
+  }
+  /*   getValue() {
+    this.options.getValue();
+    this.options.getPosition();
+  } */
+  getLine(): void {
+    this.line = this.options.getPosition()!.lineNumber;
+  }
+
+  mouseIsMoving(e: MouseEvent): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const target: any = document.getElementsByClassName(
+      "monaco-editor-background"
+    )[0];
+    const x = e.clientX;
+    const y = e.clientY;
+
+    this.sendMouseCoordinates({
+      userID: this.currentUser.uid!,
+      nombre: this.currentUser.nombre,
+      x,
+      y,
+      scroll: parseInt(target.style.top.replace("px", "")),
+    });
+  }
+
+  sendMouseCoordinates(coordinates: CursorCoordinates): void {
+    CodeService.sentCoordinates(this.currentUser.uid!, coordinates);
+  }
+
+  getMyScroll(): number {
+    const target: any = document.getElementsByClassName(
+      "monaco-editor-background"
+    )[0];
+    return parseInt(target.style.top.replace("px", ""));
+  }
+}
 </script>
 
 <style scoped>
-.toolbar {
-  flex: none;
+#editCode:hover #tooltip {
+  opacity: 1;
+  visibility: visible;
 }
-.v-toolbar__title {
-  color: white;
-  font-size: 1.13rem;
+#editCode:hover #holis {
+  opacity: 1;
+  visibility: visible;
 }
-.v-responsive {
-  position: relative;
-  overflow: visible;
-  flex: 1 0 auto;
-  max-width: 100%;
-  display: flex;
+#tooltip {
+  position: fixed;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  background: white;
+  border-radius: 7.5px;
+  color: black;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  border: 2px solid #ccc;
+  pointer-events: none;
 }
 </style>

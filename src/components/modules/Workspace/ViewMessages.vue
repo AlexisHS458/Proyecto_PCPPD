@@ -4,42 +4,32 @@
       :channelApp="channel"
       class="flex-grow-0 flex-shrink-1"
     ></app-bar-messages>
-
-    <template v-if="messages.length > 0">
-      <messages-list
-        class="background list-background scroll flex-grow-1"
-        ref="vList"
-      >
-        <messages-in-messages
-          v-for="message in messages"
-          :key="message.uid"
-          :message="message"
-          :currentUser="currentUser"
+    <div v-if="!isLoadingMessages">
+      <template v-if="messages.length > 0">
+        <messages-list
+          class="background list-background scroll flex-grow-1"
+          ref="vList"
         >
-          {{ message.contenido }}
-        </messages-in-messages>
-      </messages-list>
-      <!--   <discord-messages
-        class="background list-background scroll flex-grow-1"
-        ref="vList"
-      >
-        <discord-message
-          v-for="message in messages"
-          :key="message.uid"
-          :author="message.usuarioNombre"
-          :avatar="message.fotoURL"
-          :timestamp="new Date(message.fecha)"
-        >
-          {{ message.contenido }}
-        </discord-message>
-      </discord-messages> -->
-    </template>
-
-    <template v-else>
-      <div class="div-image-center">
-        <img src="@/assets/Messages.svg" class="img-not-messages" />
-      </div>
-    </template>
+          <messages-in-messages
+            v-for="message in messages"
+            :key="message.uid"
+            :message="message"
+            :currentUser="currentUser"
+          >
+            {{ message.contenido }}
+          </messages-in-messages>
+        </messages-list>
+      </template>
+      <template v-else>
+        <div class="div-image-center">
+          <img src="@/assets/Messages.svg" class="img-not-messages" />
+        </div>
+      </template>
+    </div>
+    <div v-else class="div-progress-circular">
+      <v-progress-circular indeterminate :size="80" :width="4" color="white">
+      </v-progress-circular>
+    </div>
     <v-footer app color="primary" inset class="display-footer">
       <input-message
         class="flex-grow-0 flex-shrink-1"
@@ -238,6 +228,14 @@ export default class MessagesPage extends Vue {
 </script>
 
 <style scoped lang="scss" >
+.div-progress-circular {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .card-center {
   /* display: flex; */
   flex-direction: column;
@@ -271,7 +269,7 @@ export default class MessagesPage extends Vue {
 .list-background {
   background-color: #0c2a52;
   color: white;
-  max-height: 79.8vh;
+  max-height: 81vh;
   overflow-x: auto;
 }
 .img-not-messages {

@@ -164,7 +164,7 @@ export default class ViewEdit extends Vue {
   public snackbarFailture = false;
   public snackbarSuccess = false;
   public textFailture = "Ocurrio un error al registrarte";
-  public textSuccess = "Se actualizo tu información";
+  public textSuccess = "Se actualizó tu información";
   public timeout = 2000;
   public textError = "";
   public rules = {
@@ -207,8 +207,12 @@ export default class ViewEdit extends Vue {
       /*   let index = this.users.findIndex((user) => user.uid === this.user.uid);
       if (index > -1) {
         this.users.splice(index, 1);
+        con
       } */
-      if (!this.users.find((user) => user.boleta === this.user.boleta)) {
+      let boletas = this.users.map((user) => {
+        return user.boleta;
+      });
+      if (!boletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {
           this.loading = false;
@@ -217,8 +221,7 @@ export default class ViewEdit extends Vue {
           this.loading = false;
           this.snackbarFailture = true;
         }
-      }
-      {
+      } else {
         this.loading = false;
         this.textError = "Boleta duplicada";
       }

@@ -171,7 +171,6 @@ export default class ListChannels extends Vue {
    * Crear nuevo canal de voz
    */
   async addChannelVoice() {
-    console.log(this.nameChannel);
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
       this.voiceChannel = {

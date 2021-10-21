@@ -3,12 +3,14 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
+
 /* eslint-disable */
 // @ts-ignore
-/* import VueDiscordMessage from "vue-discord-message"; */
+/* import vueSiteGuide from "vue-site-guide"; */
 /* eslint-enable */
-/* Vue.use(VueDiscordMessage); */
+import { TooltipPlugin } from "@syncfusion/ej2-vue-popups";
 
+Vue.use(TooltipPlugin);
 Vue.config.productionTip = false;
 
 new Vue({

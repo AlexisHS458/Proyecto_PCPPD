@@ -10,6 +10,8 @@ import MessagesPage from "../components/modules/Workspace/ViewMessages.vue";
 import NotFound from "../views/PageNotFound.vue";
 import NotChannels from "../components/modules/Workspace/NotChannels.vue";
 import CodeChannel from "../components/modules/Workspace/Channels/Code/EditCode.vue";
+import NavigationDrawer from "../components/modules/Workspace/ViewNavigationDrawer.vue";
+import ViewTreeView from "../components/modules/Workspace/ViewTreeView.vue";
 import { auth } from "@/utils/firebase";
 
 Vue.use(VueRouter);
@@ -47,29 +49,45 @@ const routes: Array<RouteConfig> = [
   {
     path: "/space/:id",
     name: "Space",
-    component: Workspace,
+    component: Workspace /* { default: Workspace, Navigation: NavigationDrawer } */,
+
     meta: {
       requiresAuth: true
     },
+
     children: [
       {
         name: "messages",
         path: ":idChannel",
-        component: MessagesPage,
-        props: true,
+        components: /*  MessagesPage */ {
+          default: MessagesPage,
+          NavigationDrawer: NavigationDrawer
+        },
+        props: {
+          default: true,
+          NavigatonDrawer: false
+        },
         meta: {
           requiresAuth: true
         }
       },
+
       {
         path: "",
-        component: NotChannels
+        /* component: NotChannels, */
+        components: /*  MessagesPage */ {
+          default: NotChannels,
+          NavigationDrawer: NavigationDrawer
+        }
       },
       {
         name: "codeChannel",
         path: "code/:idChannelCode",
-        component: CodeChannel,
-        props: true,
+        components: /* CodeChannel */ { default: CodeChannel, tree: ViewTreeView },
+        props: {
+          default: true,
+          tree: false
+        },
         meta: {
           requiresAuth: true
         }
@@ -105,7 +123,6 @@ router.beforeEach(
 
     /* console.log(store.state["UserModule/user"]); */
     auth.onAuthStateChanged(user => {
-      console.log(user);
       if (!user && requiresAuth) {
         next({ name: "Home" });
       } else if (!requiresAuth && user) {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isLoading && !isLoadingWorkspace" id="app">
+  <div v-if="!isLoading && !isLoadingWorkspace" id="app" class="body">
     <v-navigation-drawer v-model="drawer" app width="300">
       <div class="div">
         <info-workspace
@@ -21,29 +21,9 @@
         ></info-user>
       </div>
     </v-navigation-drawer>
-
-    <v-navigation-drawer app clipped right color="primaryDark">
-      <div class="flex-column d-flex">
-        <invitation-user
-          :user="currentUser"
-          :workspace="workspace"
-        ></invitation-user>
-        <!-- <v-list color="primaryDark"> -->
-        <user-info-in-list :currentUser="currentUser"></user-info-in-list>
-        <!-- </v-list> -->
-        <v-list color="primaryDark mt-0 pt-0">
-          <list-user
-            v-for="(user, index) in users"
-            :user="user"
-            :key="index"
-            :currentUser="currentUser"
-            :workspace="workspace"
-          ></list-user>
-        </v-list>
-      </div>
-    </v-navigation-drawer>
-    <router-view style="height: 100%"> </router-view>
-    <!--   Peticiones exitosas del modulo de Invitaciones -->
+    <router-view style="height: 92vh"> </router-view>
+    <router-view name="NavigationDrawer"></router-view>
+    <router-view name="tree"></router-view>
     <snackbar
       :color="'success'"
       :snackText="snackbarMessage"
