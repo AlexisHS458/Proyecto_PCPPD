@@ -15,7 +15,8 @@
         :key="cursor.userID"
         :style="{
           top: getMyScroll() + cursor.y - cursor.scroll + 'px',
-          left: cursor.x + 'px',
+          left: (cursor.x + getOffSet()) + 'px',
+          background: getColor(cursor.userID),
         }"
       >
         {{ cursor.nombre }}
@@ -31,7 +32,8 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
-import { Position } from "monaco-editor";
+import { Colors } from "@/utils/colors";
+import { StringUtils } from "@/utils/stringsUtils";
 import CodeService from "@/services/code_channel.service";
 import { namespace } from "vuex-class";
 const User = namespace("UserModule");
@@ -134,9 +136,11 @@ export default class EditCode extends Vue {
     const target: any = document.getElementsByClassName(
       "monaco-editor-background"
     )[0];
-    const x = e.clientX;
-    const y = e.clientY;
 
+    const editor = document.getElementById("container")!.getBoundingClientRect();
+    const x = e.clientX - editor.left ;
+    const y = e.clientY - editor.top;
+    
     this.sendMouseCoordinates({
       userID: this.currentUser.uid!,
       nombre: this.currentUser.nombre,
@@ -147,6 +151,7 @@ export default class EditCode extends Vue {
   }
 
   sendMouseCoordinates(coordinates: CursorCoordinates): void {
+
     CodeService.sentCoordinates(this.currentUser.uid!, coordinates);
   }
 
@@ -156,24 +161,22 @@ export default class EditCode extends Vue {
     )[0];
     return parseInt(target.style.top.replace("px", ""));
   }
+
+  getColor(userID: string): string {
+    return Colors.toColor(StringUtils.getHashCode(userID));
+  }
+
+  getOffSet(): number{
+    const editor = document.getElementById("container")!.getBoundingClientRect();
+    return editor.left ;
+  }
 }
 </script>
 
 <style scoped>
-#editCode:hover #tooltip {
-  opacity: 1;
-  visibility: visible;
-}
-#editCode:hover #holis {
-  opacity: 1;
-  visibility: visible;
-}
 #tooltip {
   position: fixed;
   display: block;
-  opacity: 0;
-  visibility: hidden;
-  background: white;
   border-radius: 7.5px;
   color: black;
   text-transform: uppercase;
