@@ -10,7 +10,7 @@
         color="white"
         :class="`${hover ? 'select-item' : 'no-select-item'}`"
         class="mb-1"
-        @click="conectToCodeChannel"
+      
       >
         <v-list-item-icon>
           <v-icon color="white">{{ icon }}</v-icon>
@@ -341,10 +341,9 @@ export default class NameChannels extends Vue {
     }
   }
 
-  conectToCodeChannel() {
+/*   conectToCodeChannel() {
     CodeService.joinToCodeChannel(this.currentUser.uid!, this.channel.uid!);
-    console.log(this.usersDisplay);
-  }
+  } */
 
   mounted() {
     CodeService.usersInCodeChannel(

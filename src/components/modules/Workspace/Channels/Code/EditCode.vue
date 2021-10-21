@@ -9,11 +9,14 @@
         @keyup="getLine"
         @mousedown="getLine"
       ></div>
-      <div 
+      <div
         id="tooltip"
-        v-for="cursor in userPointers" 
+        v-for="cursor in userPointers"
         :key="cursor.userID"
-        :style="{top: ((getMyScroll() + cursor.y)-cursor.scroll ) + 'px', left: cursor.x + 'px'}"
+        :style="{
+          top: getMyScroll() + cursor.y - cursor.scroll + 'px',
+          left: cursor.x + 'px',
+        }"
       >
         {{ cursor.nombre }}
       </div>
@@ -23,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
@@ -42,6 +45,16 @@ import { CursorCoordinates } from "@/models/cursorCoordinates";
   },
 })
 export default class EditCode extends Vue {
+  @Prop({
+    required: true,
+  })
+  public idChannelCode!: string;
+
+  @Watch("idChannelCode")
+  onChildChanged() {
+    this.changeView();
+  }
+
   /**
    * Estado obtenido del @module User
    */
@@ -55,6 +68,15 @@ export default class EditCode extends Vue {
   public userPointers: CursorCoordinates[] = [];
 
   mounted() {
+    this.changeView();
+  }
+
+  changeView() {
+    CodeService.joinToCodeChannel(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode
+    );
+
     this.initEditor();
     const code = this.$refs.codeappbar as any;
     window.visualViewport.addEventListener("resize", () => {
@@ -72,12 +94,11 @@ export default class EditCode extends Vue {
       this.currentUser.uid!,
       this.$route.params.idChannelCode,
       (coordinates) => {
-        this.userPointers = coordinates.filter((cursor)=>{
-          return cursor.userID !== this.currentUser.uid
+        this.userPointers = coordinates.filter((cursor) => {
+          return cursor.userID !== this.currentUser.uid;
         });
       }
     );
-
   }
 
   updated() {
@@ -109,27 +130,31 @@ export default class EditCode extends Vue {
   }
 
   mouseIsMoving(e: MouseEvent): void {
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const target: any = document.getElementsByClassName('monaco-editor-background')[0];
+    const target: any = document.getElementsByClassName(
+      "monaco-editor-background"
+    )[0];
     const x = e.clientX;
     const y = e.clientY;
 
     this.sendMouseCoordinates({
       userID: this.currentUser.uid!,
-      nombre: this.currentUser.nombre ,
-      x,y,
-      scroll: parseInt(target.style.top.replace('px',''))
+      nombre: this.currentUser.nombre,
+      x,
+      y,
+      scroll: parseInt(target.style.top.replace("px", "")),
     });
   }
 
-  sendMouseCoordinates(coordinates: CursorCoordinates): void{
+  sendMouseCoordinates(coordinates: CursorCoordinates): void {
     CodeService.sentCoordinates(this.currentUser.uid!, coordinates);
   }
 
   getMyScroll(): number {
-    const target: any = document.getElementsByClassName('monaco-editor-background')[0];
-    return parseInt(target.style.top.replace('px',''))
+    const target: any = document.getElementsByClassName(
+      "monaco-editor-background"
+    )[0];
+    return parseInt(target.style.top.replace("px", ""));
   }
 }
 </script>
@@ -156,5 +181,4 @@ export default class EditCode extends Vue {
   border: 2px solid #ccc;
   pointer-events: none;
 }
-
 </style>
