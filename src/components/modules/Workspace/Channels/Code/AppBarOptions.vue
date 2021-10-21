@@ -1,6 +1,11 @@
 <template>
   <v-app-bar app clipped-right flat height="48px" color="primary">
-    <v-icon color="white" class="pr-4">mdi-message-processing-outline</v-icon>
+    <v-icon
+      color="white"
+      class="mr-4"
+      @click="toggleShowNavigationDrawerChannels"
+      >mdi-menu</v-icon
+    >
     <v-toolbar-title class="font-weight-medium">Equipo</v-toolbar-title>
     <v-spacer></v-spacer>
 
@@ -174,6 +179,12 @@ const CodeChannel = namespace("CodeChannelModule");
 export default class AppBarOptions extends Vue {
   @CodeChannel.Action
   private toggleShowTreeView!: () => void;
+
+  @CodeChannel.Action
+  private toggleShowNavigationDrawer!: () => void;
+
+  @CodeChannel.Action
+  private toggleShowNavigationDrawerChannels!: () => void;
 
   public dialogImport = false;
   public validImport = true;
