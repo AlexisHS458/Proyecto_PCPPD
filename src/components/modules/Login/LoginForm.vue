@@ -4,8 +4,31 @@
       <v-col cols="10">
         <v-card rounded="lg" height="100%" width="100%">
           <v-row no-gutters>
-            <v-col cols="7" class="d-flex align-center">
+            <v-col
+              cols="12"
+              lg="7"
+              md="12"
+              sm="12"
+              xl="7"
+              class="d-flex align-center"
+            >
               <v-card-text align="center">
+                <div class="hidden-md-and-up">
+                  <p
+                    class="text-h9 text-center"
+                    align="center"
+                    justify="center"
+                  >
+                    <strong> Bienvenido a Kun </strong>
+                  </p>
+                  <p
+                    class="text-h10 text-center"
+                    align="center"
+                    justify="center"
+                  >
+                    Inicia sesión con tu cuenta de Google
+                  </p>
+                </div>
                 <v-img
                   class="img"
                   :src="require('@/assets/logo.png')"
@@ -15,7 +38,7 @@
                 <section id="firebaseui-auth-container" class="mt-10"></section>
               </v-card-text>
             </v-col>
-            <v-col cols="5">
+            <v-col cols="5" class="hidden-sm-and-down">
               <v-img
                 :src="require('@/assets/background.jpg')"
                 height="600"

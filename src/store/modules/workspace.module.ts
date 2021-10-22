@@ -205,12 +205,14 @@ class WorkspaceModule extends VuexModule {
   @Action
   async fetchUsersInWorkspace() {
     this.context.commit("setLoadingUsersStatus", true);
-    const user = await UserService.getUserAuthInfo();
-    this.context.commit("setUser", user);
-    WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
-      this.context.commit("setUsers", users);
-      this.context.commit("setLoadingUsersStatus", false);
+    await UserService.getUserAuthInfo((user)=> {
+      this.context.commit("setUser", user);
+      WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
+        this.context.commit("setUsers", users);
+        this.context.commit("setLoadingUsersStatus", false);
+      });
     });
+    
   }
 
   /**

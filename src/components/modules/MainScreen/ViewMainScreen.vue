@@ -6,7 +6,9 @@
         <template>
           <own-card :user="currentUser"></own-card>
         </template>
-        <floating-button></floating-button>
+        <div v-show="(currentUser.workspacesCount || 0) < 1">
+          <floating-button></floating-button>
+        </div>
       </v-container>
     </v-container>
 
@@ -154,6 +156,7 @@ export default class ViewMainScreen extends Vue {
   private connect!: () => void;
 
   public timeout = -1;
+  public userWorkspace = 0;
 
   async created() {
     if (!this.isLoggedIn) {

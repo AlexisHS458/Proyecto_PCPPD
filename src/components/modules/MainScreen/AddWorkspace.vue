@@ -99,17 +99,10 @@ export default class AddCard extends Vue {
       this.workspace.nombre = this.workspaceName;
       this.workspace.usuarios = [this.currentUser.uid!];
       await this.addWorkSpace(this.workspace);
-      if (this.status.showSnackbar && !this.status.showSnackbarError) {
-        this.form.resetValidation();
-        this.form.reset();
-        this.loading = false;
-        this.dialog = false;
-      } else {
-        this.form.resetValidation();
-        this.form.reset();
-        this.loading = false;
-        this.dialog = false;
-      }
+      this.form.resetValidation();
+      this.form.reset();
+      this.loading = false;
+      this.dialog = false;
     }
   }
 

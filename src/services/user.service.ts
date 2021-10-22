@@ -10,7 +10,9 @@ class UserService {
    * Obtiene la información almacenada en Firestore.
    * @returns Información del usuario autenticado.
    */
-  async getUserAuthInfo(): Promise<User> {
+  async getUserAuthInfo(
+    onSnapshot: (user: User) => void
+  ): Promise<User> {
     return new Promise((resolve, reject) => {
       auth.onAuthStateChanged(user => {
         if (user) {
@@ -20,6 +22,7 @@ class UserService {
               value => {
                 const userData = value.data();
                 if (userData) {
+                  onSnapshot(<User>userData)
                   resolve(<User>userData);
                 }
               },

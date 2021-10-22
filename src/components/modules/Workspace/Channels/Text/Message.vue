@@ -5,7 +5,7 @@
         <img
           :src="message.fotoURL"
           :alt="message.usuarioNombre"
-          onerror="this.onerror=null;this.src='../../../../../assets/userProfile.png';"
+          @error="imgError"
         />
       </div>
       <div class="discord-message-content">
@@ -130,6 +130,11 @@ import AuthorInfo from "./AuthorInfo.vue";
 // @ts-ignore
 import validators from "@/util/validators.js";
 /* eslint-enable */
+
+/* eslint-disable */
+// @ts-ignore
+import image from "@/assets/userProfile.png";
+/* eslint-enable */
 const now = new Date();
 
 @Component({
@@ -250,6 +255,10 @@ export default class Messages extends Vue {
   padZeroes(value: any) {
     const [month, day, year] = value.split("/");
     return `${month.padStart(2, 0)}/${day.padStart(2, 0)}/${year}`;
+  }
+
+  imgError(e: any) {
+    e.target.src = image;
   }
 }
 </script>
