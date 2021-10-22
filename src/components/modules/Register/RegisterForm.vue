@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="!isLoading" class="fill-height" fluid>
+  <v-container v-if="!isLoading" class="fill-height scroll" fluid>
     <v-row align="center" justify="center">
       <v-col cols="10">
         <v-card rounded="lg" height="100%" width="100%">
@@ -9,7 +9,14 @@
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
             </v-col>
-            <v-col cols="7" class="d-flex align-center">
+            <v-col
+              cols="12"
+              lg="7"
+              md="12"
+              sm="12"
+              xl="7"
+              class="d-flex align-center"
+            >
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-img
@@ -18,7 +25,7 @@
                     height="50%"
                     width="25%"
                   />
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Nombre"
                       v-model="currentUser.nombre"
@@ -28,7 +35,7 @@
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Apellidos"
                       v-model="currentUser.apellido"
@@ -39,7 +46,7 @@
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Boleta o Número de empleado"
                       v-model="currentUser.boleta"
@@ -79,7 +86,7 @@
               </v-snackbar>
             </v-col>
 
-            <v-col cols="5">
+            <v-col cols="5" class="hidden-md-and-down">
               <v-img
                 :src="require('@/assets/background.jpg')"
                 height="600"
@@ -236,5 +243,21 @@ export default class Register extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.scroll {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: #000029;
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
 }
 </style>

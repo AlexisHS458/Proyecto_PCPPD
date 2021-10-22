@@ -54,6 +54,27 @@ class CodeChannelService {
       onEvent(payload);
     });
   }
+
+
+  sendCode(
+    uid: string,
+    codeData:{
+      channelID: string,
+      code: string
+    }): void {
+    codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
+    }
+
+  
+  getDataCode(
+    uid: string,
+    codeChannelID: string,
+    onEvent: (code: string) => void
+  ): void {
+    codeChannelSocket(uid).on(`${codeChannelID}-${ResponseEventName.CODE}`, payload => {
+      onEvent(payload);
+    });
+  }
 }
 
 export default new CodeChannelService();

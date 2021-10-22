@@ -9,18 +9,6 @@
         @keyup="getLine"
         @mousedown="getLine"
       ></div>
-      <!--     <div
-        id="tooltip"
-        v-for="cursor in userPointers"
-        :key="cursor.userID"
-        :style="{
-          top: getMyScroll() + cursor.y - cursor.scroll + 'px',
-          left: cursor.x + getOffSet() + 'px',
-          background: getColor(cursor.userID),
-        }"
-      >
-        {{ cursor.nombre }}
-      </div> -->
       <cursor-component
         class="tooltip"
         v-for="cursor in userPointers"
@@ -28,7 +16,6 @@
         :style="{
           top: getMyScroll() + cursor.y - cursor.scroll + 'px',
           left: cursor.x + getOffSet() + 'px',
-          
         }"
         :cursor="cursor"
       ></cursor-component>
@@ -77,7 +64,7 @@ export default class EditCode extends Vue {
   public calculatedHeight = "height: 50px";
   public options!: monaco.editor.IStandaloneCodeEditor;
   public line = 1;
-
+  public userCode = "";
   public userPointers: CursorCoordinates[] = [];
 
   mounted() {
@@ -112,6 +99,13 @@ export default class EditCode extends Vue {
         });
       }
     );
+    CodeService.getDataCode(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode,
+      (code) => {
+        this.options.setValue(code);
+      }
+    );
   }
 
   updated() {
@@ -126,7 +120,7 @@ export default class EditCode extends Vue {
     this.options = monaco.editor.create(
       document.getElementById("container") as HTMLElement,
       {
-        value: 'console.log("Hello, world")',
+        value: "",
         language: "cpp",
         theme: "vs-dark",
         automaticLayout: true,
@@ -140,6 +134,10 @@ export default class EditCode extends Vue {
   } */
   getLine(): void {
     this.line = this.options.getPosition()!.lineNumber;
+    CodeService.sendCode(this.currentUser.uid!, {
+      channelID: this.$route.params.idChannelCode,
+      code: this.options.getValue(),
+    });
   }
 
   mouseIsMoving(e: MouseEvent): void {
@@ -173,7 +171,6 @@ export default class EditCode extends Vue {
     )[0];
     return parseInt(target.style.top.replace("px", ""));
   }
-
 
   getOffSet(): number {
     const editor = document
