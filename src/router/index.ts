@@ -73,6 +73,7 @@ const routes: Array<RouteConfig> = [
       },
 
       {
+        name: "notChannels",
         path: "",
         /* component: NotChannels, */
         components: /*  MessagesPage */ {

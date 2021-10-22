@@ -16,9 +16,16 @@
           contain
         ></v-img>
       </v-btn>
-      <v-toolbar-title class="toolbar-title font-weight-bold">
-        {{ workspace.nombre }}
-      </v-toolbar-title>
+      <router-link
+        style="text-decoration: none; color: inherit"
+        :to="{
+          name: 'notChannels',
+        }"
+      >
+        <v-toolbar-title class="toolbar-title font-weight-bold">
+          {{ workspace.nombre }}
+        </v-toolbar-title>
+      </router-link>
       <v-spacer></v-spacer>
       <v-menu
         v-if="workspace.uid_usuario !== currentUser.uid"
@@ -245,6 +252,10 @@ export default class Toolbar extends Vue {
     if (!this.status.showTreeView) {
       this.toggleShowTreeView();
     }
+  }
+
+  toNotChannels() {
+    this.$router.replace({ name: "notChannels" });
   }
 }
 </script>
