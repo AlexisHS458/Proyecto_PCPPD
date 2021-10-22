@@ -9,18 +9,6 @@
         @keyup="getLine"
         @mousedown="getLine"
       ></div>
-      <!--     <div
-        id="tooltip"
-        v-for="cursor in userPointers"
-        :key="cursor.userID"
-        :style="{
-          top: getMyScroll() + cursor.y - cursor.scroll + 'px',
-          left: cursor.x + getOffSet() + 'px',
-          background: getColor(cursor.userID),
-        }"
-      >
-        {{ cursor.nombre }}
-      </div> -->
       <cursor-component
         class="tooltip"
         v-for="cursor in userPointers"
@@ -115,7 +103,7 @@ export default class EditCode extends Vue {
       this.currentUser.uid!,
       this.$route.params.idChannelCode,
       (code) => {
-        this.userCode = code;
+        this.options.setValue(code);
       }
     );
   }
@@ -132,7 +120,7 @@ export default class EditCode extends Vue {
     this.options = monaco.editor.create(
       document.getElementById("container") as HTMLElement,
       {
-        value: this.userCode,
+        value: "",
         language: "cpp",
         theme: "vs-dark",
         automaticLayout: true,
@@ -146,8 +134,6 @@ export default class EditCode extends Vue {
   } */
   getLine(): void {
     this.line = this.options.getPosition()!.lineNumber;
-    console.log(this.options.getValue());
-
     CodeService.sendCode(this.currentUser.uid!, {
       channelID: this.$route.params.idChannelCode,
       code: this.options.getValue(),
