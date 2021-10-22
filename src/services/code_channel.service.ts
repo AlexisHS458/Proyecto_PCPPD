@@ -54,11 +54,16 @@ class CodeChannelService {
       onEvent(payload);
     });
   }
-  
 
-  sendCode(uid: string, code: string): void {
-    codeChannelSocket(uid).emit(EventName.SEND_CODE, code);
-  }
+
+  sendCode(
+    uid: string,
+    codeData:{
+      channelID: string,
+      code: string
+    }): void {
+    codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
+    }
 
   
   getDataCode(
