@@ -4,8 +4,8 @@
       <div v-if="invitations.length > 0 || workSpacesList.length > 0">
         <v-row>
           <v-col
-            v-for="(workspace, index) in workSpacesList"
-            :key="index"
+            v-for="workspace in workSpacesList"
+            :key="workspace.uid"
             lg="4"
             cols="12"
             md="6"
@@ -24,8 +24,8 @@
         </v-row>
         <v-row>
           <v-col
-            v-for="(invitation, index) in invitations"
-            :key="index"
+            v-for="invitation in invitations"
+            :key="invitation.uid"
             lg="4"
             cols="12"
             md="6"

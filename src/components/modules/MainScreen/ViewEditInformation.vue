@@ -1,10 +1,15 @@
 <template>
-  <v-container v-if="!isLoading" class="fill-height" fluid>
+  <v-container v-if="!isLoading" class="fill-height scroll" fluid>
     <v-row align="center" justify="center">
-      <v-col cols="6">
+      <v-col cols="12" sm="12" lg="6" xl="6" md="12">
         <v-card rounded="lg" height="100%" width="100%">
           <v-row no-gutters>
-            <v-col cols="7" class="arrow">
+            <v-col cols="7" class="arrow hidden-sm-and-down">
+              <v-btn class="ma-2" text icon to="/Mainscreen">
+                <v-icon large> mdi-arrow-left </v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="12" sm="7" xs="7" class="hidden-md-and-up">
               <v-btn class="ma-2" text icon to="/Mainscreen">
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
@@ -13,10 +18,10 @@
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-img
-                    class="img mb-12"
+                    class="img mb-12 hidden-sm-and-down"
                     :src="require('@/assets/logo.png')"
                   />
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Nombre"
                       outlined
@@ -26,7 +31,7 @@
                       prepend-inner-icon="mdi-account "
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Apellidos"
                       :rules="[rules.required, rules.regexLastName]"
@@ -37,7 +42,7 @@
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Boleta o Número de empleado"
                       :rules="[rules.required, rules.regexBoleta]"
@@ -248,5 +253,22 @@ export default class ViewEdit extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.scroll {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: #000029;
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
 }
 </style>
