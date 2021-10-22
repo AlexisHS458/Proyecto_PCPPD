@@ -1,6 +1,10 @@
 <template>
   <div v-if="!isLoading && !isLoadingWorkspace" id="app" class="body">
-    <v-navigation-drawer v-model="drawer" app width="300">
+    <v-navigation-drawer
+      v-model="statusDrawer.showNavigationDrawerChannels"
+      app
+      width="300"
+    >
       <div class="div">
         <info-workspace
           class="flex-grow-0 flex-shrink-1"
@@ -84,12 +88,14 @@ import InvitationUser from "@/components/modules/Workspace/InvitationUser.vue";
 import ListUser from "@/components/modules/Workspace/ListUsers.vue";
 import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
 import UserInfoInList from "@/components/modules/Workspace/UserInfoInList.vue";
+
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { CodeChannel } from "@/models/codeChannel";
+const CodeChannel = namespace("CodeChannelModule");
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
@@ -239,6 +245,9 @@ export default class Spacework extends Vue {
 
   @Permissions.State("status")
   private statusPermissions!: any;
+
+  @CodeChannel.State("status")
+  private statusDrawer!: any;
 
   public timeout = -1;
   public drawer = null;

@@ -1,5 +1,11 @@
 <template>
-  <v-navigation-drawer app clipped right color="primaryDark" v-model="drawer">
+  <v-navigation-drawer
+    app
+    clipped
+    right
+    color="primaryDark"
+    v-model="status.showNavigationDrawerUsers"
+  >
     <div class="flex-column d-flex">
       <invitation-user
         :user="currentUser"
@@ -40,7 +46,7 @@ import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
-
+const CodeChannel = namespace("CodeChannelModule");
 @Component({
   components: {
     InvitationUser,
@@ -64,6 +70,9 @@ export default class Spacework extends Vue {
 
   @MyWorkSpace.State("users")
   private users!: User[];
+
+  @CodeChannel.State("status")
+  private status!: any;
 
   public timeout = -1;
   public drawer = null;
