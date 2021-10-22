@@ -22,4 +22,6 @@ export interface User {
    * URL de la imagen de perfil del usuario
    */
   fotoURL: string,
+
+  workspacesCount?: number
 }

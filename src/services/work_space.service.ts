@@ -15,6 +15,7 @@ class WorkSpaceService {
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
     const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    UserService.updateUserWorkspaceCount(workspace.uid_usuario, true);
     return <Workspace>(await workSpaceRef).data();
   }
 
@@ -23,10 +24,12 @@ class WorkSpaceService {
    * @param id ID del documento a eliminar
    */
   async deleteWorkSpace(id: string): Promise<void> {
+    const workspaceRef = await this.getWorkspaceInfo(id)
     await db
       .collection(Collection.WORK_SPACE)
       .doc(id)
       .delete();
+    UserService.updateUserWorkspaceCount(workspaceRef.uid_usuario, false);
   }
 
   /**

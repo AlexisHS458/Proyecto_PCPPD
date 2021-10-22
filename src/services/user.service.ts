@@ -1,4 +1,4 @@
-import { db, auth } from "@/utils/firebase";
+import { db, auth, FieldValue } from "@/utils/firebase";
 import { User } from "@/models/user";
 import { Collection } from "@/utils/collections";
 
@@ -109,6 +109,22 @@ class UserService {
         );
       });
   }
+
+  updateUserWorkspaceCount(uid: string, isIncrement: boolean): void {
+    if(isIncrement){
+      db.collection(Collection.USERS).doc(uid).update({
+        'workspacesCount' : FieldValue.increment(1)
+      });
+  
+    }
+    else{
+      db.collection(Collection.USERS).doc(uid).update({
+        'workspacesCount' : FieldValue.increment(-1)
+      });
+    }
+  
+  }
+  
 
 
 }
