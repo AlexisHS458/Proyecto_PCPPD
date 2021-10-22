@@ -7,7 +7,7 @@
           <own-card :user="currentUser"></own-card>
         </template>
         <floating-button
-          v-if="(currentUser.workspacesCount || 0) < 1"
+          v-if="(currentUser.workspacesCount || 0) < 1 "
         ></floating-button>
       </v-container>
     </v-container>
