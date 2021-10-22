@@ -4,6 +4,7 @@ export enum EventName{
   JOIN_CODE_CHANNEL = 'join-code-channel',
   LEAVE_CODE_CHANNEL = 'leave-code-channel',
   SENT_COORDINATES = 'sent-coordinates',
+  SEND_CODE = 'send-code',
 
   //VoiceChannel
   JOIN_VOICE_CHANNEL = 'join-voice-channel',
