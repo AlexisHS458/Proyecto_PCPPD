@@ -127,8 +127,21 @@ class UserService {
     }
   
   }
-  
 
+  updateUserWorkspaceCollab(uid: string, isIncrement: boolean): void {
+    if(isIncrement){
+      db.collection(Collection.USERS).doc(uid).update({
+        'workspacesCollab' : FieldValue.increment(1)
+      });
+  
+    }
+    else{
+      db.collection(Collection.USERS).doc(uid).update({
+        'workspacesCollab' : FieldValue.increment(-1)
+      });
+    }
+  
+  }
 
 }
 
