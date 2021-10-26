@@ -15,9 +15,9 @@ class VoiceChannelService {
     voiceChannelSocket(uid).emit(EventName.LEAVE_VOICE_CHANNEL);
   }
 
-  usersInVoiceChannel(uid: string, voiceChannelID: string, onEvent: (users: SocketUser[]) => void) {
+  allUsers(uid: string, voiceChannelID: string, onEvent: (users: SocketUser[]) => void): void {
     voiceChannelSocket(uid).on(
-      `${voiceChannelID}-${ResponseEventName.USERS_IN_VOICE_CHANNEL}`,
+      `${voiceChannelID}-${ResponseEventName.ALL_USERS}`,
       payload => {
         onEvent(Object.values(payload));
       }

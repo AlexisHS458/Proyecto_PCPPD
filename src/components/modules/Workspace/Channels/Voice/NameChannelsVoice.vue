@@ -342,7 +342,7 @@ export default class NameChannels extends Vue {
   }
 
   mounted() {
-    VoiceService.usersInVoiceChannel(
+    VoiceService.allUsers(
       this.currentUser.uid!,
       this.channel.uid!,
       async (users) => {
