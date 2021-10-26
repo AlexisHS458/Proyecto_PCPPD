@@ -6,7 +6,7 @@
         id="container"
         :style="calculatedHeight"
         @keydown="getLine"
-        @keyup="getLine"
+        @keyup="getLine();sendCode();"
         @mousedown="getLine"
       ></div>
       <cursor-component
@@ -103,6 +103,9 @@ export default class EditCode extends Vue {
       this.currentUser.uid!,
       this.$route.params.idChannelCode,
       (code) => {
+       console.log(code);
+      
+        
         this.options.setValue(code);
       }
     );
@@ -134,10 +137,15 @@ export default class EditCode extends Vue {
   } */
   getLine(): void {
     this.line = this.options.getPosition()!.lineNumber;
+    
+  }
+
+  sendCode(): void {
+
     CodeService.sendCode(this.currentUser.uid!, {
-      channelID: this.$route.params.idChannelCode,
-      code: this.options.getValue(),
-    });
+          channelID: this.$route.params.idChannelCode,
+          code: this.options.getValue(),
+        });
   }
 
   mouseIsMoving(e: MouseEvent): void {
