@@ -101,7 +101,7 @@ class VoiceChannelModule extends VuexModule{
                 return;
             }
             navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
-                VoiceChannelService.usersInVoiceChannel(payloadAction.userID, channelID, (users) =>{
+                VoiceChannelService.allUsers(payloadAction.userID, channelID, (users) =>{
                     
                     this.context.commit(
                         "setPeers",
