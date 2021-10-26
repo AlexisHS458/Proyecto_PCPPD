@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height" fluid>
+  <v-container class="fill-height scroll" fluid>
     <v-row align="center" justify="center">
       <v-col cols="10">
         <v-card rounded="lg" height="100%" width="100%">
@@ -29,13 +29,28 @@
                     Inicia sesión con tu cuenta de Google
                   </p>
                 </div>
-                <v-img
-                  class="img"
-                  :src="require('@/assets/logo.png')"
-                  height="50%"
-                  width="25%"
-                />
-                <section id="firebaseui-auth-container" class="mt-10"></section>
+                <v-col>
+                  <v-img
+                    class="img"
+                    :src="require('@/assets/logo.png')"
+                    height="50%"
+                    width="25%"
+                  />
+                  <section
+                    id="firebaseui-auth-container"
+                    class="mt-10"
+                  ></section>
+                </v-col>
+                <v-col>
+                  <div class="user-manual">
+                    <a
+                      href="https://correoipn-my.sharepoint.com/:b:/g/personal/hgalvang1701_alumno_ipn_mx/EW_2eYj07aVCn9C58N59xh4B-HkrcZ1Q_afVUfrOYyxRiQ?e=9dWLPg"
+                      target="_blank"
+                    >
+                      Ver manual de usuario
+                    </a>
+                  </div>
+                </v-col>
               </v-card-text>
             </v-col>
             <v-col cols="5" class="hidden-sm-and-down">
@@ -112,5 +127,26 @@ export default class LoginForm extends Vue {
 html {
   overflow-y: hidden; /* Hide scrollbars */
   overflow: hidden;
+}
+.user-manual {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.scroll {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: #000029;
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
 }
 </style>
