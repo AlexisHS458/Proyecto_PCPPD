@@ -9,6 +9,7 @@
         <div v-show="(currentUser.workspacesCount || 0) < 1">
           <floating-button></floating-button>
         </div>
+        <users-manual-bottom></users-manual-bottom>
       </v-container>
     </v-container>
 
@@ -69,6 +70,7 @@ import CollaborationCard from "@/components/modules/MainScreen/CardCollaboration
 import InvitationCard from "@/components/modules/MainScreen/CardInvitation.vue";
 import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
 import SnackbarWarning from "@/components/modules/Workspace/SnackbarWarning.vue";
+import UsersManualBottom from "@/components/modules/MainScreen/UsersManualBottom.vue";
 import { User } from "@/models/user";
 const User = namespace("UserModule");
 const LeaveWorkspace = namespace("MainScreenModule");
@@ -83,6 +85,7 @@ const SocketIO = namespace("SocketIO");
     FloatingButton,
     Snackbar,
     SnackbarWarning,
+    UsersManualBottom,
   },
 })
 export default class ViewMainScreen extends Vue {
