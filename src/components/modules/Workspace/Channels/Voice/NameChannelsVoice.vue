@@ -188,7 +188,7 @@
     <v-list class="ml-10 mt-0">
       <v-list-item v-for="user in usersDisplay" :key="user.uid">
         <v-list-item-avatar size="25">
-          <v-img :src="user.fotoURL"></v-img>
+          <v-img :src="user.fotoURL" @error="imgError"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title v-text="user.nombre"></v-list-item-title>
@@ -212,6 +212,10 @@ import UserService from "@/services/user.service";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
+/* eslint-disable */
+// @ts-ignore
+import image from "@/assets/userProfile.png";
+/* eslint-enable */
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -351,6 +355,10 @@ export default class NameChannels extends Vue {
       }
     );
     VoiceService.emitUsers(this.currentUser.uid!, this.channel.uid!);
+  }
+
+  imgError(e: any) {
+    e.target.src = image;
   }
 }
 </script>

@@ -42,17 +42,22 @@
                   >
                     <v-row align="center" justify="center" class="mt-6">
                       <v-col cols="9">
-                        <v-text-field
-                          v-model="text"
+                        <v-textarea
+                          v-model.trim="text"
                           label="Mensaje"
                           :placeholder="message.contenido"
+                          class="chat-input"
                           outlined
                           dense
+                          counter
                           color="primary"
                           prepend-inner-icon="mdi-message"
                           :rules="[rules.required]"
-                          @keyup.enter="editMessages"
-                        ></v-text-field>
+                          @keydown="inputHandler"
+                          autocomplete="off"
+                          maxlength="500"
+                          no-resize
+                        ></v-textarea>
                       </v-col>
                     </v-row>
                   </v-form>
@@ -209,17 +214,19 @@ export default class Messages extends Vue {
    */
   async editMessages() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
-      this.loadingEdit = true;
-      this.message.contenido = this.text;
-      await this.editMessage(this.message);
-      if (this.status.showSnackbar && !this.status.showSnackbarError) {
-        this.loadingEdit = false;
-        this.form.reset();
-        this.dialogEdit = false;
-      } else {
-        this.loadingEdit = false;
-        this.form.reset();
-        this.dialogEdit = false;
+      if (this.text && this.text.length > 0) {
+        this.loadingEdit = true;
+        this.message.contenido = this.text;
+        await this.editMessage(this.message);
+        if (this.status.showSnackbar && !this.status.showSnackbarError) {
+          this.loadingEdit = false;
+          this.form.reset();
+          this.dialogEdit = false;
+        } else {
+          this.loadingEdit = false;
+          this.form.reset();
+          this.dialogEdit = false;
+        }
       }
     }
   }
@@ -259,6 +266,13 @@ export default class Messages extends Vue {
 
   imgError(e: any) {
     e.target.src = image;
+  }
+
+  inputHandler(e: KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      this.editMessages();
+    }
   }
 }
 </script>
@@ -374,5 +388,20 @@ export default class Messages extends Vue {
 }
 .hidden {
   visibility: hidden;
+}
+
+.chat-input::v-deep {
+  textarea::-webkit-scrollbar {
+    width: 5px;
+    margin-right: 200px;
+  }
+  textarea::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+  textarea::-webkit-scrollbar-thumb {
+    background-color: #3e527e;
+    border-radius: 10px;
+  }
 }
 </style>

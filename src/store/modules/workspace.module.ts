@@ -51,6 +51,16 @@ class WorkspaceModule extends VuexModule {
    * Mensaje a mostrar error en snackbar
    */
   public snackbarMessageError = "";
+  
+  /**
+   * Todos los usuarios dentro de la base de datos
+   */
+  public allUsers: User[] = [];
+
+
+
+
+
 
   /**
    * Status de la consulta del espacio de trabajo
@@ -147,6 +157,13 @@ class WorkspaceModule extends VuexModule {
   public setShowSnackBarMessage(status: boolean): void {
     this.status.showSnackbar = status;
   }
+
+
+  @Mutation
+  public setAllUsers(allUsers: User[]): void {
+      this.allUsers = allUsers;
+  }
+
 
   /**
    * Consulta la información de un espacio de trabajo.
@@ -449,6 +466,18 @@ class WorkspaceModule extends VuexModule {
   setNotVisibleSnackBarError(): void {
     this.context.commit("setShowSnackBarMessageError", false);
   }
+
+
+  /**
+  * Recupera los usuarios de la base de datos para enviar invitación
+  * @param userIDs IDs de los usuarios dentro del workspace
+  */
+   @Action
+   fetchAllUsers(): void {
+     UserService.getUsers(users => {
+       this.context.commit("setAllUsers", users);
+     });
+   }
 
   get getUserList(): User[] {
     return this.users

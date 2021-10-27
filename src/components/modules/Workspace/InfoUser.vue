@@ -1,26 +1,41 @@
 <template>
-  <v-app-bar color="primaryDark" dense class="toolbar">
-    <v-tooltip top>
-      <template v-slot:activator="{ on, attrs }">
-        <v-toolbar-title v-bind="attrs" v-on="on">
-          {{ currentUser.nombre + " " + currentUser.apellido }}
-        </v-toolbar-title>
-      </template>
-      <span>{{ currentUser.nombre + " " + currentUser.apellido }}</span>
-    </v-tooltip>
-    <v-spacer></v-spacer>
-    <v-btn icon @click="toggleMicrophone">
-      <v-icon v-if="isTalk" color="success">mdi-microphone</v-icon>
-      <v-icon v-else color="error">mdi-microphone-off</v-icon>
-    </v-btn>
-    <v-btn icon @click="toggleHeadphones">
-      <v-icon v-if="isListening" color="success">mdi-headphones</v-icon>
-      <v-icon v-else color="error">mdi-headphones-off</v-icon>
-    </v-btn>
-    <v-btn icon @click="disconnect" v-if="isConnected">
-      <v-icon color="errorLight">mdi-phone-remove</v-icon>
-    </v-btn>
-  </v-app-bar>
+  <div>
+    <v-app-bar v-if="isConnected" color="primaryDark" dense class="toolbar">
+      <v-toolbar-title> Conectado </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon @click="disconnect" v-if="isConnected">
+        <v-icon color="errorLight">mdi-phone-remove</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon color="errorLight">mdi-xml</v-icon>
+      </v-btn>
+    </v-app-bar>
+    <v-app-bar color="primaryDark" dense class="toolbar">
+      <v-tooltip top>
+        <template v-slot:activator="{ on, attrs }">
+          <v-toolbar-title v-bind="attrs" v-on="on">
+            {{ currentUser.nombre + " " + currentUser.apellido }}
+          </v-toolbar-title>
+        </template>
+        <span>{{ currentUser.nombre + " " + currentUser.apellido }}</span>
+      </v-tooltip>
+      <v-spacer></v-spacer>
+      <v-btn icon @click="toggleMicrophone">
+        <v-icon v-if="isTalk" color="success">mdi-microphone</v-icon>
+        <v-icon v-else color="error">mdi-microphone-off</v-icon>
+      </v-btn>
+      <v-btn icon @click="toggleHeadphones">
+        <v-icon v-if="isListening" color="success">mdi-headphones</v-icon>
+        <v-icon v-else color="error">mdi-headphones-off</v-icon>
+      </v-btn>
+      <!--  <v-btn icon @click="disconnect" v-if="isConnected">
+        <v-icon color="errorLight">mdi-phone-remove</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon color="errorLight">mdi-xml</v-icon>
+      </v-btn> -->
+    </v-app-bar>
+  </div>
 </template>
 
 <script lang="ts">
@@ -58,8 +73,6 @@ export default class UserInfo extends Vue {
   }
 
   mounted() {
-    
-    
     VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
       this.isConnected = !!isConnected;
     });
