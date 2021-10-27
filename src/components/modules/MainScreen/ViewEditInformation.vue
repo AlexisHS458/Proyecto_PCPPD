@@ -121,7 +121,7 @@ import { User } from "@/models/user";
 import { Ref } from "vue-property-decorator";
 import { VForm } from "@/utils/types";
 const EditUser = namespace("UserModule");
-const GetUsers = namespace("InvitationsModule");
+const Workspace = namespace("WorkspaceModule");
 
 @Component
 export default class ViewEdit extends Vue {
@@ -152,14 +152,12 @@ export default class ViewEdit extends Vue {
   /**
    * Accion obtenida del @module Invitations
    */
-  @GetUsers.Action
-  private fetchUserNames!: () => void;
+  @Workspace.State("allUsers")
+  private allUsers!: User[];
 
-  /**
-   * Estado obtenido del @module Invitations
-   */
-  @GetUsers.State("users")
-  private users!: User[];
+  @Workspace.Action
+  private fetchAllUsers!: () => void;
+  
 
   @Ref("form") readonly form!: VForm;
 
@@ -197,7 +195,7 @@ export default class ViewEdit extends Vue {
     }
     /*  await this.fetchCurrentUser(); */
     this.user = JSON.parse(JSON.stringify(this.currentUser));
-    this.fetchUserNames();
+    this.fetchAllUsers();
   }
 
   /**
@@ -209,15 +207,13 @@ export default class ViewEdit extends Vue {
       this.loading = true;
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
-      /*   let index = this.users.findIndex((user) => user.uid === this.user.uid);
-      if (index > -1) {
-        this.users.splice(index, 1);
-        con
-      } */
-      let boletas = this.users.map((user) => {
+   
+      
+      let boletas = this.allUsers.map((user) => {
         return user.boleta;
       });
-      const filtredBoletas = boletas.filter((boleta) => boleta !== this.currentUser.boleta);
+      const filtredBoletas = boletas.filter((boleta) => boleta != this.currentUser.boleta);
+      
       if (!filtredBoletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {
