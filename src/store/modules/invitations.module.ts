@@ -129,14 +129,16 @@ class InivtationsModule extends VuexModule {
       });
   }
 
-  /**
-   * Recupera las invitaciones del usuario
-   */
+ /**
+  * Recupera los usuarios de la base de datos para enviar invitación
+  * @param userIDs IDs de los usuarios dentro del workspace
+  */
   @Action
-  fetchUserNames(): void {
+  fetchUserNames(userIDs: string[]): void {
     this.context.commit("setLoadingUserNamesStatus", true);
     UserService.getUsers(users => {
-      this.context.commit("setUserNamesList", users);
+      const filterUsers = users.filter((user) => !userIDs.includes(user.uid!))
+      this.context.commit("setUserNamesList", filterUsers);
       this.context.commit("setLoadingUserNamesStatus", false);
     });
   }
