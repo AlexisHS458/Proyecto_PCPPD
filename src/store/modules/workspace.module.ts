@@ -450,6 +450,10 @@ class WorkspaceModule extends VuexModule {
     this.context.commit("setShowSnackBarMessageError", false);
   }
 
+  get getUserList(): User[] {
+    return this.users
+  }
+
   get isLoadingWorkspace(): boolean {
     return this.status.loadingWorkspace;
   }
