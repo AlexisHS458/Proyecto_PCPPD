@@ -56,9 +56,10 @@
                       dense
                       color="primary"
                       prepend-inner-icon="mdi-account-voice"
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.regexNameChannel]"
                       v-model="nameChannel"
                       @keyup.enter="addChannelVoice"
+                      @keydown.esc="closeAddSpace"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -68,7 +69,7 @@
               <v-btn color="success" :loading="loading" @click="addChannelVoice"
                 >Crear</v-btn
               >
-              <v-btn text @click="dialog = false">Cancelar</v-btn>
+              <v-btn text @click="closeAddSpace">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -165,6 +166,8 @@ export default class ListChannels extends Vue {
   public voiceChannel = {} as VoiceChannel;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    regexNameChannel: (v: string): string | boolean =>
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
 
   /**
@@ -188,6 +191,12 @@ export default class ListChannels extends Vue {
         this.dialog = false;
       }
     }
+  }
+
+  closeAddSpace() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialog = false;
   }
 }
 </script>

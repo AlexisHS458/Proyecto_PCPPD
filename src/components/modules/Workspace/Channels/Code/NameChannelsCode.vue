@@ -10,7 +10,6 @@
         color="white"
         :class="`${hover ? 'select-item' : 'no-select-item'}`"
         class="mb-1"
-      
       >
         <v-list-item-icon>
           <v-icon color="white">{{ icon }}</v-icon>
@@ -192,11 +191,19 @@
     <v-list class="ml-10 mt-0">
       <v-list-item v-for="user in usersDisplay" :key="user.uid">
         <v-list-item-avatar size="25">
-          <v-img :src="user.fotoURL"></v-img>
+          <img @error="imgError" :src="user.fotoURL" />
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title v-text="user.nombre"></v-list-item-title>
         </v-list-item-content>
+        <v-list-item-action>
+          <v-chip small color="error"> Driver </v-chip>
+        </v-list-item-action>
+        <v-list-item-action>
+          <v-btn icon>
+            <v-icon>mdi-swap-horizontal</v-icon>
+          </v-btn>
+        </v-list-item-action>
       </v-list-item>
     </v-list>
   </div>
@@ -215,6 +222,10 @@ const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
 import UserService from "@/services/user.service";
+/* eslint-disable */
+// @ts-ignore
+import image from "@/assets/userProfile.png";
+/* eslint-enable */
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -341,7 +352,7 @@ export default class NameChannels extends Vue {
     }
   }
 
-/*   conectToCodeChannel() {
+  /*   conectToCodeChannel() {
     CodeService.joinToCodeChannel(this.currentUser.uid!, this.channel.uid!);
   } */
 
@@ -356,6 +367,10 @@ export default class NameChannels extends Vue {
       }
     );
     CodeService.emitUsers(this.currentUser.uid!, this.channel.uid!);
+  }
+
+   imgError(e: any) {
+    e.target.src = image;
   }
 }
 </script>

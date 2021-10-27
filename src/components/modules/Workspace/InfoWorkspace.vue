@@ -16,16 +16,23 @@
           contain
         ></v-img>
       </v-btn>
-      <router-link
-        style="text-decoration: none; color: inherit"
+
+      <v-toolbar-title
+        class="toolbar-title font-weight-bold"
         :to="{
           name: 'notChannels',
         }"
       >
-        <v-toolbar-title class="toolbar-title font-weight-bold">
+        <router-link
+          style="text-decoration: none; color: inherit"
+          :to="{
+            name: 'notChannels',
+          }"
+        >
           {{ workspace.nombre }}
-        </v-toolbar-title>
-      </router-link>
+        </router-link>
+      </v-toolbar-title>
+
       <v-spacer></v-spacer>
       <v-menu
         v-if="workspace.uid_usuario !== currentUser.uid"
