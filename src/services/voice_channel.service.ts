@@ -6,7 +6,12 @@ import { ResponseEventName } from "@/utils/response_event_name";
 
 class VoiceChannelService {
 
-  joinToVoiceChannel(uid: string, voiceChannelID: string) {
+  /**
+   * Se conecta a un canal de voz
+   * @param uid ID del usuario a conectar
+   * @param voiceChannelID ID del canal de voz al cual para conectar al usuario
+   */
+  joinToVoiceChannel(uid: string, voiceChannelID: string): void {
     voiceChannelSocket(uid).emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
   }
 
@@ -15,13 +20,11 @@ class VoiceChannelService {
     voiceChannelSocket(uid).emit(EventName.LEAVE_VOICE_CHANNEL);
   }
 
-  allUsers(uid: string, voiceChannelID: string, onEvent: (users: SocketUser[]) => void): void {
-    voiceChannelSocket(uid).on(
-      `${voiceChannelID}-${ResponseEventName.ALL_USERS}`,
-      payload => {
+  allUsers(uid: string, onEvent: (users: SocketUser[]) => void): void {
+    voiceChannelSocket(uid).on(ResponseEventName.ALL_USERS, payload => {
+        console.log(Object.values(payload));
         onEvent(Object.values(payload));
-      }
-    );
+      });
   }
 
   emitUsers(uid: string, voiceChannelID: string){

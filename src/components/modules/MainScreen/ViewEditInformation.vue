@@ -217,7 +217,8 @@ export default class ViewEdit extends Vue {
       let boletas = this.users.map((user) => {
         return user.boleta;
       });
-      if (!boletas.includes(this.user.boleta)) {
+      const filtredBoletas = boletas.filter((boleta) => boleta !== this.currentUser.boleta);
+      if (!filtredBoletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {
           this.loading = false;
