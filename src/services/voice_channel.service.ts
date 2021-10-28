@@ -77,8 +77,6 @@ class VoiceChannelService {
     onEvent: (signalPayload: SignalPayload) => void
   ): Socket {
     return this.joinRoom(uid,uid,false).on(ResponseEventName.RECEIVING_RETURNED_SIGNAL,(payload)=>{
-      console.log('receiving signal', payload);
-      
       onEvent(payload);
     });
   }

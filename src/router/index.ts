@@ -1,4 +1,3 @@
-import store from "@/store";
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
@@ -107,10 +106,10 @@ const router = new VueRouter({
   routes
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(/* async */ (to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
-  await store.dispatch("UserModule/fetchCurrentUser");
-  const currentUser = store.getters["UserModule/getUser"];
+  /* await store.dispatch("UserModule/fetchCurrentUser");
+  const currentUser = store.getters["UserModule/getUser"]; */
 
   /*  if (!currentUser && requiresAuth) {
     next({ name: "Home" });
@@ -120,7 +119,6 @@ router.beforeEach(async (to, from, next) => {
   else next(); */
 
   auth.onAuthStateChanged(user => {
-    console.log(currentUser);
     if (!user && requiresAuth) {
       next({ name: "Home" });
     } else if (!requiresAuth && user) {

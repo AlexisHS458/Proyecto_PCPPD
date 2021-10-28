@@ -17,10 +17,7 @@
             <v-col class="d-flex align-center">
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-img
-                    class="img mb-12 hidden-sm-and-down"
-                    :src="require('@/assets/logo.png')"
-                  />
+                  <v-img class="img mb-12 hidden-sm-and-down" :src="require('@/assets/logo.png')" />
                   <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Nombre"
@@ -49,7 +46,7 @@
                         rules.required,
                         rules.regexBoleta,
                         rules.caracteres,
-                        rules.caracteresMayor,
+                        rules.caracteresMayor
                       ]"
                       v-model="user.boleta"
                       outlined
@@ -72,36 +69,18 @@
                   </v-col>
                 </v-form>
               </v-card-text>
-              <v-snackbar
-                v-model="snackbarFailture"
-                :timeout="timeout"
-                color="error"
-              >
+              <v-snackbar v-model="snackbarFailture" :timeout="timeout" color="error">
                 {{ textFailture }}
                 <template v-slot:action="{ attrs }">
-                  <v-btn
-                    color="white"
-                    text
-                    v-bind="attrs"
-                    @click="snackbarFailture = false"
-                  >
+                  <v-btn color="white" text v-bind="attrs" @click="snackbarFailture = false">
                     Cerrar
                   </v-btn>
                 </template>
               </v-snackbar>
-              <v-snackbar
-                v-model="snackbarSuccess"
-                :timeout="timeout"
-                color="success"
-              >
+              <v-snackbar v-model="snackbarSuccess" :timeout="timeout" color="success">
                 {{ textSuccess }}
                 <template v-slot:action="{ attrs }">
-                  <v-btn
-                    color="white"
-                    text
-                    v-bind="attrs"
-                    @click="snackbarSuccess = false"
-                  >
+                  <v-btn color="white" text v-bind="attrs" @click="snackbarSuccess = false">
                     Cerrar
                   </v-btn>
                 </template>
@@ -166,6 +145,8 @@ export default class ViewEdit extends Vue {
   @Ref("form") readonly form!: VForm;
 
   public user = {} as User;
+  public boletas: string[] = [];
+
   public loading = false;
   public valid = true;
   public snackbarFailture = false;
@@ -181,15 +162,12 @@ export default class ViewEdit extends Vue {
     caracteresMayor: (v: string): string | boolean =>
       v.length <= 15 || "Este campo no puede tener más de 15 caracteres",
     regex: (v: string): string | boolean =>
-      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
-        v
-      ) || "Nombre inválido",
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(v) ||
+      "Nombre inválido",
     regexLastName: (v: string): string | boolean =>
-      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
-        v
-      ) || "Apellido inválido",
-    regexBoleta: (v: string): string | boolean =>
-      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido",
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(v) ||
+      "Apellido inválido",
+    regexBoleta: (v: string): string | boolean => /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido"
   };
 
   /*  @Watch("user")
@@ -204,6 +182,8 @@ export default class ViewEdit extends Vue {
     /*  await this.fetchCurrentUser(); */
     this.user = JSON.parse(JSON.stringify(this.currentUser));
     this.fetchAllUsers();
+    const allUsersBoletas = this.allUsers.map(user => user.boleta);
+    this.boletas = allUsersBoletas.filter(boleta => boleta !== this.currentUser.boleta);
   }
 
   /**
@@ -216,14 +196,7 @@ export default class ViewEdit extends Vue {
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
 
-      let boletas = this.allUsers.map((user) => {
-        return user.boleta;
-      });
-      const filtredBoletas = boletas.filter(
-        (boleta) => boleta != this.currentUser.boleta
-      );
-      console.log(filtredBoletas);
-      if (!filtredBoletas.includes(this.user.boleta)) {
+      if (!this.boletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {
           this.loading = false;
@@ -241,7 +214,7 @@ export default class ViewEdit extends Vue {
 }
 </script>
 
-<style scoped >
+<style scoped>
 .img {
   border-radius: 1rem;
   width: 14rem;

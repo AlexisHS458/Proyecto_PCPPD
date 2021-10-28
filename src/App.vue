@@ -1,6 +1,5 @@
 <template>
   <v-app>
-    <div ref="audioContainer" id="audio-container"></div>
     <v-main>
       <router-view />
     </v-main>
@@ -12,7 +11,6 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { User } from "./models/user";
 const CurrentUser = namespace("UserModule");
-const VoiceChannel = namespace("VoiceChannelModule");
 @Component
 export default class AppVue extends Vue {
   /**
@@ -33,22 +31,10 @@ export default class AppVue extends Vue {
   @CurrentUser.Getter
   private isLoggedIn!: boolean;
 
-  @VoiceChannel.Action
-  private initVoiceService!: (payloadAction: {
-    htmlDivElement: HTMLDivElement;
-    userID: string;
-  }) => void;
 
   async mounted() {
     if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
-    }
-    console.log(this.$refs.audioContainer as HTMLDivElement);
-    if (this.$refs.audioContainer) {
-      this.initVoiceService({
-        htmlDivElement: this.$refs.audioContainer as HTMLDivElement,
-        userID: this.currentUser.uid!,
-      });
     }
   }
 }
@@ -62,9 +48,7 @@ export default class AppVue extends Vue {
   font-family: "Roboto", sans-serif;
 }
 
-#audio-container {
-  visibility: hidden;
-}
+
 
 .application {
   font-family: "Roboto", sans-serif;
