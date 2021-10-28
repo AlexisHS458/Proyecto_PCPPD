@@ -57,6 +57,7 @@
                       color="primary"
                       prepend-inner-icon="mdi-credit-card-outline"
                       :error-messages="textError"
+                      required
                     ></v-text-field>
                   </v-col>
                   <v-col cols="4">
@@ -155,7 +156,7 @@ export default class ViewEdit extends Vue {
   private isLoading!: boolean;
 
   /**
-   * Accion obtenida del @module Invitations
+   * Accion obtenida del @module Worksapce
    */
   @Workspace.State("allUsers")
   private allUsers!: User[];
