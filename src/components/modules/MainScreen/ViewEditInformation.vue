@@ -140,7 +140,7 @@ export default class ViewEdit extends Vue {
   private allUsers!: User[];
 
   @Workspace.Action
-  private fetchAllUsers!: () => void;
+  private fetchAllUsers!: () => Promise<void>;
 
   @Ref("form") readonly form!: VForm;
 
@@ -181,9 +181,6 @@ export default class ViewEdit extends Vue {
     }
     /*  await this.fetchCurrentUser(); */
     this.user = JSON.parse(JSON.stringify(this.currentUser));
-    this.fetchAllUsers();
-    const allUsersBoletas = this.allUsers.map(user => user.boleta);
-    this.boletas = allUsersBoletas.filter(boleta => boleta !== this.currentUser.boleta);
   }
 
   /**
@@ -196,6 +193,10 @@ export default class ViewEdit extends Vue {
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
 
+      await this.fetchAllUsers();
+      const allUsersBoletas = this.allUsers.map(user => user.boleta);
+      this.boletas = allUsersBoletas.filter(boleta => boleta !== this.currentUser.boleta);
+      console.log(this.boletas);
       if (!this.boletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {

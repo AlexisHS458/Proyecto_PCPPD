@@ -473,12 +473,10 @@ class WorkspaceModule extends VuexModule {
   * @param userIDs IDs de los usuarios dentro del workspace
   */
    @Action
-   fetchAllUsers(): void {
-     UserService.getUsers(users => {
-       this.context.commit("setAllUsers", users);
-     });
+   async fetchAllUsers(): Promise<void> {
+    this.context.commit("setAllUsers", await UserService.getUsers());
    }
-
+     
   get getUserList(): User[] {
     return this.users
   }
