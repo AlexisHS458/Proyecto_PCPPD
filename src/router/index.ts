@@ -106,27 +106,29 @@ const router = new VueRouter({
   routes
 });
 
-router.beforeEach(/* async */ (to, from, next) => {
-  const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
-  /* await store.dispatch("UserModule/fetchCurrentUser");
+router.beforeEach(
+  /* async */ (to, from, next) => {
+    const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
+    /*   await store.dispatch("UserModule/fetchCurrentUser");
   const currentUser = store.getters["UserModule/getUser"]; */
 
-  /*  if (!currentUser && requiresAuth) {
+    /*  if (!currentUser && requiresAuth) {
     next({ name: "Home" });
   } else if (!requiresAuth && currentUser) {
     next("/Mainscreen");
   } else if (!requiresAuth && !currentUser) next();
   else next(); */
 
-  auth.onAuthStateChanged(user => {
-    if (!user && requiresAuth) {
-      next({ name: "Home" });
-    } else if (!requiresAuth && user) {
-      next("/Mainscreen");
-    } else if (!requiresAuth && !user) {
-      next();
-    } else next();
-  });
-});
+    auth.onAuthStateChanged(user => {
+      if (!user && requiresAuth) {
+        next({ name: "Home" });
+      } else if (!requiresAuth && user) {
+        next("/Mainscreen");
+      } else if (!requiresAuth && !user) {
+        next();
+      } else next();
+    });
+  }
+);
 
 export default router;
