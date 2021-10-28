@@ -350,11 +350,14 @@ export default class NameChannels extends Vue {
   }
 
   mounted() {
-    VoiceService.allUsers(this.currentUser.uid!, async (users) => {
-      this.usersDisplay = await Promise.all(
-        users.map((user) => UserService.getUserInfoByID(user.uid))
-      );
-    });
+    VoiceService.allUsers(
+      this.currentUser.uid!, this.channel.uid!,
+      async (users) => {
+        this.usersDisplay = await Promise.all(
+          users.map((user) => UserService.getUserInfoByID(user.uid))
+        );
+      }
+    );
     VoiceService.emitUsers(this.currentUser.uid!, this.channel.uid!);
   }
 
