@@ -45,7 +45,12 @@
                   <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Boleta o Número de empleado"
-                      :rules="[rules.required, rules.regexBoleta]"
+                      :rules="[
+                        rules.required,
+                        rules.regexBoleta,
+                        rules.caracteres,
+                        rules.caracteresMayor,
+                      ]"
                       v-model="user.boleta"
                       outlined
                       dense
@@ -157,7 +162,6 @@ export default class ViewEdit extends Vue {
 
   @Workspace.Action
   private fetchAllUsers!: () => void;
-  
 
   @Ref("form") readonly form!: VForm;
 
@@ -172,6 +176,10 @@ export default class ViewEdit extends Vue {
   public textError = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    caracteres: (v: string): string | boolean =>
+      v.length >= 7 || "Este campo no puede tener menor de 7 caracteres",
+    caracteresMayor: (v: string): string | boolean =>
+      v.length <= 15 || "Este campo no puede tener más de 15 caracteres",
     regex: (v: string): string | boolean =>
       /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
         v
@@ -181,7 +189,7 @@ export default class ViewEdit extends Vue {
         v
       ) || "Apellido inválido",
     regexBoleta: (v: string): string | boolean =>
-      /^[a-zA-Z0-9]+$/.test(v) || "Apellido inválido",
+      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido",
   };
 
   /*  @Watch("user")
@@ -207,13 +215,14 @@ export default class ViewEdit extends Vue {
       this.loading = true;
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
-   
-      
+
       let boletas = this.allUsers.map((user) => {
         return user.boleta;
       });
-      const filtredBoletas = boletas.filter((boleta) => boleta != this.currentUser.boleta);
-      
+      const filtredBoletas = boletas.filter(
+        (boleta) => boleta != this.currentUser.boleta
+      );
+      console.log(filtredBoletas);
       if (!filtredBoletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {

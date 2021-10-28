@@ -114,10 +114,12 @@
                               outlined
                               dense
                               color="primary"
-                              prepend-inner-icon="mdi-account"
+                              prepend-inner-icon="mdi-message-text "
                               v-model="newNameChannel"
-                              :rules="[rules.required]"
+                              :rules="[rules.required, rules.regexNameChannel]"
                               @keyup.enter="editChannel"
+                              @keydown.esc="closeAddSpace"
+                              autocomplete="off"
                             ></v-text-field>
                           </v-col>
                         </v-row>
@@ -130,9 +132,7 @@
                         @click="editChannel"
                         >Aceptar</v-btn
                       >
-                      <v-btn text @click="dialogRenameChanel = false"
-                        >Cancelar</v-btn
-                      >
+                      <v-btn text @click="closeAddSpace">Cancelar</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -269,6 +269,8 @@ export default class NameChannels extends Vue {
   public newNameChannel = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    regexNameChannel: (v: string): string | boolean =>
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
   public permissions = {} as PermissionsPath;
   public statusCheckbox = false;
@@ -328,6 +330,12 @@ export default class NameChannels extends Vue {
     } else {
       await this.RemovePermission(this.permissions);
     }
+  }
+
+  closeAddSpace() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialogRenameChanel = false;
   }
 }
 </script>
