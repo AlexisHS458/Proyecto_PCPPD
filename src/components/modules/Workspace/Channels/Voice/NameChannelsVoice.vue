@@ -156,7 +156,7 @@
         </v-list-item-content>
       </v-list-item>
     </v-list>
-    <div ref="audioContainer"></div>
+    <div ref="audioContainer" class="audio-container"></div>
   </div>
   <!-- </v-hover> -->
 </template>
@@ -311,11 +311,18 @@ export default class NameChannels extends Vue {
 
   mounted() {
     VoiceService.allUsers(this.currentUser.uid!, this.channel.uid!, async users => {
-      if(!users.find((user)=> user.uid === this.currentUser.uid)){
-        this.stream?.getTracks().forEach((track) => {
+      if (!users.find(user => user.uid === this.currentUser.uid)) {
+        this.stream?.getTracks().forEach(track => {
           track.stop();
-        })
-        this.stream = undefined
+        });
+        this.stream = undefined;
+        this.peers.forEach(peer => {
+          peer.on("stream", stream => {
+            stream.getTracks().forEach(track => {
+              track.stop();
+            });
+          });
+        });
       }
       this.usersDisplay = await Promise.all(
         users.map(user => UserService.getUserInfoByID(user.uid))
@@ -351,8 +358,6 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("stream", stream => {
-      console.log("onStream");
-
       const audio = document.createElement("audio");
       audio.srcObject = stream;
       (this.$refs.audioContainer as any).appendChild(audio);
@@ -379,8 +384,6 @@ export default class NameChannels extends Vue {
     peer.signal(incomingSignal);
 
     peer.on("stream", stream => {
-      console.log("onStream");
-
       const audio = document.createElement("audio");
       audio.srcObject = stream;
       (this.$refs.audioContainer as any).appendChild(audio);
@@ -406,8 +409,6 @@ export default class NameChannels extends Vue {
     });
 
     VoiceService.listenReturningSignal(this.currentUser.uid!, payloadSignal => {
-      console.log("payloadSignal.userIDToSignal", payloadSignal.userIDToSignal);
-
       if (payloadSignal.userIDToSignal) {
         const item = this.peers.get(payloadSignal.userIDToSignal);
         item?.signal(payloadSignal.signal);
@@ -464,5 +465,9 @@ export default class NameChannels extends Vue {
 
 .no-select-item {
   background-color: #000029;
+}
+
+.audio-container {
+  visibility: hidden;
 }
 </style>
