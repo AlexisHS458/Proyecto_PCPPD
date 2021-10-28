@@ -16,15 +16,31 @@ class VoiceChannelService {
     return voiceChannelSocket(uid).emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
   }
 
+  /**
+   * Conecta un socket a un room
+   * @param uid uid del usuarios
+   * @param roomID ID del room a unirse
+   * @param createNewSocket si es true creara una nueva instancia del socket al unirse
+   */
   joinRoom(uid: string, roomID: string, createNewSocket = true): Socket {
     return voiceChannelSocket(uid,createNewSocket).emit(EventName.JOIN_ROOM,roomID);
   }
 
-
+  /**
+   * Abandona un canal de voz
+   * @param uid uid de usuario a abandonar el canal de voz
+   * @returns 
+   */
   leaveVoiceChannel(uid: string): Socket{
     return voiceChannelSocket(uid).emit(EventName.LEAVE_VOICE_CHANNEL);
   }
 
+  /**
+   * Obtiene todos los usuarios dentro de un canal de voz
+   * @param uid ID del usuarios
+   * @param voiceChannelID canal de voz de donde se obtendran los usuarios
+   * @param onEvent suscripción al evento
+   */
   allUsers(uid: string, voiceChannelID: string, onEvent: (users: SocketUser[]) => void): Socket {
     return this.joinRoom(uid,voiceChannelID).on(ResponseEventName.ALL_USERS, payload => {
       onEvent(Object.values(payload));
@@ -32,7 +48,11 @@ class VoiceChannelService {
 
   }
 
-  
+  /**
+   * Obtiene la lista de usuario cuando un usuario nuevo se une al canal de voz
+   * @param uid ID del usuario
+   * @param onEvent suscripción al eventro 
+   */
   joinedUsers(uid: string, onEvent: (users: SocketUser[]) => void): Socket {
     return voiceChannelSocket(uid).on(ResponseEventName.JOINED_USERS, payload => {
       onEvent(Object.values(payload));

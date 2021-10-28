@@ -75,22 +75,23 @@ class UserService {
   }
 
 
-  /**
-   * Recupera todos los usuarios de la base de datos
-   * @param onSnapshot Snapshot de la colección de usuarios
-   */
-  getUsers(onSnapshot: (user: User[]) => void): void {
-    db.collection(Collection.USERS).get().then(snapshot => {
-        onSnapshot(
-            snapshot.docs.map<User>(doc => {
-                const user = {
-                    ...doc.data(),
-                    uid: doc.id
-                };
-                return <User>user;
-            })
-        );
+ /**
+  * Recupera todos los usuarios de la base de datos
+  * @returns Lista de usuarios
+  */
+  async getUsers(): Promise<User[]>{
+
+    const snapshot = await db.collection(Collection.USERS).get();
+    const users: User[] = [];
+
+    snapshot.forEach((doc) => {
+        const user = {
+          ...doc.data(),
+          uid: doc.id
+        }
+        users.push(<User>user);
     });
+    return users
   }
 
   /**

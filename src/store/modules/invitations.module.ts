@@ -134,13 +134,11 @@ class InivtationsModule extends VuexModule {
   * @param userIDs IDs de los usuarios dentro del workspace
   */
   @Action
-  fetchUserNames(userIDs: string[]): void {
+  async fetchUserNames(userIDs: string[]): Promise<void>{
     this.context.commit("setLoadingUserNamesStatus", true);
-    UserService.getUsers(users => {
-      const filterUsers = users.filter((user) => !userIDs.includes(user.uid!))
-      this.context.commit("setUserNamesList", filterUsers);
-      this.context.commit("setLoadingUserNamesStatus", false);
-    });
+    const filterUsers = (await UserService.getUsers()).filter((user) => !userIDs.includes(user.uid!));
+    this.context.commit("setUserNamesList", filterUsers);
+    this.context.commit("setLoadingUserNamesStatus", false);
   }
 
   /**
