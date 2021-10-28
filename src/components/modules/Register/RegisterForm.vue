@@ -202,9 +202,9 @@ export default class Register extends Vue {
     //Se obtiene información del usuario.
     await this.fetchCurrentUser();
     //Si el usuario ya esta regsitrado será redireccionado a la pantalla principal
-    if (this.isLoggedIn) {
+    /*  if (this.isLoggedIn) {
       this.$router.push("/Mainscreen");
-    }
+    } */
   }
 
   /**

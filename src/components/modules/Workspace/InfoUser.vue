@@ -3,7 +3,15 @@
     <v-app-bar v-if="isConnected" color="primaryDark" dense class="toolbar">
       <v-toolbar-title> Conectado </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="disconnect" v-if="isConnected">
+      <v-btn
+        icon
+        @click="
+          disconnect(
+            'http://soundbible.com/mp3/Elevator Ding-SoundBible.com-685385892.mp3'
+          )
+        "
+        v-if="isConnected"
+      >
         <v-icon color="errorLight">mdi-phone-remove</v-icon>
       </v-btn>
       <v-btn icon>
@@ -68,8 +76,12 @@ export default class UserInfo extends Vue {
     this.isTalk = !this.isTalk;
   }
 
-  disconnect() {
+  disconnect(sound: string) {
     VoiceService.leaveVoiceChannel(this.currentUser.uid!);
+    if (sound) {
+      var audio = new Audio(sound);
+      audio.play();
+    }
   }
 
   mounted() {
