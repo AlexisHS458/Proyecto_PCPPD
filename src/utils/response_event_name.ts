@@ -6,6 +6,7 @@ export enum ResponseEventName{
     CODE = 'code',
 
     //VoiceChannel
+    JOINED_USERS='joined-users',
     ALL_USERS = 'all-users',
     USER_STATUS = 'user-status',
     RECEIVING_RETURNED_SIGNAL = 'receiving returned signal',

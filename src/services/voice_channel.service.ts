@@ -16,8 +16,8 @@ class VoiceChannelService {
     return voiceChannelSocket(uid).emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
   }
 
-  joinRoom(uid: string, voiceChannelID: string): Socket {
-    return voiceChannelSocket(uid,true).emit(EventName.JOIN_ROOM,voiceChannelID);
+  joinRoom(uid: string, roomID: string, createNewSocket = true): Socket {
+    return voiceChannelSocket(uid,createNewSocket).emit(EventName.JOIN_ROOM,roomID);
   }
 
 
@@ -28,13 +28,17 @@ class VoiceChannelService {
   allUsers(uid: string, voiceChannelID: string, onEvent: (users: SocketUser[]) => void): Socket {
     return this.joinRoom(uid,voiceChannelID).on(ResponseEventName.ALL_USERS, payload => {
       onEvent(Object.values(payload));
+    }).emit(EventName.EMIT_USERS, voiceChannelID);
+
+  }
+
+  
+  joinedUsers(uid: string, onEvent: (users: SocketUser[]) => void): Socket {
+    return voiceChannelSocket(uid).on(ResponseEventName.JOINED_USERS, payload => {
+      onEvent(Object.values(payload));
     });
   }
 
-  emitUsers(uid: string, voiceChannelID: string): Socket{
-    return voiceChannelSocket(uid).emit(EventName.EMIT_USERS,voiceChannelID)
-  }
-  
   userStatus(
     uid: string,
     onEvent: (channelID: string | undefined) => void
@@ -63,23 +67,20 @@ class VoiceChannelService {
     uid: string,
     onEvent: (signalPayload: SignalPayload) => void
   ): Socket {
-    const socket = voiceChannelSocket(uid);
-    socket.on(`${uid}-${ResponseEventName.USER_JOINED}`,(payload)=>{
+    return voiceChannelSocket(uid).on(ResponseEventName.USER_JOINED,(payload)=>{
       onEvent(payload);
     });
-    return socket;
   }
 
   listenReturningSignal(
     uid: string,
     onEvent: (signalPayload: SignalPayload) => void
   ): Socket {
-    const socket = voiceChannelSocket(uid);
-
-    socket.on(`${uid}-${ResponseEventName.RECEIVING_RETURNED_SIGNAL}`,(payload)=>{
+    return this.joinRoom(uid,uid,false).on(ResponseEventName.RECEIVING_RETURNED_SIGNAL,(payload)=>{
+      console.log('receiving signal', payload);
+      
       onEvent(payload);
     });
-    return socket;
   }
 }
 

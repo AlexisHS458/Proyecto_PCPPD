@@ -95,51 +95,49 @@ class VoiceChannelModule extends VuexModule{
            return peer;
        }
         
-        VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
-            payloadAction.htmlDivElement.innerHTML = '';
-            if(!channelID){
-                return;
-            }
-            navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
-                VoiceChannelService.allUsers(payloadAction.userID, channelID, (users) =>{
-                    
-                    this.context.commit(
-                        "setPeers",
-                        new Map<string, Peer.Instance>(
-                            users.map((user) => [
-                                user.uid,
-                                createPeer(
-                                   user.uid,
-                                   payloadAction.userID,
-                                   stream,
-                                   payloadAction.htmlDivElement
-                                )
-                            ])
-                        )
-                    );
-                    
-                    VoiceChannelService.listenUserJoined(payloadAction.userID, (payloadSignal) => {
-                        const peer = addPeer(
-                            payloadSignal.signal,
-                            payloadSignal.callerID,
-                            stream,
-                            channelID);
-                        this.context.commit("addPeerToState", {
-                            id: payloadAction.userID,
-                            peer: peer
-                        });
-                    });
+        // VoiceChannelService.userStatus(payloadAction.userID, (channelID) => {
+        //     payloadAction.htmlDivElement.innerHTML = '';
+        //     if(!channelID){
+        //         return;
+        //     }
+        // }); 
 
-                    VoiceChannelService.listenReturningSignal(payloadAction.userID, (payloadSignal) => {
-                        if(payloadSignal.userIDToSignal){
-                            const item = this.peers.get(payloadSignal.userIDToSignal);
-                            item?.signal(payloadSignal.signal);
-                        }    
-                    });
+        // navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
+        //     VoiceChannelService.joinedUsers(payloadAction.userID, (users) => {                    
+        //         this.context.commit(
+        //             "setPeers",
+        //             new Map<string, Peer.Instance>(
+        //                 users.filter((user) => user.uid != payloadAction.userID).map((user) => [
+        //                     user.uid,
+        //                     createPeer(
+        //                        user.uid,
+        //                        payloadAction.userID,
+        //                        stream,
+        //                        payloadAction.htmlDivElement
+        //                     )
+        //                 ])
+        //             )
+        //         );
+        //     });
+        //     VoiceChannelService.listenUserJoined(payloadAction.userID, (payloadSignal) => {
+        //         const peer = addPeer(
+        //             payloadSignal.signal,
+        //             payloadSignal.callerID,
+        //             stream,
+        //             channelID);
+        //         this.context.commit("addPeerToState", {
+        //             id: payloadAction.userID,
+        //             peer: peer
+        //         });
+        //     });
 
-                });
-            });
-        }); 
+        //     VoiceChannelService.listenReturningSignal(payloadAction.userID, (payloadSignal) => {
+        //         if(payloadSignal.userIDToSignal){
+        //             const item = this.peers.get(payloadSignal.userIDToSignal);
+        //             item?.signal(payloadSignal.signal);
+        //         }    
+        //     });
+        // });
     }
     
 }
