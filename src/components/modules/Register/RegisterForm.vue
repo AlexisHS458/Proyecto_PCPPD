@@ -50,7 +50,12 @@
                     <v-text-field
                       label="Boleta o Número de empleado"
                       v-model="currentUser.boleta"
-                      :rules="[rules.required, rules.regexBoleta]"
+                      :rules="[
+                        rules.required,
+                        rules.regexBoleta,
+                        rules.caracteres,
+                        rules.caracteresMayor,
+                      ]"
                       outlined
                       dense
                       color="primary"
@@ -186,6 +191,10 @@ export default class Register extends Vue {
       ) || "Apellido inválido",
     regexBoleta: (v: string): string | boolean =>
       /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválida",
+    caracteres: (v: string): string | boolean =>
+      v.length >= 7 || "Este campo no puede tener menor de 7 caracteres",
+    caracteresMayor: (v: string): string | boolean =>
+      v.length <= 15 || "Este campo no puede tener más de 15 caracteres",
   };
 
   async created(): Promise<void> {

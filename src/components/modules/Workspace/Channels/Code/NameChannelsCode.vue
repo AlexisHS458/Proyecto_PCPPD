@@ -117,8 +117,12 @@
                                 color="primary"
                                 prepend-inner-icon="mdi-code-tags"
                                 v-model="newNameChannel"
-                                :rules="[rules.required]"
+                                :rules="[
+                                  rules.required,
+                                  rules.regexNameChannel,
+                                ]"
                                 @keyup.enter="editChannel"
+                                @keydown.esc="closeAddSpace"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -131,9 +135,7 @@
                           @click="editChannel"
                           >Aceptar</v-btn
                         >
-                        <v-btn text @click="dialogRenameChanel = false"
-                          >Cancelar</v-btn
-                        >
+                        <v-btn text @click="closeAddSpace">Cancelar</v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
@@ -300,6 +302,8 @@ export default class NameChannels extends Vue {
   public permissions = {} as PermissionsPath;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    regexNameChannel: (v: string): string | boolean =>
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
   public usersDisplay: User[] = [];
   /**
@@ -369,8 +373,14 @@ export default class NameChannels extends Vue {
     CodeService.emitUsers(this.currentUser.uid!, this.channel.uid!);
   }
 
-   imgError(e: any) {
+  imgError(e: any) {
     e.target.src = image;
+  }
+
+  closeAddSpace() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialogRenameChanel = false;
   }
 }
 </script>
