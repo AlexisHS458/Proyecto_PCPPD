@@ -25,7 +25,7 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              v-show="channels.length < 2"
+              
               class="add flex-shrink-1 flex-grow-0 mx-2"
               icon
               color="white"
