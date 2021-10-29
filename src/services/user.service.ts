@@ -95,16 +95,13 @@ class UserService {
    * @param usersIDs ID de los usuarios a consultar información
    * @param onSnapshot funcion que contiene la lista de usuarios obtenidos
    */
-  getUsersByID(usersIDs: string[], onSnapshot: (users: User[]) => void): void {
-    db.collection(Collection.USERS)
-      .where("uid", "in", usersIDs)
-      .onSnapshot(snapshot => {
-        onSnapshot(
-          snapshot.docs.map<User>(doc => {
-            return <User>doc.data();
-          })
-        );
-      });
+  async getUsersByID(usersIDs: string[]): Promise<User[]> {
+    const users: User[] = [];
+    
+    const snapshot = await db.collection(Collection.USERS).where("uid", "in", usersIDs).get();
+    snapshot.forEach(doc => users.push(<User>doc.data()));
+
+    return users;
   }
 
   updateUserWorkspaceCount(uid: string, isIncrement: boolean): void {
