@@ -99,7 +99,7 @@ export default class InvitationsCard extends Vue {
 
   async acceptInvitationToWorkspace() {
     await this.fetchMyWorkspace(this.invitation.idEspacioTrabajo);
-    if (this.currentUser.workspacesCollab! < 2) {
+    if ((this.currentUser.workspacesCollab || 0) < 2) {
       if (this.workspace.usuarios.length < 7) {
         await this.acceptInvitation(this.invitation);
         if (this.status.showSnackbar && !this.status.showSnackbarError) {
