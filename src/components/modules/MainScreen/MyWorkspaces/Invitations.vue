@@ -38,8 +38,10 @@ import { Invitation } from "@/models/invitation";
 import { StringUtils } from "@/utils/stringsUtils";
 import { namespace } from "vuex-class";
 import { Workspace } from "@/models/workspace";
+import { User } from "@/models/user";
 const OptionsInvitation = namespace("InvitationsModule");
 const MyWorkSpace = namespace("WorkspaceModule");
+const User = namespace("UserModule");
 @Component
 export default class InvitationsCard extends Vue {
   @Prop({
@@ -89,22 +91,32 @@ export default class InvitationsCard extends Vue {
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
 
+  @User.State("user")
+  private currentUser!: User;
+
   public getInitials = StringUtils.getInitials;
   public show = true;
 
   async acceptInvitationToWorkspace() {
     await this.fetchMyWorkspace(this.invitation.idEspacioTrabajo);
-    if (this.workspace.usuarios.length < 7) {
-      await this.acceptInvitation(this.invitation);
-      if (this.status.showSnackbar && !this.status.showSnackbarError) {
-        this.show = false;
+    if (this.currentUser.workspacesCollab! < 2) {
+      if (this.workspace.usuarios.length < 7) {
+        await this.acceptInvitation(this.invitation);
+        if (this.status.showSnackbar && !this.status.showSnackbarError) {
+          this.show = false;
+        } else {
+          this.show = false;
+        }
       } else {
-        this.show = false;
+        this.setVisibleSnackBarWarning();
+        this.setMessageOnSnackbar(
+          "No hay lugares para unirse a este espacio de trabajo. <br> Contacta al administrador que te invitó."
+        );
       }
     } else {
       this.setVisibleSnackBarWarning();
       this.setMessageOnSnackbar(
-        "No hay lugares para unirse a este espacio de trabajo. <br> Contacta al administrador que te invitó."
+        "No puedes pertenecer más de dos espacios como colaborador"
       );
     }
   }

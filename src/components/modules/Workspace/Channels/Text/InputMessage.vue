@@ -133,6 +133,10 @@ export default class InputMessage extends Vue {
     }
   }
 
+  destroyed() {
+    this.message = "";
+  }
+
   /*   preventEnter(event: KeyboardEvent) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
