@@ -10,9 +10,7 @@ class UserService {
    * Obtiene la información almacenada en Firestore.
    * @returns Información del usuario autenticado.
    */
-  async getUserAuthInfo(
-    onSnapshot: (user: User) => void
-  ): Promise<User> {
+  async getUserAuthInfo(onSnapshot: (user: User) => void): Promise<User> {
     return new Promise((resolve, reject) => {
       auth.onAuthStateChanged(user => {
         if (user) {
@@ -22,7 +20,7 @@ class UserService {
               value => {
                 const userData = value.data();
                 if (userData) {
-                  onSnapshot(<User>userData)
+                  onSnapshot(<User>userData);
                   resolve(<User>userData);
                 }
               },
@@ -74,24 +72,22 @@ class UserService {
       .update(user);
   }
 
-
- /**
-  * Recupera todos los usuarios de la base de datos
-  * @returns Lista de usuarios
-  */
-  async getUsers(): Promise<User[]>{
-
+  /**
+   * Recupera todos los usuarios de la base de datos
+   * @returns Lista de usuarios
+   */
+  async getUsers(): Promise<User[]> {
     const snapshot = await db.collection(Collection.USERS).get();
     const users: User[] = [];
 
-    snapshot.forEach((doc) => {
-        const user = {
-          ...doc.data(),
-          uid: doc.id
-        }
-        users.push(<User>user);
+    snapshot.forEach(doc => {
+      const user = {
+        ...doc.data(),
+        uid: doc.id
+      };
+      users.push(<User>user);
     });
-    return users
+    return users;
   }
 
   /**
@@ -99,11 +95,8 @@ class UserService {
    * @param usersIDs ID de los usuarios a consultar información
    * @param onSnapshot funcion que contiene la lista de usuarios obtenidos
    */
-  getUsersByID(
-    usersIDs: string[],
-    onSnapshot: (users: User[]) => void
-    ): void {
-      db.collection(Collection.USERS)
+  getUsersByID(usersIDs: string[], onSnapshot: (users: User[]) => void): void {
+    db.collection(Collection.USERS)
       .where("uid", "in", usersIDs)
       .onSnapshot(snapshot => {
         onSnapshot(
@@ -115,20 +108,36 @@ class UserService {
   }
 
   updateUserWorkspaceCount(uid: string, isIncrement: boolean): void {
-    if(isIncrement){
-      db.collection(Collection.USERS).doc(uid).update({
-        'workspacesCount' : FieldValue.increment(1)
-      });
-  
+    if (isIncrement) {
+      db.collection(Collection.USERS)
+        .doc(uid)
+        .update({
+          workspacesCount: FieldValue.increment(1)
+        });
+    } else {
+      db.collection(Collection.USERS)
+        .doc(uid)
+        .update({
+          workspacesCount: FieldValue.increment(-1)
+        });
     }
-    else{
-      db.collection(Collection.USERS).doc(uid).update({
-        'workspacesCount' : FieldValue.increment(-1)
-      });
-    }
-  
   }
-  
+
+  updateUserWorkspaceCollab(uid: string, isIncrement: boolean): void {
+    if (isIncrement) {
+      db.collection(Collection.USERS)
+        .doc(uid)
+        .update({
+          workspacesCollab: FieldValue.increment(1)
+        });
+    } else {
+      db.collection(Collection.USERS)
+        .doc(uid)
+        .update({
+          workspacesCollab: FieldValue.increment(-1)
+        });
+    }
+  }
 }
 
 export default new UserService();
