@@ -85,11 +85,9 @@ class WorkSpaceService {
   getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void): void {
     db.collection(Collection.WORK_SPACE)
       .doc(workspaceID)
-      .onSnapshot(snapshot => {
+      .onSnapshot(async snapshot => {
         const workspaceData = <Workspace>snapshot.data();
-        UserService.getUsersByID(workspaceData.usuarios, users => {
-          onSnapshot(users);
-        });
+        onSnapshot(await UserService.getUsersByID(workspaceData.usuarios));
       });
   }
 
