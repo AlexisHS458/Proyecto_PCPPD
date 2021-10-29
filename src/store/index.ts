@@ -4,7 +4,9 @@ import UserModule from "./modules/user.module";
 import MainScreenModule from "./modules/main_screen.module";
 import WorkspaceModule from "./modules/workspace.module";
 import TextChannelModule from "./modules/text_channel.module";
-
+import InvitationsModule from "./modules/invitations.module";
+import PermissionsModule from "./modules/permissions.module";
+import CodeChannelModule from "./modules/code_channel.module";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -15,6 +17,9 @@ export default new Vuex.Store({
     UserModule,
     MainScreenModule,
     WorkspaceModule,
-    TextChannelModule
+    TextChannelModule,
+    InvitationsModule,
+    PermissionsModule,
+    CodeChannelModule
   }
 });

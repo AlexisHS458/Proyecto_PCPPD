@@ -10,6 +10,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "allowJs": true,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
@@ -33,7 +34,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx"
-  ],
+, "src/utils/hashCode.js"  ],
   "exclude": [
     "node_modules"
   ]
