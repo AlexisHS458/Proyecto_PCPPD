@@ -79,7 +79,6 @@ class InvitationsService{
      * @param invitation invitacion a eliminar
      */
     async deleteInvitation(invitation: Invitation): Promise<void>{
-        UserService.updateUserWorkspaceCollab(invitation.idUsuarioInvitado, false);
         return await db.collection(Collection.USERS).doc(invitation.idUsuarioInvitado)
         .collection(Collection.INVITATIONS).doc(invitation.uid).delete();
     }

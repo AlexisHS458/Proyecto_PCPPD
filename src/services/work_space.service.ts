@@ -99,6 +99,7 @@ class WorkSpaceService {
    * @param IDWorkSpace espacio de trabajo
    */
   async removeUser(IDUser: string, IDWorkSpace: string): Promise<void> {
+    UserService.updateUserWorkspaceCollab(IDUser, false);
     return await db
       .collection(Collection.WORK_SPACE)
       .doc(IDWorkSpace)
