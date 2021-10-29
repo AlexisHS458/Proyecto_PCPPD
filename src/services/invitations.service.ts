@@ -70,7 +70,7 @@ class InvitationsService{
         .update({
             'usuarios': FieldValue.arrayUnion(invitation.idUsuarioInvitado)
         });
-        UserService.updateUserWorkspaceCollab(invitation.idUsuarioInvitado, true);
+        await UserService.updateUserWorkspaceCollab(invitation.idUsuarioInvitado, true);
         return await this.deleteInvitation(invitation);
     }
 
