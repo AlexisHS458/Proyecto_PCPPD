@@ -180,7 +180,7 @@ export default class ViewEdit extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     caracteres: (v: string): string | boolean =>
-      (v || "").length >= 7 ||
+      (v || "").length >= 6 ||
       "Este campo no puede tener menor de 7 caracteres",
     caracteresMayor: (v: string): string | boolean =>
       (v || "").length <= 15 ||
