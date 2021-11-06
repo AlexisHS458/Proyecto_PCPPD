@@ -203,7 +203,7 @@ export default class Register extends Vue {
       /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválida",
     caracteres: (v: string): string | boolean =>
       (v || "").length >= 6 ||
-      "Este campo no puede tener menor de 7 caracteres",
+      "Este campo no puede tener menor de 6 caracteres",
     caracteresMayor: (v: string): string | boolean =>
       (v || "").length <= 15 ||
       "Este campo no puede tener más de 15 caracteres",

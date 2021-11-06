@@ -1,8 +1,10 @@
 export enum ResponseEventName{
 
     //CodeChannel
-    USERS_IN_CODE_CHANNEL = 'users-in-code-channel',
-    GET_COORDINAES = 'coordinates',
+    CODE_JOINED_USERS = 'code-joined-users',
+    CODE_ALL_USERS = 'code-all-users',
+    CODE_USER_STATUS = 'code-user-status',
+    COORDINAES = 'coordinates',
     CODE = 'code',
 
     //VoiceChannel
