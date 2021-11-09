@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
+import {SOCKET_SERVER_ENDPOINT} from "./constants"
 
-const endpoit = `${process.env.VUE_APP_SOCKET_SERVER_ENDPOINT}voiceChannel`;
+const endpoit = `${SOCKET_SERVER_ENDPOINT}voiceChannel`;
 let vcSocket: Socket;
 let vcUID: string;
 
@@ -20,7 +21,9 @@ const voiceChannelSocket = (uid: string, createNewSocket = false): Socket => {
   }
 };
 
-const endpoitCC = `${process.env.VUE_APP_SOCKET_SERVER_ENDPOINT}codeChannel`;
+const endpoitCC = `${SOCKET_SERVER_ENDPOINT}codeChannel`;
+console.log(endpoitCC);
+
 let ccSocket: Socket;
 let ccUID: string;
 

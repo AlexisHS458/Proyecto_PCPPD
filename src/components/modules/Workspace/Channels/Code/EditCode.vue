@@ -14,7 +14,7 @@
         v-for="cursor in userPointers"
         :key="cursor.userID"
         :style="{
-          top: getMyScroll() + cursor.y - cursor.scroll + 'px',
+          top: getMyScroll() + cursor.y + 41 - cursor.scroll + 'px',
           left: cursor.x + getOffSet() + 'px',
         }"
         :cursor="cursor"
