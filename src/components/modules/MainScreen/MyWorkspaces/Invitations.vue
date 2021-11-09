@@ -19,7 +19,11 @@
 
         <v-card-text>
           <v-row align="center" justify="space-around">
-            <v-btn color="success" @click="acceptInvitationToWorkspace">
+            <v-btn
+              color="success"
+              @click="acceptInvitationToWorkspace"
+              :loading="loading"
+            >
               Aceptar <v-icon class="ml-6"> mdi-check </v-icon>
             </v-btn>
             <v-btn color="error" @click="declineInvitationToWorkspace">
@@ -64,6 +68,9 @@ export default class InvitationsCard extends Vue {
   @OptionsInvitation.Action
   private setVisibleSnackBarWarning!: () => void;
 
+  @OptionsInvitation.Action
+  private setVisibleSnackBar!: () => void;
+
   /**
    * Estados obtenidos del @module Invitations
    */
@@ -96,24 +103,31 @@ export default class InvitationsCard extends Vue {
 
   public getInitials = StringUtils.getInitials;
   public show = true;
+  public loading = false;
 
   async acceptInvitationToWorkspace() {
+    this.loading = true;
     await this.fetchMyWorkspace(this.invitation.idEspacioTrabajo);
     if ((this.currentUser.workspacesCollab || 0) < 2) {
       if (this.workspace.usuarios.length < 7) {
+        this.loading = false;
         await this.acceptInvitation(this.invitation);
-        if (this.status.showSnackbar && !this.status.showSnackbarError) {
+        this.show = false;
+
+        /*   if (this.status.showSnackbar && !this.status.showSnackbarError) {
           this.show = false;
         } else {
           this.show = false;
-        }
+        } */
       } else {
+        this.loading = false;
         this.setVisibleSnackBarWarning();
         this.setMessageOnSnackbar(
           "No hay lugares para unirse a este espacio de trabajo. <br> Contacta al administrador que te invitó."
         );
       }
     } else {
+      this.loading = false;
       this.setVisibleSnackBarWarning();
       this.setMessageOnSnackbar(
         "No puedes pertenecer más de dos espacios como colaborador"

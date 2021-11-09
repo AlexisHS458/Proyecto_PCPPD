@@ -361,16 +361,11 @@ export default class NameChannels extends Vue {
   } */
 
   mounted() {
-    CodeService.usersInCodeChannel(
-      this.currentUser.uid!,
-      this.channel.uid!,
-      async (users) => {
-        this.usersDisplay = await Promise.all(
-          users.map((user) => UserService.getUserInfoByID(user.uid))
-        );
-      }
-    );
-    CodeService.emitUsers(this.currentUser.uid!, this.channel.uid!);
+    CodeService.allUsers(this.currentUser.uid!, this.channel.uid!, async users => {
+      this.usersDisplay = await Promise.all(
+        users.map(user => UserService.getUserInfoByID(user.uid))
+      );
+    });
   }
 
   imgError(e: any) {

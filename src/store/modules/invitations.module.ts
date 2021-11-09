@@ -129,14 +129,14 @@ class InivtationsModule extends VuexModule {
       });
   }
 
- /**
-  * Recupera los usuarios de la base de datos para enviar invitación
-  * @param userIDs IDs de los usuarios dentro del workspace
-  */
+  /**
+   * Recupera los usuarios de la base de datos para enviar invitación
+   * @param userIDs IDs de los usuarios dentro del workspace
+   */
   @Action
-  async fetchUserNames(userIDs: string[]): Promise<void>{
+  async fetchUserNames(userIDs: string[]): Promise<void> {
     this.context.commit("setLoadingUserNamesStatus", true);
-    const filterUsers = (await UserService.getUsers()).filter((user) => !userIDs.includes(user.uid!));
+    const filterUsers = (await UserService.getUsers()).filter(user => !userIDs.includes(user.uid!));
     this.context.commit("setUserNamesList", filterUsers);
     this.context.commit("setLoadingUserNamesStatus", false);
   }
@@ -150,7 +150,10 @@ class InivtationsModule extends VuexModule {
       .acceptInvitation(invitation)
       .then(() => {
         this.context.commit("invitationAcceptedSuccess");
-        this.context.commit("setSnackBarMessage", "Se acepto correctamente la invitación");
+        this.context.commit(
+          "setSnackBarMessage",
+          "Se acepto correctamente la invitación a " + invitation.nombreEspacioTrabajo
+        );
         this.context.commit("setShowSnackBarMessage", true);
       })
       .catch(() => {

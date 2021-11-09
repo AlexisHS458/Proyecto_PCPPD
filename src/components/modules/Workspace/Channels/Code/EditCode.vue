@@ -92,7 +92,6 @@ export default class EditCode extends Vue {
 
     CodeService.getCoordinates(
       this.currentUser.uid!,
-      this.$route.params.idChannelCode,
       (coordinates) => {
         this.userPointers = coordinates.filter((cursor) => {
           return cursor.userID !== this.currentUser.uid;
@@ -101,11 +100,7 @@ export default class EditCode extends Vue {
     );
     CodeService.getDataCode(
       this.currentUser.uid!,
-      this.$route.params.idChannelCode,
       (code) => {
-       console.log(code);
-      
-        
         this.options.setValue(code);
       }
     );
