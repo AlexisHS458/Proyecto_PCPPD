@@ -45,15 +45,16 @@ class CodeChannelService {
       x: number;
       y: number;
     }
-  ) {
-    codeChannelSocket(uid).emit(EventName.SENT_COORDINATES, coordinates);
+  ): Socket {
+    return codeChannelSocket(uid).emit(EventName.SENT_COORDINATES, coordinates);
   }
 
   getCoordinates(
     uid: string,
     onEvent: (coordinates: CursorCoordinates[]) => void
-  ) {
-    codeChannelSocket(uid).on(ResponseEventName.COORDINAES, payload => {
+  ): Socket {
+    return codeChannelSocket(uid).on(ResponseEventName.COORDINAES, payload => {
+      console.log('Si llegan las coordenandas');
       onEvent(payload);
     });
   }
@@ -64,12 +65,12 @@ class CodeChannelService {
       channelID: string;
       code: string;
     }
-  ): void {
-    codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
+  ): Socket {
+    return codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
   }
 
-  getDataCode(uid: string, onEvent: (code: string) => void): void {
-    codeChannelSocket(uid).on(ResponseEventName.CODE, payload => {
+  getDataCode(uid: string, onEvent: (code: string) => void): Socket {
+    return codeChannelSocket(uid).on(ResponseEventName.CODE, payload => {
       onEvent(payload);
     });
   }
