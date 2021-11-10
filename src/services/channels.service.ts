@@ -231,14 +231,16 @@ class ChannelsService {
         .get();
       return (<VoiceChannel>snapshot.data()).nombre 
       }
-      case ChannelType.CODE: {
+      case ChannelType.CODE: {        
         const snapshot = await db
         .collection(Collection.WORK_SPACE)
         .doc(workspaceUID)
         .collection(Collection.CODE_CHANNEL)
         .doc(channelUID)
         .get();
-      return (<CodeChannel>snapshot.data()).nombre 
+      const codeData = <CodeChannel>snapshot.data();
+      console.log(codeData.nombre);
+      return codeData.nombre;
       }
       default: {
         return "";

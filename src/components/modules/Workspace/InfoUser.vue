@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-app-bar v-if="iSConnectedCode" color="primaryDark" dense class="toolbar">
-      <v-toolbar-title class="text-color">
-        Conectado: {{ nameCodeChannel }}</v-toolbar-title
-      >
+      <v-toolbar-title class="text-color"> Conectado: {{ nameCodeChannel }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="disconnectCode" v-if="iSConnectedCode">
         <v-icon color="errorLight">mdi-xml</v-icon>
@@ -11,17 +9,11 @@
     </v-app-bar>
 
     <v-app-bar v-if="isConnected" color="primaryDark" dense class="toolbar">
-      <v-toolbar-title
-        v-if="isConnectedStatus == 'Conectando'"
-        class="text-color-connecting"
-      >
-        {{ isConnectedStatus }}
+      <v-toolbar-title v-if="isConnectedStatus == 'Conectando'" class="text-color-connecting">
+        {{ isConnectedStatus + " a: " + nameVoiceChannel }}
       </v-toolbar-title>
-      <v-toolbar-title
-        v-else-if="isConnectedStatus == 'Conectado'"
-        class="text-color"
-      >
-        {{ isConnectedStatus }}
+      <v-toolbar-title v-else-if="isConnectedStatus == 'Conectado'" class="text-color">
+        {{ isConnectedStatus + ": " + nameVoiceChannel }}
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -70,7 +62,7 @@ const MyWorkSpace = namespace("WorkspaceModule");
 @Component
 export default class UserInfo extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -89,6 +81,7 @@ export default class UserInfo extends Vue {
   public isConnected = false;
   public iSConnectedCode = false;
   public nameCodeChannel = "";
+  public nameVoiceChannel = "";
   toggleMicrophone() {
     this.toggleIsMuteStatus();
     this.isTalk = !this.isTalk;
@@ -114,17 +107,26 @@ export default class UserInfo extends Vue {
     audio.play();
   }
 
-  async mounted() {
-    this.nameCodeChannel = await ServiceChannels.getChannelName(
-      ChannelType.CODE,
-      this.$route.params.id,
-      this.$route.params.idChannelCode
-    );
+  mounted() {
     console.log(this.nameCodeChannel);
-    VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
+    VoiceService.userStatus(this.currentUser.uid!, async isConnected => {
+      if (isConnected) {
+        this.nameVoiceChannel = await ServiceChannels.getChannelName(
+          ChannelType.VOICE,
+          this.$route.params.id,
+          isConnected
+        );
+      }
       this.isConnected = !!isConnected;
     });
-    CodeService.userStatus(this.currentUser.uid!, (isConnected) => {
+    CodeService.userStatus(this.currentUser.uid!, async isConnected => {
+      if (isConnected) {
+        this.nameCodeChannel = await ServiceChannels.getChannelName(
+          ChannelType.CODE,
+          this.$route.params.id,
+          isConnected
+        );
+      }
       this.iSConnectedCode = !!isConnected;
     });
   }
