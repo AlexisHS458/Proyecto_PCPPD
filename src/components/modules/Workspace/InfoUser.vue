@@ -1,32 +1,17 @@
 <template>
   <div>
-    <v-app-bar
-      v-if="isConnected || iSConnectedCode"
-      color="primaryDark"
-      dense
-      class="toolbar"
-    >
-      <v-toolbar-title
-        v-if="isConnectedStatus == 'Conectando'"
-        class="text-color-connecting"
-      >
+    <v-app-bar v-if="isConnected || iSConnectedCode" color="primaryDark" dense class="toolbar">
+      <v-toolbar-title v-if="isConnectedStatus == 'Conectando'" class="text-color-connecting">
         {{ isConnectedStatus }}
       </v-toolbar-title>
-      <v-toolbar-title
-        v-else-if="isConnectedStatus == 'Conectado'"
-        class="text-color"
-      >
+      <v-toolbar-title v-else-if="isConnectedStatus == 'Conectado'" class="text-color">
         {{ isConnectedStatus }}
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
       <v-btn
         icon
-        @click="
-          disconnect(
-            'http://soundbible.com/mp3/Elevator Ding-SoundBible.com-685385892.mp3'
-          )
-        "
+        @click="disconnect('http://soundbible.com/mp3/Elevator Ding-SoundBible.com-685385892.mp3')"
         v-if="isConnected"
       >
         <v-icon color="errorLight">mdi-phone-remove</v-icon>
@@ -42,7 +27,7 @@
             {{ currentUser.nombre + " " + currentUser.apellido }}
           </v-toolbar-title>
         </template>
-        <span>{{  isConnected + " " + iSConnectedCode}}</span>
+        <span>{{ isConnected + " " + iSConnectedCode }}</span>
       </v-tooltip>
       <v-spacer></v-spacer>
       <v-btn icon @click="toggleMicrophone">
@@ -71,7 +56,7 @@ const StatusVoice = namespace("VoiceChannelModule");
 @Component
 export default class UserInfo extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -86,7 +71,7 @@ export default class UserInfo extends Vue {
   public isListening = true;
   public isConnected = false;
   public iSConnectedCode = false;
- // currentUser.nombre + " " + currentUser.apellido
+  // currentUser.nombre + " " + currentUser.apellido
 
   toggleMicrophone() {
     this.toggleIsMuteStatus();
@@ -108,13 +93,14 @@ export default class UserInfo extends Vue {
 
   disconnectCode() {
     CodeService.leaveCodeChannel(this.currentUser.uid!);
+    this.$router.replace({ name: "notChannels" });
   }
 
   mounted() {
-    VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
+    VoiceService.userStatus(this.currentUser.uid!, isConnected => {
       this.isConnected = !!isConnected;
     });
-    CodeService.userStatus(this.currentUser.uid!, (isConnected) => {
+    CodeService.userStatus(this.currentUser.uid!, isConnected => {
       this.iSConnectedCode = !!isConnected;
     });
   }
