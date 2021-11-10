@@ -5,9 +5,7 @@
         color="white"
         class="mb-1"
         @click="
-          conectToVoiceChannel(
-            'http://soundbible.com/mp3/Air Plane Ding-SoundBible.com-496729130.mp3'
-          )
+          conectToVoiceChannel
         "
         slot-scope="{ hover }"
         :class="`${hover ? 'select-item' : 'no-select-item'}`"
@@ -322,7 +320,7 @@ export default class NameChannels extends Vue {
     }
   }
 
-  async conectToVoiceChannel(sound: string) {
+  async conectToVoiceChannel(){//sound: string) {
     VoiceService.userStatus(this.currentUser.uid!, isConnected => {
       this.isConnected = !!isConnected;
     });
@@ -330,10 +328,10 @@ export default class NameChannels extends Vue {
       this.setIsConnectedStatus(VoiceState.CONNECTING);
       await this.initSignaling();
       VoiceService.joinToVoiceChannel(this.currentUser.uid!, this.channel.uid!);
-      if (sound) {
-        var audio = new Audio(sound);
+     // if (sound) {
+        var audio = new Audio(require('@/assets/connected.mp3'));
         audio.play();
-      }
+      //}
     }
   }
 
