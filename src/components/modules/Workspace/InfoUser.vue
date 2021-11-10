@@ -68,12 +68,16 @@ export default class UserInfo extends Vue {
   @StatusVoice.State("isConnectedStatus")
   private isConnectedStatus!: VoiceState;
 
+  @StatusVoice.Action
+  private toggleIsMuteStatus!: () => void;
+
   public loading = false;
   public isTalk = true;
   public isListening = true;
   public isConnected = false;
 
   toggleMicrophone() {
+    this.toggleIsMuteStatus();
     this.isTalk = !this.isTalk;
   }
 

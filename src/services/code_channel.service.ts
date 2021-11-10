@@ -54,7 +54,6 @@ class CodeChannelService {
     onEvent: (coordinates: CursorCoordinates[]) => void
   ): Socket {
     return codeChannelSocket(uid).on(ResponseEventName.COORDINAES, payload => {
-      console.log('Si llegan las coordenandas');
       onEvent(payload);
     });
   }
