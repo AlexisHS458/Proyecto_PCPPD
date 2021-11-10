@@ -6,7 +6,9 @@
       @click="toggleShowNavigationDrawerChannels"
       >mdi-menu</v-icon
     >
-    <v-toolbar-title class="font-weight-medium">Equipo</v-toolbar-title>
+    <v-toolbar-title class="font-weight-medium">
+      {{ nameChannel }}
+    </v-toolbar-title>
     <v-spacer></v-spacer>
 
     <v-responsive max-width="180">
@@ -170,13 +172,18 @@
 
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
 const CodeChannel = namespace("CodeChannelModule");
 
 @Component
 export default class AppBarOptions extends Vue {
+  @Prop({
+    required: true,
+  })
+  public nameChannel!: string;
+
   @CodeChannel.Action
   private toggleShowTreeView!: () => void;
 

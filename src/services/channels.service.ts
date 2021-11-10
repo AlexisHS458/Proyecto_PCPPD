@@ -239,7 +239,7 @@ class ChannelsService {
         .doc(channelUID)
         .get();
       const codeData = <CodeChannel>snapshot.data();
-      console.log(codeData.nombre);
+
       return codeData.nombre;
       }
       default: {

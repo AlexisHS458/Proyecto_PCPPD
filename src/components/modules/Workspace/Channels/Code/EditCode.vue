@@ -1,12 +1,18 @@
 <template>
   <div>
     <div id="editCode" @mousemove="mouseIsMoving">
-      <app-bar-options ref="codeappbar"></app-bar-options>
+      <app-bar-options
+        ref="codeappbar"
+        :nameChannel="nameCodeChannel"
+      ></app-bar-options>
       <div
         id="container"
         :style="calculatedHeight"
         @keydown="getLine"
-        @keyup="getLine();sendCode();"
+        @keyup="
+          getLine();
+          sendCode();
+        "
         @mousedown="getLine"
       ></div>
       <cursor-component
@@ -30,12 +36,13 @@ import CursorComponent from "@/components/modules/Workspace/Channels/Code/Cursor
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
-
+import ServiceChannels from "@/services/channels.service";
 import CodeService from "@/services/code_channel.service";
 import { namespace } from "vuex-class";
 const User = namespace("UserModule");
 import { User } from "@/models/user";
 import { CursorCoordinates } from "@/models/cursorCoordinates";
+import { ChannelType } from "@/utils/channels_types";
 @Component({
   components: {
     /* MonacoEditor, */
@@ -66,9 +73,18 @@ export default class EditCode extends Vue {
   public line = 1;
   public userCode = "";
   public userPointers: CursorCoordinates[] = [];
+  public nameCodeChannel = "";
 
   mounted() {
     this.changeView();
+  }
+
+  async nameCode() {
+    this.nameCodeChannel = await ServiceChannels.getChannelName(
+      ChannelType.CODE,
+      this.$route.params.id,
+      this.$route.params.idChannelCode
+    );
   }
 
   changeView() {
@@ -76,7 +92,6 @@ export default class EditCode extends Vue {
       this.currentUser.uid!,
       this.$route.params.idChannelCode
     );
-
     this.initEditor();
     const code = this.$refs.codeappbar as any;
     window.visualViewport.addEventListener("resize", () => {
@@ -90,20 +105,17 @@ export default class EditCode extends Vue {
     }px;`;
     this.options.layout();
 
-    CodeService.getCoordinates(
-      this.currentUser.uid!,
-      (coordinates) => {
-        this.userPointers = coordinates.filter((cursor) => {
-          return cursor.userID !== this.currentUser.uid;
-        });
-      }
-    );
-    CodeService.getDataCode(
-      this.currentUser.uid!,
-      (code) => {
-        this.options.setValue(code);
-      }
-    );
+    CodeService.getCoordinates(this.currentUser.uid!, (coordinates) => {
+      this.userPointers = coordinates.filter((cursor) => {
+        return cursor.userID !== this.currentUser.uid;
+      });
+    });
+    CodeService.getDataCode(this.currentUser.uid!, (code) => {
+      this.options.setValue(code);
+    });
+    var audio = new Audio(require("@/assets/connected.mp3"));
+    audio.play();
+    this.nameCode();
   }
 
   updated() {
@@ -132,15 +144,13 @@ export default class EditCode extends Vue {
   } */
   getLine(): void {
     this.line = this.options.getPosition()!.lineNumber;
-    
   }
 
   sendCode(): void {
-
     CodeService.sendCode(this.currentUser.uid!, {
-          channelID: this.$route.params.idChannelCode,
-          code: this.options.getValue(),
-        });
+      channelID: this.$route.params.idChannelCode,
+      code: this.options.getValue(),
+    });
   }
 
   mouseIsMoving(e: MouseEvent): void {

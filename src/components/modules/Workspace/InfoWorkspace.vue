@@ -14,6 +14,7 @@
           max-height="40"
           max-width="40"
           contain
+          @click="disconnect"
         ></v-img>
       </v-btn>
 
@@ -156,6 +157,8 @@ import { namespace } from "vuex-class";
 const LeaveWorkspace = namespace("MainScreenModule");
 import { LeaveWorkspace } from "@/models/leaveWorkspace";
 const CodeChannel = namespace("CodeChannelModule");
+import VoiceService from "@/services/voice_channel.service";
+import CodeService from "@/services/code_channel.service";
 @Component
 export default class Toolbar extends Vue {
   @CodeChannel.State("status")
@@ -187,6 +190,7 @@ export default class Toolbar extends Vue {
   public singleSelect = false;
   public dialogLeave = false;
   public userLeave = {} as LeaveWorkspace;
+  public isConnected = false;
   public headers = [
     {
       sortable: false,
@@ -263,6 +267,18 @@ export default class Toolbar extends Vue {
 
   toNotChannels() {
     this.$router.replace({ name: "notChannels" });
+  }
+
+  disconnect() {
+    /*  VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
+      this.isConnected = !!isConnected;
+    });*/
+    //  if (this.isConnected) {
+    VoiceService.leaveVoiceChannel(this.currentUser.uid!);
+    CodeService.leaveCodeChannel(this.currentUser.uid!);
+    //   var audio = new Audio(require("@/assets/disconnected.mp3"));
+    //  audio.play();
+    // }
   }
 }
 </script>
