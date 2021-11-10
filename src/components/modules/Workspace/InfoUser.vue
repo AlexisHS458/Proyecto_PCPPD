@@ -1,12 +1,15 @@
 <template>
   <div>
     <v-app-bar v-if="iSConnectedCode" color="primaryDark" dense class="toolbar">
+      <v-toolbar-title class="text-color">
+        Conectado: {{ nameCodeChannel }}</v-toolbar-title
+      >
       <v-spacer></v-spacer>
-
       <v-btn icon @click="disconnectCode" v-if="iSConnectedCode">
         <v-icon color="errorLight">mdi-xml</v-icon>
       </v-btn>
     </v-app-bar>
+
     <v-app-bar v-if="isConnected" color="primaryDark" dense class="toolbar">
       <v-toolbar-title
         v-if="isConnectedStatus == 'Conectando'"
@@ -26,6 +29,7 @@
         <v-icon color="errorLight">mdi-phone-remove</v-icon>
       </v-btn>
     </v-app-bar>
+
     <v-app-bar color="primaryDark" dense class="toolbar">
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
@@ -56,9 +60,13 @@ import { User } from "@/models/user";
 import { Prop } from "vue-property-decorator";
 import VoiceService from "@/services/voice_channel.service";
 import CodeService from "@/services/code_channel.service";
+import ServiceChannels from "@/services/channels.service";
 import { VoiceState } from "@/utils/voiceState";
+import { ChannelType } from "@/utils/channels_types";
+import { Workspace } from "@/models/workspace";
 const User = namespace("UserModule");
 const StatusVoice = namespace("VoiceChannelModule");
+const MyWorkSpace = namespace("WorkspaceModule");
 @Component
 export default class UserInfo extends Vue {
   @Prop({
@@ -72,12 +80,15 @@ export default class UserInfo extends Vue {
   @StatusVoice.Action
   private toggleIsMuteStatus!: () => void;
 
+  @MyWorkSpace.State("workspace")
+  private workspace!: Workspace;
+
   public loading = false;
   public isTalk = true;
   public isListening = true;
   public isConnected = false;
   public iSConnectedCode = false;
-
+  public nameCodeChannel = "";
   toggleMicrophone() {
     this.toggleIsMuteStatus();
     this.isTalk = !this.isTalk;
@@ -103,7 +114,13 @@ export default class UserInfo extends Vue {
     audio.play();
   }
 
-  mounted() {
+  async mounted() {
+    this.nameCodeChannel = await ServiceChannels.getChannelName(
+      ChannelType.CODE,
+      this.$route.params.id,
+      this.$route.params.idChannelCode
+    );
+    console.log(this.nameCodeChannel);
     VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
       this.isConnected = !!isConnected;
     });
