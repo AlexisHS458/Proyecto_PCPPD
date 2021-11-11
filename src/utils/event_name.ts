@@ -6,6 +6,8 @@ export enum EventName {
   SEND_CODE = 'send-code',
   CODE_EMIT_USERS = 'code-emit-users',
   CODE_JOIN_ROOM = 'code-join-room',
+  REQUEST_DRIVER = 'request-driver',
+  ACCEPT_REQUEST = 'accpet-request',
 
   //VoiceChannel
   JOIN_VOICE_CHANNEL = 'join-voice-channel',

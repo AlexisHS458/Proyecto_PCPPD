@@ -5,6 +5,8 @@ export enum ResponseEventName{
   CODE_USER_STATUS = 'code-user-status',
   COORDINAES = 'coordinates',
   CODE = 'code',
+  DRIVER = 'driver',
+  REQUEST_FROM_NAV = 'request-from-nav',
 
   //VoiceChannel
   JOINED_USERS='joined-users',

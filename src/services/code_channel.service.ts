@@ -73,6 +73,53 @@ class CodeChannelService {
       onEvent(payload);
     });
   }
+
+  /**
+   * Obtiene el uid del driver dentro del canal de código
+   * @param uid uid de usuario
+   * @param onEvent evento cuando cambia el driver
+   */
+  currentDriver(
+    uid: string,
+    onEvent: (driverID: string) => void,
+  ): Socket {
+    return codeChannelSocket(uid).on(ResponseEventName.DRIVER, payload => {
+      onEvent(payload);
+    });
+  }
+
+  /**
+   * Envia al driver una solicitud al driver para alternar a ser driver
+   * @param uid uid del usuario actual
+   */
+  sendRequestToDriver(uid: string): Socket{
+    return codeChannelSocket(uid).emit(EventName.REQUEST_DRIVER);
+  }
+  
+  /**
+   * El driver actual recibe una notifiación si un navigator solicita ser driver
+   * @param uid uid del usuairo actual
+   * @param onEvent Evento que contiene el uid del usuario que esta solicitando ser driver
+   */
+  listenForRequest(
+    uid: string,
+    onEvent: (navigatorID: string) => void
+    ): Socket{
+      return codeChannelSocket(uid).on(ResponseEventName.REQUEST_FROM_NAV, payload => {
+        onEvent(payload);
+      });
+  }
+
+  /**
+   * Acepta la solicitud para cambio de driver
+   * @param uid uid del usuario actual
+   * @param newDriverID uid del nuevo usuario a ser driver
+   * @returns 
+   */
+  acceptRequest(uid: string, newDriverID: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.ACCEPT_REQUEST, newDriverID);
+  }
+
 }
 
 export default new CodeChannelService();
