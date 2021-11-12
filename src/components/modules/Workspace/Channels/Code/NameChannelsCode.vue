@@ -198,11 +198,11 @@
         <v-list-item-content>
           <v-list-item-title v-text="user.nombre"></v-list-item-title>
         </v-list-item-content>
-        <v-list-item-action>
+        <v-list-item-action v-if="user.uid == currentDriver">
           <v-chip small color="error"> Driver </v-chip>
         </v-list-item-action>
-        <v-list-item-action>
-          <v-btn icon>
+        <v-list-item-action v-if="user.uid == currentDriver">
+          <v-btn icon @click="sendRequestDriver">
             <v-icon>mdi-swap-horizontal</v-icon>
           </v-btn>
         </v-list-item-action>
@@ -300,6 +300,7 @@ export default class NameChannels extends Vue {
   public valid = true;
   public newNameChannel = "";
   public permissions = {} as PermissionsPath;
+  public currentDriver = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
@@ -361,10 +362,17 @@ export default class NameChannels extends Vue {
   } */
 
   mounted() {
-    CodeService.allUsers(this.currentUser.uid!, this.channel.uid!, async users => {
-      this.usersDisplay = await Promise.all(
-        users.map(user => UserService.getUserInfoByID(user.uid))
-      );
+    CodeService.allUsers(
+      this.currentUser.uid!,
+      this.channel.uid!,
+      async (users) => {
+        this.usersDisplay = await Promise.all(
+          users.map((user) => UserService.getUserInfoByID(user.uid))
+        );
+      }
+    );
+    CodeService.currentDriver(this.currentUser.uid!, (uid) => {
+      this.currentDriver = uid;
     });
   }
 
@@ -376,6 +384,10 @@ export default class NameChannels extends Vue {
     this.form.resetValidation();
     this.form.reset();
     this.dialogRenameChanel = false;
+  }
+
+  sendRequestDriver() {
+    CodeService.sendRequestToDriver(this.currentUser.uid!);
   }
 }
 </script>
