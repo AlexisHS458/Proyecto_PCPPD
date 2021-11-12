@@ -74,7 +74,7 @@ export default class EditCode extends Vue {
   public userCode = "";
   public userPointers: CursorCoordinates[] = [];
   public nameCodeChannel = "";
-
+  public currentDriver = "";
   mounted() {
     this.changeView();
   }
@@ -88,6 +88,9 @@ export default class EditCode extends Vue {
   }
 
   changeView() {
+    CodeService.currentDriver(this.currentUser.uid!, (uid) => {
+      this.currentDriver = uid;
+    });
     CodeService.joinToCodeChannel(
       this.currentUser.uid!,
       this.$route.params.idChannelCode
@@ -137,6 +140,14 @@ export default class EditCode extends Vue {
         columnSelection: true,
       }
     );
+    console.log("hola: " + this.currentDriver);
+
+    if (this.currentDriver != this.currentUser.uid) {
+      console.log("entro");
+      this.options.updateOptions({
+        readOnly: true,
+      });
+    }
   }
   /*   getValue() {
     this.options.getValue();
@@ -147,10 +158,12 @@ export default class EditCode extends Vue {
   }
 
   sendCode(): void {
-    CodeService.sendCode(this.currentUser.uid!, {
-      channelID: this.$route.params.idChannelCode,
-      code: this.options.getValue(),
-    });
+    if (this.currentUser.uid != this.currentDriver) {
+      CodeService.sendCode(this.currentUser.uid!, {
+        channelID: this.$route.params.idChannelCode,
+        code: this.options.getValue(),
+      });
+    }
   }
 
   mouseIsMoving(e: MouseEvent): void {

@@ -105,7 +105,7 @@ class UserModule extends VuexModule {
   @Action
   async fetchCurrentUser(): Promise<void> {
     this.context.commit("setLoadingStatus", true);
-    await UserService.getUserAuthInfo((user)=> {
+    await UserService.getUserAuthInfo(user => {
       this.context.commit("setUser", user);
       this.context.commit("setLoadingStatus", false);
     });
