@@ -238,7 +238,7 @@ export default class AppBarOptions extends Vue {
 
   acceptRequest() {
     console.log(this.currentUser.uid);
-    CodeService.acceptRequest(this.currentUser.uid!, this.currentUser.uid!);
+    CodeService.acceptRequest(this.currentUser.uid!, this.userRequest.uid!);
   }
 
   mounted() {

@@ -83,7 +83,7 @@ class CodeChannelService {
     uid: string,
     onEvent: (driverID: string) => void,
   ): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.DRIVER, payload => {
+    return codeChannelSocket(uid).on(ResponseEventName.DRIVER, payload => {      
       onEvent(payload);
     });
   }

@@ -371,8 +371,10 @@ export default class NameChannels extends Vue {
         );
       }
     );
-    CodeService.currentDriver(this.currentUser.uid!, (uid) => {
+    CodeService.currentDriver(this.currentUser.uid!, async (uid) => {
       this.currentDriver = uid;
+      console.log((await UserService.getUserInfoByID(this.currentDriver)).nombre);
+      
     });
   }
 
