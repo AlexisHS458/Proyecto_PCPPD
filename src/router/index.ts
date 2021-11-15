@@ -53,10 +53,7 @@ const routes: Array<RouteConfig> = [
     beforeEnter: async (to, from, next) => {
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
-      const hola = store.state["UserModule/user"];
       console.log(currentUser);
-      console.log(hola);
-
       next();
     },
     meta: {

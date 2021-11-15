@@ -8,6 +8,7 @@ export enum EventName {
   CODE_JOIN_ROOM = 'code-join-room',
   REQUEST_DRIVER = 'request-driver',
   ACCEPT_REQUEST = 'accpet-request',
+  GET_DRIVER = 'get-driver',
 
   //VoiceChannel
   JOIN_VOICE_CHANNEL = 'join-voice-channel',

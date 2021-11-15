@@ -326,9 +326,7 @@ export default class NameChannels extends Vue {
     VoiceService.userStatus(this.currentUser.uid!, isConnected => {
       this.isConnected = !!isConnected;
     });
-    if (!this.isConnected) {
-      console.log('isConnected');
-      
+    if (!this.isConnected) {      
       const audio = new Audio(require("@/assets/connected.mp3"));
       audio.play();
     }
