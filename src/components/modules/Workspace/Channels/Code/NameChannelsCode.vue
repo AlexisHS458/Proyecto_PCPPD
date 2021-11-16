@@ -157,10 +157,10 @@
         <v-list-item-content>
           <v-list-item-title v-text="user.nombre"></v-list-item-title>
         </v-list-item-content>
-        <v-list-item-action v-if="user.uid == currentDriver">
+        <v-list-item-action v-if="user.uid == driverUID">
           <v-chip small color="error"> Driver </v-chip>
         </v-list-item-action>
-        <v-list-item-action v-if="user.uid == currentDriver">
+        <v-list-item-action v-if="user.uid == driverUID">
           <v-btn icon @click="sendRequestDriver">
             <v-icon>mdi-swap-horizontal</v-icon>
           </v-btn>
@@ -177,7 +177,7 @@ import { User } from "@/models/user";
 import CodeService from "@/services/code_channel.service";
 import { Workspace } from "@/models/workspace";
 import { VForm } from "@/utils/types";
-import { Component, Prop, Ref, Vue } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
@@ -209,6 +209,11 @@ export default class NameChannels extends Vue {
     required: true
   })
   public workspaceUID!: string;
+
+  @Watch("driverUID")
+  currentDriverWatch(val: string) {
+    this.driverUID = val;
+  }
 
   /**
    * Acciones obtenidas del @module Workspace
@@ -248,7 +253,7 @@ export default class NameChannels extends Vue {
   private setDriverUIDStatus!: (uid: string) => void;
 
   @CodeChannel.State("driverUID")
-  private driverUID!: string;
+  private driverUID!: string | undefined;
 
   @CodeChannel.Getter
   private driverID!: string;
@@ -332,11 +337,11 @@ export default class NameChannels extends Vue {
         users.map(user => UserService.getUserInfoByID(user.uid))
       );
     });
-    CodeService.currentDriver(this.currentUser.uid!, async uid => {
+    /*    CodeService.currentDriver(this.currentUser.uid!, async uid => {
       this.currentDriver = uid;
       this.setDriverUIDStatus(uid);
-      /*       console.log(this.driverUID); */
-    });
+      console.log(this.driverUID); 
+    }); */
   }
 
   imgError(e: any) {

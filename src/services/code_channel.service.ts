@@ -117,6 +117,10 @@ class CodeChannelService {
   ): Socket {
     return codeChannelSocket(uid).emit(EventName.GET_DRIVER, codeChannelID);
   }
+
+  delay(ms: number){
+    return new Promise(resolve => setTimeout(resolve,ms));
+  }
 }
 
 export default new CodeChannelService();

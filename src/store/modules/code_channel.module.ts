@@ -1,10 +1,12 @@
 import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
+import CodeChannelService from "@/services/code_channel.service";
 
 @Module({ namespaced: true })
 class CodeChannelModule extends VuexModule {
   public codeChannelName = "";
-  public driverUID = "";
+  public driverUID: string | undefined = undefined;
   public status = {
+    isLoading: true,
     showTreeView: false,
     showNavigationDrawerUsers: true,
     showNavigationDrawerChannels: true
@@ -23,6 +25,10 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public setDriverUID(status: string): void {
     this.driverUID = status;
+  }
+
+  @Mutation	setLoading(status: boolean): void {
+    this.status.isLoading = status;
   }
 
   @Action
@@ -60,11 +66,20 @@ class CodeChannelModule extends VuexModule {
 
   @Action
   setDriverUIDStatus(uid: string): void {
-    this.context.commit("setDriverUID", uid);
+    this.context.commit("setLoading", true);
+    CodeChannelService.currentDriver(uid, driverID => {
+      console.log('se detono');
+      
+      this.context.commit("setDriverUID", driverID);
+      this.context.commit("setLoading", false);
+    });
   }
 
   get getDriverID(): string{
-    return this.driverUID;
+    return this.driverUID!;
+  }
+  get isLoading() : boolean{
+    return this.status.isLoading;
   }
 
 

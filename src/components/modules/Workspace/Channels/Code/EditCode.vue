@@ -5,7 +5,10 @@
       <div
         id="container"
         :style="calculatedHeight"
-        @keydown="getLine"
+        @keydown="
+          getLine();
+          keyboardState();
+        "
         @keyup="
           getLine();
           sendCode();
@@ -25,6 +28,10 @@
       <footer-options-code :line="line"></footer-options-code>
     </div>
   </div>
+  <!--   <div v-else class="div-progress-circular">
+    <v-progress-circular indeterminate :size="120" :width="4" color="primary">
+    </v-progress-circular>
+  </div> -->
 </template>
 
 <script lang="ts">
@@ -41,6 +48,7 @@ import { User } from "@/models/user";
 import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { ChannelType } from "@/utils/channels_types";
 import CodeChannelService from "@/services/code_channel.service";
+import { watch } from "original-fs";
 const CodeChannel = namespace("CodeChannelModule");
 @Component({
   components: {
@@ -67,7 +75,35 @@ export default class EditCode extends Vue {
   @User.State("user")
   private currentUser!: User;
 
-  
+  @CodeChannel.State("status")
+  private status!: any;
+
+  @CodeChannel.Getter
+  private isLoading!: boolean;
+
+  @CodeChannel.Action
+  private loadingMonaco!: () => Promise<void>;
+
+  @CodeChannel.State("driverUID")
+  private driverUID!: string | undefined;
+
+  @CodeChannel.Getter
+  private getDriverID!: string;
+
+  @CodeChannel.Action
+  private setLoadingStatus!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setDriverUIDStatus!: (uid: string) => void;
+
+  /*   @Watch("driverUID")
+  currentDriverWatch(val: string) {
+    if (val) {
+      this.currentDriver = val;
+      this.setLoadingStatus(false);
+      this.changeView();
+    }
+  } */
 
   public calculatedHeight = "height: 50px";
   public options!: monaco.editor.IStandaloneCodeEditor;
@@ -77,12 +113,8 @@ export default class EditCode extends Vue {
   public nameCodeChannel = "";
   public currentDriver = "";
 
-
   mounted() {
-    CodeChannelService.requestCurrentDriver(this.currentUser.uid!,this.idChannelCode);
-    CodeChannelService.currentDriver(this.currentUser.uid!, payload => {
-      this.currentDriver = payload
-    })
+    this.setDriverUIDStatus(this.currentUser.uid!);
     this.changeView();
   }
 
@@ -132,14 +164,6 @@ export default class EditCode extends Vue {
       automaticLayout: true,
       columnSelection: true
     });
-
-    console.log(`currentD: ${this.currentDriver} :: currentU ${this.currentUser.uid}`);
-
-    if (this.currentDriver !== this.currentUser.uid) {
-      document.onkeydown = e => false;
-    } else {
-      document.onkeydown = e => true;
-    }
   }
   /*   getValue() {
     this.options.getValue();
@@ -187,6 +211,14 @@ export default class EditCode extends Vue {
     return editor.left;
   }
 
+  keyboardState(): void {
+    if (this.driverUID !== this.currentUser.uid) {
+      document.onkeydown = e => false;
+    } else {
+      document.onkeydown = e => true;
+    }
+  }
+
   destroyed() {
     document.onkeydown = e => true;
   }
@@ -198,5 +230,13 @@ export default class EditCode extends Vue {
   position: fixed;
   display: block;
   pointer-events: none;
+}
+.div-progress-circular {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
