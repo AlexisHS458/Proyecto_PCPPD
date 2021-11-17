@@ -13,37 +13,58 @@
 
     <v-responsive max-width="180">
       <v-row justify="space-around">
-        <v-menu offset-y>
+        <v-menu v-if="currentUser.uid == driverUID" offset-y v-model="test">
           <template v-slot:activator="{ on, attrs }">
             <v-icon color="info" size="25px" v-on="on" v-bind="attrs">
               mdi-alert-circle-outline
             </v-icon>
           </template>
           <v-card color="infoDark">
-            <v-list color="infoDark">
-              <v-list-item>
-                <v-list-item-title class="text-center"
-                  >{{ userRequest.nombre }} ha <br />
-                  solicitado cambio de rol</v-list-item-title
+            <template v-if="userRequest">
+              <v-list color="infoDark">
+                <v-list-item>
+                  <v-list-item-title class="text-center">
+                    {{ userRequest.nombre }} ha <br />
+                    solicitado cambio de rol
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+              <v-divider></v-divider>
+              <v-card-actions class="justify-center">
+                <v-btn color="success" small @click="acceptRequest"
+                  >Aceptar</v-btn
                 >
-              </v-list-item>
-            </v-list>
-
-            <v-divider></v-divider>
-
-            <v-card-actions class="justify-center">
-              <v-btn color="success" small @click="acceptRequest"
-                >Aceptar</v-btn
-              >
-              <v-btn color="error" small>Rechazar</v-btn>
-            </v-card-actions>
+                <v-btn color="error" small>Rechazar</v-btn>
+              </v-card-actions>
+            </template>
+            <template v-else>
+              <v-list color="infoDark">
+                <v-list-item>
+                  <v-list-item-title class="text-center">
+                    No hay solicitudes
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </template>
           </v-card>
         </v-menu>
 
-        <v-icon size="25px" color="info"> mdi-content-save </v-icon>
+        <v-icon
+          size="25px"
+          color="info"
+          :disabled="currentUser.uid != driverUID"
+        >
+          mdi-content-save
+        </v-icon>
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon size="25px" color="info" v-on="on" v-bind="attrs">
+            <v-icon
+              size="25px"
+              color="info"
+              v-on="on"
+              v-bind="attrs"
+              :disabled="currentUser.uid != driverUID"
+            >
               mdi-github
             </v-icon>
           </template>
@@ -185,7 +206,13 @@
         </v-icon>
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon size="25px" color="success" v-bind="attrs" v-on="on">
+            <v-icon
+              size="25px"
+              color="success"
+              v-bind="attrs"
+              v-on="on"
+              :disabled="currentUser.uid != driverUID"
+            >
               mdi-play-outline
             </v-icon>
           </template>
@@ -198,7 +225,7 @@
 
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
@@ -212,6 +239,16 @@ export default class AppBarOptions extends Vue {
   })
   public nameChannel!: string;
 
+  @Watch("driverUID")
+  currentDriverWatch(val: string) {
+    this.driverUID = val;
+  }
+
+  @Watch("status.showRequestDriver")
+  Watch(val: string) {
+    console.log(val);
+  }
+
   @CodeChannel.Action
   private toggleShowTreeView!: () => void;
 
@@ -220,6 +257,12 @@ export default class AppBarOptions extends Vue {
 
   @CodeChannel.Action
   private toggleShowNavigationDrawerChannels!: () => void;
+
+  @CodeChannel.State("status")
+  public status!: any;
+
+  @CodeChannel.State("driverUID")
+  private driverUID!: string | undefined;
 
   /**
    * Estado obtenido del @module User
@@ -234,16 +277,17 @@ export default class AppBarOptions extends Vue {
   public validExport = true;
   public dialogExit = false;
   public validExit = false;
-  public userRequest = {} as User;
+  public userRequest: User | undefined = undefined;
+  public test = false;
 
   acceptRequest() {
-    console.log(this.currentUser.uid);
-    CodeService.acceptRequest(this.currentUser.uid!, this.userRequest.uid!);
+    CodeService.acceptRequest(this.currentUser.uid!, this.userRequest!.uid!);
   }
 
   mounted() {
     CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
+      this.test = true;
     });
   }
 }
