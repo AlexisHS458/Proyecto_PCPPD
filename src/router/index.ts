@@ -12,6 +12,7 @@ import CodeChannel from "../components/modules/Workspace/Channels/Code/EditCode.
 import NavigationDrawer from "../components/modules/Workspace/ViewNavigationDrawer.vue";
 import ViewTreeView from "../components/modules/Workspace/ViewTreeView.vue";
 import { auth } from "@/utils/firebase";
+import store from "@/store";
 
 Vue.use(VueRouter);
 
@@ -49,7 +50,12 @@ const routes: Array<RouteConfig> = [
     path: "/space/:id",
     name: "Space",
     component: Workspace /* { default: Workspace, Navigation: NavigationDrawer } */,
-
+    beforeEnter: async (to, from, next) => {
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      console.log(currentUser);
+      next();
+    },
     meta: {
       requiresAuth: true
     },

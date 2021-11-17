@@ -4,11 +4,7 @@
       <v-list-item
         color="white"
         class="mb-1"
-        @click="
-          conectToVoiceChannel(
-            'http://soundbible.com/mp3/Air Plane Ding-SoundBible.com-496729130.mp3'
-          )
-        "
+        @click="conectToVoiceChannel"
         slot-scope="{ hover }"
         :class="`${hover ? 'select-item' : 'no-select-item'}`"
       >
@@ -171,7 +167,7 @@ import { User } from "@/models/user";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { Workspace } from "@/models/workspace";
 import { VForm } from "@/utils/types";
-import { Component, Prop, Ref, Vue } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import VoiceService from "@/services/voice_channel.service";
 import UserService from "@/services/user.service";
@@ -244,7 +240,15 @@ export default class NameChannels extends Vue {
   @StatusVoice.Action
   private setIsConnectedStatus!: (status: VoiceState) => void;
 
+  @StatusVoice.State("isMute")
+  private isMute!: boolean;
+
   @Ref("form") readonly form!: VForm;
+
+  @Watch("isMute")
+  onChildChanged() {
+    this.mutePeers();
+  }
 
   public menu = false;
   public dialog = false;
@@ -266,6 +270,7 @@ export default class NameChannels extends Vue {
 
   public peers: Map<string, Peer.Instance> = new Map<string, Peer.Instance>();
   public stream: MediaStream | undefined = undefined;
+  
 
   editChannel(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
@@ -314,18 +319,16 @@ export default class NameChannels extends Vue {
     }
   }
 
-  async conectToVoiceChannel(sound: string) {
+  async conectToVoiceChannel() {
+    this.setIsConnectedStatus(VoiceState.CONNECTING);
+    await this.initSignaling();
+    VoiceService.joinToVoiceChannel(this.currentUser.uid!, this.channel.uid!);
     VoiceService.userStatus(this.currentUser.uid!, isConnected => {
       this.isConnected = !!isConnected;
     });
-    if (!this.isConnected) {
-      this.setIsConnectedStatus(VoiceState.CONNECTING);
-      await this.initSignaling();
-      VoiceService.joinToVoiceChannel(this.currentUser.uid!, this.channel.uid!);
-      if (sound) {
-        var audio = new Audio(sound);
-        audio.play();
-      }
+    if (!this.isConnected) {      
+      const audio = new Audio(require("@/assets/connected.mp3"));
+      audio.play();
     }
   }
 
@@ -354,8 +357,6 @@ export default class NameChannels extends Vue {
   }
 
   createPeer(userSocketIDToSignal: string, callerID: string, stream: MediaStream): Peer.Instance {
-    console.log("createPeer");
-
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -371,8 +372,6 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("stream", stream => {
-      console.log("onStream");
-
       const audio = document.createElement("audio");
       audio.srcObject = stream;
       (this.$refs.audioContainer as any).appendChild(audio);
@@ -387,7 +386,6 @@ export default class NameChannels extends Vue {
   }
 
   addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream): Peer.Instance {
-    console.log("addPeer");
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -403,8 +401,6 @@ export default class NameChannels extends Vue {
     peer.signal(incomingSignal);
 
     peer.on("stream", stream => {
-      console.log("onStream");
-
       const audio = document.createElement("audio");
       audio.srcObject = stream;
       (this.$refs.audioContainer as any).appendChild(audio);
@@ -416,6 +412,18 @@ export default class NameChannels extends Vue {
     });
 
     return peer;
+  }
+
+  mutePeers(): void {
+    if (this.isMute) {
+      this.peers.forEach(peer => {
+        peer.pause();
+      });
+    } else {
+      this.peers.forEach(peer => {
+        peer.resume();
+      });
+    }
   }
 
   async initSignaling(): Promise<void> {
@@ -437,8 +445,6 @@ export default class NameChannels extends Vue {
     });
 
     VoiceService.listenReturningSignal(this.currentUser.uid!, payloadSignal => {
-      console.log("payloadSignal.userIDToSignal", payloadSignal.userIDToSignal);
-
       if (payloadSignal.userIDToSignal) {
         const item = this.peers.get(payloadSignal.userIDToSignal);
         item?.signal(payloadSignal.signal);

@@ -224,7 +224,6 @@ export default class ViewEdit extends Vue {
       this.boletas = allUsersBoletas.filter(
         (boleta) => boleta !== this.currentUser.boleta
       );
-      console.log(this.boletas);
       if (!this.boletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {

@@ -22,7 +22,6 @@ const voiceChannelSocket = (uid: string, createNewSocket = false): Socket => {
 };
 
 const endpoitCC = `${SOCKET_SERVER_ENDPOINT}codeChannel`;
-console.log(endpoitCC);
 
 let ccSocket: Socket;
 let ccUID: string;
