@@ -4,12 +4,13 @@ import CodeChannelService from "@/services/code_channel.service";
 @Module({ namespaced: true })
 class CodeChannelModule extends VuexModule {
   public codeChannelName = "";
-  public driverUID: string | undefined = undefined;
+  public driverUID = "";
   public status = {
     isLoading: true,
     showTreeView: false,
     showNavigationDrawerUsers: true,
-    showNavigationDrawerChannels: true
+    showNavigationDrawerChannels: true,
+    showRequestDriver: false
   };
 
   @Mutation
@@ -31,24 +32,23 @@ class CodeChannelModule extends VuexModule {
     this.status.isLoading = status;
   }
 
-  @Action
-  toggleShowTreeView(): void {
-    this.context.commit("setShowTreeViewStatus", !this.status.showTreeView);
-  }
+  
 
   @Mutation
   public setShowNavigationDrawer(status: boolean): void {
     this.status.showNavigationDrawerUsers = status;
   }
 
-  @Action
-  toggleShowNavigationDrawer(): void {
-    this.context.commit("setShowNavigationDrawer", !this.status.showNavigationDrawerUsers);
-  }
-
+  
   @Mutation
   public setShowNavigationDrawerChannels(status: boolean): void {
     this.status.showNavigationDrawerChannels = status;
+  }
+
+
+  @Mutation
+  public setShowRequestInfo(status: boolean): void {
+    this.status.showRequestDriver = status;
   }
 
   @Action
@@ -73,6 +73,20 @@ class CodeChannelModule extends VuexModule {
       this.context.commit("setDriverUID", driverID);
       this.context.commit("setLoading", false);
     });
+  }
+
+  @Action
+  toggleShowTreeView(): void {
+    this.context.commit("setShowTreeViewStatus", !this.status.showTreeView);
+  }
+  @Action
+  toggleShowNavigationDrawer(): void {
+    this.context.commit("setShowNavigationDrawer", !this.status.showNavigationDrawerUsers);
+  }
+
+  @Action
+  setShowRequestDriverStatus(status: boolean): void {
+    this.context.commit("setShowRequestInfo",status);
   }
 
   get getDriverID(): string{

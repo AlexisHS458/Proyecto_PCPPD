@@ -85,7 +85,7 @@ export default class EditCode extends Vue {
   private loadingMonaco!: () => Promise<void>;
 
   @CodeChannel.State("driverUID")
-  private driverUID!: string | undefined;
+  private driverUID!: string;
 
   @CodeChannel.Getter
   private getDriverID!: string;
