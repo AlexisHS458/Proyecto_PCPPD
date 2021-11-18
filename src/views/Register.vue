@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import RegisterForm from "@/components/modules/RegisterForm.vue";
+import RegisterForm from "@/components/modules/Register/RegisterForm.vue";
 
 export default Vue.extend({
   name: "Register",

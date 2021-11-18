@@ -1,0 +1,6 @@
+body.home {
+  overflow-y: auto;
+}
+body.intro {
+  background: pink;
+}

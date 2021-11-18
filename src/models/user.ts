@@ -5,7 +5,7 @@ export interface User {
   /**
    * ID único del usuario
    */
-  uid: string,
+  uid?: string,
   /**
    * Nombre del usuario
    */
@@ -22,4 +22,8 @@ export interface User {
    * URL de la imagen de perfil del usuario
    */
   fotoURL: string,
+
+  workspacesCount?: number,
+
+  workspacesCollab?: number
 }

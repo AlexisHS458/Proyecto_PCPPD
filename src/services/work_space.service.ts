@@ -1,8 +1,8 @@
-import { db } from "@/utils/firebase";
 import { Workspace } from "@/models/workspace";
 import { Collection } from "@/utils/collections";
-import ChannelsService from "@/services/channels.service";
-import channelsService from "@/services/channels.service";
+import { User } from "@/models/user";
+import { db, FieldValue } from "@/utils/firebase";
+import UserService from "@/services/user.service";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -14,9 +14,8 @@ class WorkSpaceService {
    * @returns WorkSpace. Referencia del espacio de trabajo creado.
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
-    const workSpaceRef = (
-      await db.collection(Collection.WORK_SPACE).add(workspace)
-    ).get();
+    const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    UserService.updateUserWorkspaceCount(workspace.uid_usuario, true);
     return <Workspace>(await workSpaceRef).data();
   }
 
@@ -25,34 +24,29 @@ class WorkSpaceService {
    * @param id ID del documento a eliminar
    */
   async deleteWorkSpace(id: string): Promise<void> {
+    const workspaceRef = await this.getWorkspaceInfo(id)
     await db
       .collection(Collection.WORK_SPACE)
       .doc(id)
       .delete();
+    UserService.updateUserWorkspaceCount(workspaceRef.uid_usuario, false);
   }
 
   /**
    * Recupera los espacios de trabajo de un usuario
    * @param uid ID del usuario a recuperar sus espacios de trabajo
    */
-  getWorkspaces(
-    uid: string,
-    onSnapshot: (workspaces: Workspace[]) => void
-  ): void {
+  getWorkspaces(uid: string, onSnapshot: (workspaces: Workspace[]) => void): void {
     db.collection(Collection.WORK_SPACE)
-      .where("uid_usuario", "==", uid)
+      .where("usuarios", "array-contains", uid)
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<Workspace>(doc => {
             const workspace = {
               ...doc.data(),
-              uid: doc.id, 
+              uid: doc.id
             };
-            const workspaceData = <Workspace>workspace;
-            ChannelsService.getTextChannels(doc.id, textChannels => {
-              workspaceData.canales_texto = textChannels;
-            })
-            return workspaceData;
+            return <Workspace>workspace;
           })
         );
       });
@@ -68,21 +62,12 @@ class WorkSpaceService {
         .doc(uid)
         .onSnapshot(
           value => {
-            const workspaceData ={
-             ...value.data(),
-             uid: value.id
-            } 
+            const workspaceData = {
+              ...value.data(),
+              uid: value.id
+            };
             if (workspaceData) {
-              const workspace = <Workspace>workspaceData;
-              
-              ChannelsService.getTextChannels(workspace.uid, textChannels => {
-                workspace.canales_texto = textChannels;
-              })
-              ChannelsService.getVoiceChannels(workspace.uid, voiceChannels => {
-                workspace.canales_voz = voiceChannels;
-              })
-
-              resolve(workspace);
+              resolve(<Workspace>workspaceData);
             }
           },
           error => {
@@ -90,6 +75,35 @@ class WorkSpaceService {
           }
         );
     });
+  }
+
+  /**
+   * Recupera los usuarios dentro del espacio de trabajo.
+   * @param usersID IDs de los usuarios dentro del espacio de trabajo.
+   * @param onSnapshot Suscripcion a colección de usuarios.
+   */
+  getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void): void {
+    db.collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .onSnapshot(async snapshot => {
+        const workspaceData = <Workspace>snapshot.data();
+        onSnapshot(await UserService.getUsersByID(workspaceData.usuarios));
+      });
+  }
+
+  /**
+   * Remueve un usuario de un espacio de trabajo.
+   * @param IDUser usuario a remover
+   * @param IDWorkSpace espacio de trabajo
+   */
+  async removeUser(IDUser: string, IDWorkSpace: string): Promise<void> {
+    await UserService.updateUserWorkspaceCollab(IDUser, false);
+    return await db
+      .collection(Collection.WORK_SPACE)
+      .doc(IDWorkSpace)
+      .update({
+        usuarios: FieldValue.arrayRemove(IDUser)
+      });
   }
 }
 

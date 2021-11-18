@@ -28,7 +28,8 @@ export default new Vuetify({
         errorDark: "#6b0001",
         infoDark: "#75b4a9",
         successDark: "#3b7900",
-        warningDark: "#c55d00"
+        warningDark: "#c55d00",
+        grey: "#E0E0E0"
       }
       /*  dark: {
                 primaryDark: '#000029',
