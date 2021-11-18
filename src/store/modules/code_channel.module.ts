@@ -3,6 +3,17 @@ import CodeChannelService from "@/services/code_channel.service";
 
 @Module({ namespaced: true })
 class CodeChannelModule extends VuexModule {
+
+/**
+   * Mensaje a mostrar en snackbar
+   */
+ public snackbarMessage = "";
+
+ /**
+  * Mensaje a mostrar error en snackbar
+  */
+ public snackbarMessageError = "";
+
   public codeChannelName = "";
   public driverUID = "";
   public status = {
@@ -10,7 +21,9 @@ class CodeChannelModule extends VuexModule {
     showTreeView: false,
     showNavigationDrawerUsers: true,
     showNavigationDrawerChannels: true,
-    showRequestDriver: false
+    showRequestDriver: false,
+    showSnackbar: false,
+    showSnackbarError: false
   };
 
   @Mutation
@@ -51,6 +64,26 @@ class CodeChannelModule extends VuexModule {
     this.status.showRequestDriver = status;
   }
 
+  @Mutation
+  public setSnackBarMessage(message: string): void {
+    this.snackbarMessage = message;
+  }
+
+  @Mutation
+  public setSnackBarMessageError(message: string): void {
+    this.snackbarMessageError = message;
+  }
+
+  @Mutation
+  public setShowSnackBarMessageError(status: boolean): void {
+    this.status.showSnackbarError = status;
+  }
+
+  @Mutation
+  public setShowSnackBarMessage(status: boolean): void {
+    this.status.showSnackbar = status;
+  }
+
   @Action
   toggleShowNavigationDrawerChannels(): void {
     this.context.commit(
@@ -89,13 +122,56 @@ class CodeChannelModule extends VuexModule {
     this.context.commit("setShowRequestInfo",status);
   }
 
+  /**
+   * Coloca un mensaje en el snackbar
+   * @param message mensaje a mostrar en el snackbar
+   */
+   @Action
+   setMessageOnSnackbar(message: string): void {
+     this.context.commit("setSnackBarMessage", message);
+   }
+ 
+   /**
+    * Hace visible el snackbar
+    */
+   @Action
+   setVisibleSnackBar(): void {
+     this.context.commit("setShowSnackBarMessage", true);
+   }
+ 
+   /**
+    * Hace visible el snackbar de error
+    */
+   @Action
+   setVisibleSnackBarError(): void {
+     this.context.commit("setShowSnackBarMessageError", true);
+   }
+ 
+   /**
+    * Hace no visible el snackbar
+    */
+   @Action
+   setNotVisibleSnackBar(): void {
+     this.context.commit("setShowSnackBarMessage", false);
+   }
+ 
+   /**
+    * Hace no visible el snackbar de error
+    */
+   @Action
+   setNotVisibleSnackBarError(): void {
+     this.context.commit("setShowSnackBarMessageError", false);
+   }
+
   get getDriverID(): string{
     return this.driverUID!;
   }
   get isLoading() : boolean{
     return this.status.isLoading;
   }
-
+  get showSnackbar(): boolean {
+    return this.status.showSnackbar;
+  }
 
 }
 
