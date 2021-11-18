@@ -167,7 +167,7 @@ import { User } from "@/models/user";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { Workspace } from "@/models/workspace";
 import { VForm } from "@/utils/types";
-import { Component, Prop, Ref, Vue } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import VoiceService from "@/services/voice_channel.service";
 import UserService from "@/services/user.service";
@@ -175,9 +175,11 @@ import Peer from "simple-peer";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
+const StatusVoice = namespace("VoiceChannelModule");
 /* eslint-disable */
 // @ts-ignore
 import image from "@/assets/userProfile.png";
+import { VoiceState } from "@/utils/voiceState";
 /* eslint-enable */
 @Component
 export default class NameChannels extends Vue {
@@ -235,7 +237,18 @@ export default class NameChannels extends Vue {
   @Permissions.Action
   private RemoveVoicePermission!: (permissionsPath: PermissionsPath) => Promise<void>;
 
+  @StatusVoice.Action
+  private setIsConnectedStatus!: (status: VoiceState) => void;
+
+  @StatusVoice.State("isMute")
+  private isMute!: boolean;
+
   @Ref("form") readonly form!: VForm;
+
+  @Watch("isMute")
+  onChildChanged() {
+    this.mutePeers();
+  }
 
   public menu = false;
   public dialog = false;
@@ -253,9 +266,11 @@ export default class NameChannels extends Vue {
       /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido"
   };
   public usersDisplay: User[] = [];
+  public isConnected = false;
 
   public peers: Map<string, Peer.Instance> = new Map<string, Peer.Instance>();
   public stream: MediaStream | undefined = undefined;
+  
 
   editChannel(): void {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
@@ -305,8 +320,16 @@ export default class NameChannels extends Vue {
   }
 
   async conectToVoiceChannel() {
+    this.setIsConnectedStatus(VoiceState.CONNECTING);
     await this.initSignaling();
     VoiceService.joinToVoiceChannel(this.currentUser.uid!, this.channel.uid!);
+    VoiceService.userStatus(this.currentUser.uid!, isConnected => {
+      this.isConnected = !!isConnected;
+    });
+    if (!this.isConnected) {      
+      const audio = new Audio(require("@/assets/connected.mp3"));
+      audio.play();
+    }
   }
 
   mounted() {
@@ -316,13 +339,6 @@ export default class NameChannels extends Vue {
           track.stop();
         });
         this.stream = undefined;
-        this.peers.forEach(peer => {
-          peer.on("stream", stream => {
-            stream.getTracks().forEach(track => {
-              track.stop();
-            });
-          });
-        });
       }
       this.usersDisplay = await Promise.all(
         users.map(user => UserService.getUserInfoByID(user.uid))
@@ -341,8 +357,6 @@ export default class NameChannels extends Vue {
   }
 
   createPeer(userSocketIDToSignal: string, callerID: string, stream: MediaStream): Peer.Instance {
-    console.log("createPeer");
-
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -364,11 +378,14 @@ export default class NameChannels extends Vue {
       audio.play();
     });
 
+    peer.on("connect", () => {
+      this.setIsConnectedStatus(VoiceState.CONNECTED);
+    });
+
     return peer;
   }
 
   addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream): Peer.Instance {
-    console.log("addPeer");
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -390,11 +407,30 @@ export default class NameChannels extends Vue {
       audio.play();
     });
 
+    peer.on("connect", () => {
+      this.setIsConnectedStatus(VoiceState.CONNECTED);
+    });
+
     return peer;
   }
 
+  mutePeers(): void {
+    if (this.isMute) {
+      this.peers.forEach(peer => {
+        peer.pause();
+      });
+    } else {
+      this.peers.forEach(peer => {
+        peer.resume();
+      });
+    }
+  }
+
   async initSignaling(): Promise<void> {
-    this.stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+    this.stream = await navigator.mediaDevices.getUserMedia({
+      video: false,
+      audio: true
+    });
     VoiceService.joinedUsers(this.currentUser.uid!, users => {
       this.peers = new Map<string, Peer.Instance>(
         users

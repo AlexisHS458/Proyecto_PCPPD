@@ -3,6 +3,7 @@ import { CodeChannel } from "@/models/codeChannel";
 import { TextChannel } from "@/models/textChannel";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { Collection } from "@/utils/collections";
+import { ChannelType } from "@/utils/channels_types";
 
 /**
  * Conexión a servicios de información de los canales.
@@ -146,7 +147,7 @@ class ChannelsService {
    * @param codeChannel Canal de codigo a agregar a la DB
    * @returns CodeChannel. Referencia del canal de texto creado.
    */
-   async createCodeChannel(workSpaceID: string, codeChannel: CodeChannel): Promise<CodeChannel> {
+  async createCodeChannel(workSpaceID: string, codeChannel: CodeChannel): Promise<CodeChannel> {
     const codeChannelRef = (
       await db
         .collection(Collection.WORK_SPACE)
@@ -204,6 +205,47 @@ class ChannelsService {
           })
         );
       });
+  }
+
+  async getChannelName(
+    type: ChannelType,
+    workspaceUID: string,
+    channelUID: string
+  ): Promise<string> {
+    switch (type) {
+      case ChannelType.TEXT: {
+        const snapshot = await db
+          .collection(Collection.WORK_SPACE)
+          .doc(workspaceUID)
+          .collection(Collection.TEXT_CHANNEL)
+          .doc(channelUID)
+          .get();
+        return (<TextChannel>snapshot.data()).nombre  
+      }
+      case ChannelType.VOICE: {
+        const snapshot = await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceUID)
+        .collection(Collection.VOICE_CHANNEL)
+        .doc(channelUID)
+        .get();
+      return (<VoiceChannel>snapshot.data()).nombre 
+      }
+      case ChannelType.CODE: {        
+        const snapshot = await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceUID)
+        .collection(Collection.CODE_CHANNEL)
+        .doc(channelUID)
+        .get();
+      const codeData = <CodeChannel>snapshot.data();
+
+      return codeData.nombre;
+      }
+      default: {
+        return "";
+      }
+    }
   }
 }
 

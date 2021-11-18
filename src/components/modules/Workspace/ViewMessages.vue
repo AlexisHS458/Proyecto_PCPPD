@@ -72,6 +72,8 @@ import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 import { Prop, Watch } from "vue-property-decorator";
+import { ChannelType } from "@/utils/channels_types";
+import ServiceChannels from "@/services/channels.service";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
@@ -178,7 +180,7 @@ export default class MessagesPage extends Vue {
     this.getMessages();
   }
 
-  public channel? = {} as TextChannel;
+  public channel = "";
   public timeout = -1;
 
   /**
@@ -188,7 +190,13 @@ export default class MessagesPage extends Vue {
     /*   await this.fetchTextChannels(this.$route.params.id); */
     this.getMessages();
   }
-
+  async nameText() {
+    this.channel = await ServiceChannels.getChannelName(
+      ChannelType.TEXT,
+      this.$route.params.id,
+      this.$route.params.idChannel
+    );
+  }
   destroyed() {
     this.setNotVisibleSnackBarWorkspace();
     this.setNotVisibleSnackBar();
@@ -212,10 +220,7 @@ export default class MessagesPage extends Vue {
     this.setNotVisibleSnackBarPermissions();
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    this.channel = this.textChannel.find(
-      (channel) => channel.uid === this.$route.params.idChannel
-    );
-
+    this.nameText();
     this.fetchMesages(() => {
       setTimeout(() => {
         //Mostrar scroll inverso

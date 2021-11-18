@@ -2,7 +2,7 @@ import { Invitation } from "@/models/invitation";
 import { User } from "@/models/user";
 import { Collection } from "@/utils/collections";
 import { db, FieldValue} from "@/utils/firebase";
-
+import UserService from "@/services/user.service";
 
 /**
  * Servicio de invitaciones de espacios de trabajo.
@@ -70,7 +70,7 @@ class InvitationsService{
         .update({
             'usuarios': FieldValue.arrayUnion(invitation.idUsuarioInvitado)
         });
-
+        await UserService.updateUserWorkspaceCollab(invitation.idUsuarioInvitado, true);
         return await this.deleteInvitation(invitation);
     }
 

@@ -1,16 +1,17 @@
 import { io, Socket } from "socket.io-client";
+import {SOCKET_SERVER_ENDPOINT} from "./constants"
 
-const endpoit = `${process.env.VUE_APP_SOCKET_SERVER_ENDPOINT}voiceChannel`;
+const endpoit = `${SOCKET_SERVER_ENDPOINT}voiceChannel`;
 let vcSocket: Socket;
 let vcUID: string;
 
 const voiceChannelSocket = (uid: string, createNewSocket = false): Socket => {
-  if (!(vcSocket && vcUID === uid)|| createNewSocket) {
+  if (!(vcSocket && vcUID === uid) || createNewSocket) {
     const socket = io(endpoit, {
       transports: ["websocket"],
       auth: { uid }
     });
-    if(!createNewSocket){
+    if (!createNewSocket) {
       vcUID = uid;
       vcSocket = socket;
     }
@@ -20,20 +21,24 @@ const voiceChannelSocket = (uid: string, createNewSocket = false): Socket => {
   }
 };
 
+const endpoitCC = `${SOCKET_SERVER_ENDPOINT}codeChannel`;
+
 let ccSocket: Socket;
 let ccUID: string;
-const endpoitCC = `${process.env.VUE_APP_SOCKET_SERVER_ENDPOINT}codeChannel`;
-const codeChannelSocket = (uid: string): Socket => {
-  if (ccSocket && ccUID === uid) {
-    return ccSocket;
-  } else {
+
+const codeChannelSocket = (uid: string, createNewSocket = false): Socket => {
+  if (!(ccSocket && ccUID === uid) || createNewSocket) {
     const socket = io(endpoitCC, {
       transports: ["websocket"],
       auth: { uid }
     });
-    ccSocket = socket;
-    ccUID = uid;
+    if (!createNewSocket) {
+      ccUID = uid;
+      ccSocket = socket;
+    }
     return socket;
+  } else {
+    return ccSocket;
   }
 };
-export { codeChannelSocket, voiceChannelSocket};
+export { codeChannelSocket, voiceChannelSocket };

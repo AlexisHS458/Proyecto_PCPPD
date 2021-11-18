@@ -6,16 +6,65 @@
       @click="toggleShowNavigationDrawerChannels"
       >mdi-menu</v-icon
     >
-    <v-toolbar-title class="font-weight-medium">Equipo</v-toolbar-title>
+    <v-toolbar-title class="font-weight-medium">
+      {{ nameChannel }}
+    </v-toolbar-title>
     <v-spacer></v-spacer>
 
     <v-responsive max-width="180">
       <v-row justify="space-around">
-        <v-icon color="info" size="25px"> mdi-alert-circle-outline </v-icon>
-        <v-icon size="25px" color="info"> mdi-content-save </v-icon>
+        <v-menu v-if="currentUser.uid == driverUID" offset-y v-model="test">
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon color="info" size="25px" v-on="on" v-bind="attrs">
+              mdi-alert-circle-outline
+            </v-icon>
+          </template>
+          <v-card color="infoDark">
+            <template v-if="userRequest">
+              <v-list color="infoDark">
+                <v-list-item>
+                  <v-list-item-title class="text-center">
+                    {{ userRequest.nombre }} ha <br />
+                    solicitado cambio de rol
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+              <v-divider></v-divider>
+              <v-card-actions class="justify-center">
+                <v-btn color="success" small @click="acceptRequest"
+                  >Aceptar</v-btn
+                >
+                <v-btn color="error" small>Rechazar</v-btn>
+              </v-card-actions>
+            </template>
+            <template v-else>
+              <v-list color="infoDark">
+                <v-list-item>
+                  <v-list-item-title class="text-center">
+                    No hay solicitudes
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </template>
+          </v-card>
+        </v-menu>
+
+        <v-icon
+          size="25px"
+          color="info"
+          :disabled="currentUser.uid != driverUID"
+        >
+          mdi-content-save
+        </v-icon>
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon size="25px" color="info" v-on="on" v-bind="attrs">
+            <v-icon
+              size="25px"
+              color="info"
+              v-on="on"
+              v-bind="attrs"
+              :disabled="currentUser.uid != driverUID"
+            >
               mdi-github
             </v-icon>
           </template>
@@ -157,7 +206,13 @@
         </v-icon>
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon size="25px" color="success" v-bind="attrs" v-on="on">
+            <v-icon
+              size="25px"
+              color="success"
+              v-bind="attrs"
+              v-on="on"
+              :disabled="currentUser.uid != driverUID"
+            >
               mdi-play-outline
             </v-icon>
           </template>
@@ -170,13 +225,30 @@
 
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-
+import CodeService from "@/services/code_channel.service";
+import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
-
+const User = namespace("UserModule");
+import UserService from "@/services/user.service";
 @Component
 export default class AppBarOptions extends Vue {
+  @Prop({
+    required: true,
+  })
+  public nameChannel!: string;
+
+  @Watch("driverUID")
+  currentDriverWatch(val: string) {
+    this.driverUID = val;
+  }
+
+  @Watch("status.showRequestDriver")
+  Watch(val: string) {
+    console.log(val);
+  }
+
   @CodeChannel.Action
   private toggleShowTreeView!: () => void;
 
@@ -186,12 +258,38 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.Action
   private toggleShowNavigationDrawerChannels!: () => void;
 
+  @CodeChannel.State("status")
+  public status!: any;
+
+  @CodeChannel.State("driverUID")
+  private driverUID!: string | undefined;
+
+  /**
+   * Estado obtenido del @module User
+   */
+
+  @User.State("user")
+  private currentUser!: User;
+
   public dialogImport = false;
   public validImport = true;
   public dialogExport = false;
   public validExport = true;
   public dialogExit = false;
   public validExit = false;
+  public userRequest: User | undefined = undefined;
+  public test = false;
+
+  acceptRequest() {
+    CodeService.acceptRequest(this.currentUser.uid!, this.userRequest!.uid!);
+  }
+
+  mounted() {
+    CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
+      this.userRequest = await UserService.getUserInfoByID(uidRequest);
+      this.test = true;
+    });
+  }
 }
 </script>
 

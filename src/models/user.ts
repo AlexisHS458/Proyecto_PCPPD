@@ -23,5 +23,7 @@ export interface User {
    */
   fotoURL: string,
 
-  workspacesCount?: number
+  workspacesCount?: number,
+
+  workspacesCollab?: number
 }

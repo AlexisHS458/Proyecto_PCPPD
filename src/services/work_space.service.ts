@@ -85,11 +85,9 @@ class WorkSpaceService {
   getUsersInWorkspace(workspaceID: string, onSnapshot: (users: User[]) => void): void {
     db.collection(Collection.WORK_SPACE)
       .doc(workspaceID)
-      .onSnapshot(snapshot => {
+      .onSnapshot(async snapshot => {
         const workspaceData = <Workspace>snapshot.data();
-        UserService.getUsersByID(workspaceData.usuarios, users => {
-          onSnapshot(users);
-        });
+        onSnapshot(await UserService.getUsersByID(workspaceData.usuarios));
       });
   }
 
@@ -99,6 +97,7 @@ class WorkSpaceService {
    * @param IDWorkSpace espacio de trabajo
    */
   async removeUser(IDUser: string, IDWorkSpace: string): Promise<void> {
+    await UserService.updateUserWorkspaceCollab(IDUser, false);
     return await db
       .collection(Collection.WORK_SPACE)
       .doc(IDWorkSpace)

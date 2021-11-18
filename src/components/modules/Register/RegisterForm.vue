@@ -129,10 +129,11 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
-import { Ref } from "vue-property-decorator";
+import { Ref, Watch } from "vue-property-decorator";
 import { VForm } from "@/utils/types";
 const Auth = namespace("UserModule");
 const GetUsers = namespace("InvitationsModule");
+const Workspace = namespace("WorkspaceModule");
 @Component
 export default class Register extends Vue {
   /**
@@ -171,6 +172,15 @@ export default class Register extends Vue {
   @GetUsers.State("users")
   private users!: User[];
 
+  /**
+   * Accion obtenida del @module Worksapce
+   */
+  @Workspace.State("allUsers")
+  private allUsers!: User[];
+
+  @Workspace.Action
+  private fetchAllUsers!: () => Promise<void>;
+
   @Ref("form") readonly form!: VForm;
 
   public loading = false;
@@ -192,9 +202,11 @@ export default class Register extends Vue {
     regexBoleta: (v: string): string | boolean =>
       /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválida",
     caracteres: (v: string): string | boolean =>
-      v.length >= 7 || "Este campo no puede tener menor de 7 caracteres",
+      (v || "").length >= 6 ||
+      "Este campo no puede tener menor de 6 caracteres",
     caracteresMayor: (v: string): string | boolean =>
-      v.length <= 15 || "Este campo no puede tener más de 15 caracteres",
+      (v || "").length <= 15 ||
+      "Este campo no puede tener más de 15 caracteres",
   };
 
   async created(): Promise<void> {
@@ -216,8 +228,10 @@ export default class Register extends Vue {
       this.form.resetValidation();
       this.loading = true;
       this.snackbar = false;
-
-      if (!this.users.find((user) => user.boleta === this.currentUser.boleta)) {
+      await this.fetchAllUsers();
+      if (
+        !this.allUsers.find((user) => user.boleta === this.currentUser.boleta)
+      ) {
         await this.saveUser(this.currentUser);
         if (this.isLoggedIn) {
           this.loading = false;
@@ -231,6 +245,11 @@ export default class Register extends Vue {
         this.loading = false;
       }
     }
+  }
+
+  @Watch("currentUser.boleta")
+  onChildChanged() {
+    this.textError = "";
   }
 }
 </script>

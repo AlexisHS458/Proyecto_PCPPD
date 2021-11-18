@@ -6,7 +6,7 @@
       @click="toggleShowNavigationDrawerChannels"
       >mdi-menu</v-icon
     >
-    <v-toolbar-title>{{ channelApp.nombre }}</v-toolbar-title>
+    <v-toolbar-title>{{ channelApp }}</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-icon
       color="white"
@@ -34,7 +34,7 @@ export default class AppBarMessages extends Vue {
   @Prop({
     required: true,
   })
-  public channelApp!: TextChannel;
+  public channelApp!: string;
 }
 </script>
 

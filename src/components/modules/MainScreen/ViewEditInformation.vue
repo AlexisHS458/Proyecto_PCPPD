@@ -17,7 +17,10 @@
             <v-col class="d-flex align-center">
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-img class="img mb-12 hidden-sm-and-down" :src="require('@/assets/logo.png')" />
+                  <v-img
+                    class="img mb-12 hidden-sm-and-down"
+                    :src="require('@/assets/logo.png')"
+                  />
                   <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Nombre"
@@ -46,7 +49,7 @@
                         rules.required,
                         rules.regexBoleta,
                         rules.caracteres,
-                        rules.caracteresMayor
+                        rules.caracteresMayor,
                       ]"
                       v-model="user.boleta"
                       outlined
@@ -54,6 +57,7 @@
                       color="primary"
                       prepend-inner-icon="mdi-credit-card-outline"
                       :error-messages="textError"
+                      required
                     ></v-text-field>
                   </v-col>
                   <v-col cols="4">
@@ -69,18 +73,36 @@
                   </v-col>
                 </v-form>
               </v-card-text>
-              <v-snackbar v-model="snackbarFailture" :timeout="timeout" color="error">
+              <v-snackbar
+                v-model="snackbarFailture"
+                :timeout="timeout"
+                color="error"
+              >
                 {{ textFailture }}
                 <template v-slot:action="{ attrs }">
-                  <v-btn color="white" text v-bind="attrs" @click="snackbarFailture = false">
+                  <v-btn
+                    color="white"
+                    text
+                    v-bind="attrs"
+                    @click="snackbarFailture = false"
+                  >
                     Cerrar
                   </v-btn>
                 </template>
               </v-snackbar>
-              <v-snackbar v-model="snackbarSuccess" :timeout="timeout" color="success">
+              <v-snackbar
+                v-model="snackbarSuccess"
+                :timeout="timeout"
+                color="success"
+              >
                 {{ textSuccess }}
                 <template v-slot:action="{ attrs }">
-                  <v-btn color="white" text v-bind="attrs" @click="snackbarSuccess = false">
+                  <v-btn
+                    color="white"
+                    text
+                    v-bind="attrs"
+                    @click="snackbarSuccess = false"
+                  >
                     Cerrar
                   </v-btn>
                 </template>
@@ -102,7 +124,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
-import { Ref } from "vue-property-decorator";
+import { Ref, Watch } from "vue-property-decorator";
 import { VForm } from "@/utils/types";
 const EditUser = namespace("UserModule");
 const Workspace = namespace("WorkspaceModule");
@@ -134,13 +156,13 @@ export default class ViewEdit extends Vue {
   private isLoading!: boolean;
 
   /**
-   * Accion obtenida del @module Invitations
+   * Accion obtenida del @module Worksapce
    */
   @Workspace.State("allUsers")
   private allUsers!: User[];
 
   @Workspace.Action
-  private fetchAllUsers!: () => void;
+  private fetchAllUsers!: () => Promise<void>;
 
   @Ref("form") readonly form!: VForm;
 
@@ -158,32 +180,33 @@ export default class ViewEdit extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     caracteres: (v: string): string | boolean =>
-      v.length >= 7 || "Este campo no puede tener menor de 7 caracteres",
+      (v || "").length >= 6 ||
+      "Este campo no puede tener menor de 6 caracteres",
     caracteresMayor: (v: string): string | boolean =>
-      v.length <= 15 || "Este campo no puede tener más de 15 caracteres",
+      (v || "").length <= 15 ||
+      "Este campo no puede tener más de 15 caracteres",
     regex: (v: string): string | boolean =>
-      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(v) ||
-      "Nombre inválido",
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
+        v
+      ) || "Nombre inválido",
     regexLastName: (v: string): string | boolean =>
-      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(v) ||
-      "Apellido inválido",
-    regexBoleta: (v: string): string | boolean => /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido"
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
+        v
+      ) || "Apellido inválido",
+    regexBoleta: (v: string): string | boolean =>
+      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido",
   };
 
-  /*  @Watch("user")
+  @Watch("user.boleta")
   onChildChanged() {
-    this.getMessages();
-  } */
+    this.textError = "";
+  }
 
   async created() {
     if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
     }
-    /*  await this.fetchCurrentUser(); */
     this.user = JSON.parse(JSON.stringify(this.currentUser));
-    this.fetchAllUsers();
-    const allUsersBoletas = this.allUsers.map(user => user.boleta);
-    this.boletas = allUsersBoletas.filter(boleta => boleta !== this.currentUser.boleta);
   }
 
   /**
@@ -196,6 +219,11 @@ export default class ViewEdit extends Vue {
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
 
+      await this.fetchAllUsers();
+      const allUsersBoletas = this.allUsers.map((user) => user.boleta);
+      this.boletas = allUsersBoletas.filter(
+        (boleta) => boleta !== this.currentUser.boleta
+      );
       if (!this.boletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {

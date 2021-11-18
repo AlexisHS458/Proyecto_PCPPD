@@ -19,7 +19,11 @@
 
         <v-card-text>
           <v-row align="center" justify="space-around">
-            <v-btn color="success" @click="acceptInvitationToWorkspace">
+            <v-btn
+              color="success"
+              @click="acceptInvitationToWorkspace"
+              :loading="loading"
+            >
               Aceptar <v-icon class="ml-6"> mdi-check </v-icon>
             </v-btn>
             <v-btn color="error" @click="declineInvitationToWorkspace">
@@ -38,8 +42,10 @@ import { Invitation } from "@/models/invitation";
 import { StringUtils } from "@/utils/stringsUtils";
 import { namespace } from "vuex-class";
 import { Workspace } from "@/models/workspace";
+import { User } from "@/models/user";
 const OptionsInvitation = namespace("InvitationsModule");
 const MyWorkSpace = namespace("WorkspaceModule");
+const User = namespace("UserModule");
 @Component
 export default class InvitationsCard extends Vue {
   @Prop({
@@ -61,6 +67,9 @@ export default class InvitationsCard extends Vue {
 
   @OptionsInvitation.Action
   private setVisibleSnackBarWarning!: () => void;
+
+  @OptionsInvitation.Action
+  private setVisibleSnackBar!: () => void;
 
   /**
    * Estados obtenidos del @module Invitations
@@ -89,22 +98,39 @@ export default class InvitationsCard extends Vue {
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
 
+  @User.State("user")
+  private currentUser!: User;
+
   public getInitials = StringUtils.getInitials;
   public show = true;
+  public loading = false;
 
   async acceptInvitationToWorkspace() {
+    this.loading = true;
     await this.fetchMyWorkspace(this.invitation.idEspacioTrabajo);
-    if (this.workspace.usuarios.length < 7) {
-      await this.acceptInvitation(this.invitation);
-      if (this.status.showSnackbar && !this.status.showSnackbarError) {
+    if ((this.currentUser.workspacesCollab || 0) < 2) {
+      if (this.workspace.usuarios.length < 7) {
+        this.loading = false;
+        await this.acceptInvitation(this.invitation);
         this.show = false;
+
+        /*   if (this.status.showSnackbar && !this.status.showSnackbarError) {
+          this.show = false;
+        } else {
+          this.show = false;
+        } */
       } else {
-        this.show = false;
+        this.loading = false;
+        this.setVisibleSnackBarWarning();
+        this.setMessageOnSnackbar(
+          "No hay lugares para unirse a este espacio de trabajo. <br> Contacta al administrador que te invitó."
+        );
       }
     } else {
+      this.loading = false;
       this.setVisibleSnackBarWarning();
       this.setMessageOnSnackbar(
-        "No hay lugares para unirse a este espacio de trabajo. <br> Contacta al administrador que te invitó."
+        "No puedes pertenecer más de dos espacios como colaborador"
       );
     }
   }

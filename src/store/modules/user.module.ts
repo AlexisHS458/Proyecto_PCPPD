@@ -4,7 +4,7 @@ import UserService from "@/services/user.service";
 import AuthService from "@/services/auth.service";
 import presenceServices from "@/services/presence.service";
 import { Status } from "@/models/status";
-import { State } from "vuex-class";
+
 
 /**
  * Clase para el manejo de la información de usuario.
@@ -105,7 +105,7 @@ class UserModule extends VuexModule {
   @Action
   async fetchCurrentUser(): Promise<void> {
     this.context.commit("setLoadingStatus", true);
-    await UserService.getUserAuthInfo((user)=> {
+    await UserService.getUserAuthInfo(user => {
       this.context.commit("setUser", user);
       this.context.commit("setLoadingStatus", false);
     });
