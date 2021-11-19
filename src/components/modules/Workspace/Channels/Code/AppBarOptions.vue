@@ -21,6 +21,7 @@
           </template>
           <v-card color="infoDark">
             <template v-if="userRequest">
+              <div v-show="userRequest"></div>
               <v-list color="infoDark">
                 <v-list-item>
                   <v-list-item-title class="text-center">
