@@ -3,6 +3,9 @@ import { Collection } from "@/utils/collections";
 import { User } from "@/models/user";
 import { db, FieldValue } from "@/utils/firebase";
 import UserService from "@/services/user.service";
+import PermissionsService from "@/services/permissions.service";
+import ChannelsService from "@/services/channels.service";
+import { TextChannel } from "@/models/textChannel";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -24,7 +27,22 @@ class WorkSpaceService {
    * @param id ID del documento a eliminar
    */
   async deleteWorkSpace(id: string): Promise<void> {
-    const workspaceRef = await this.getWorkspaceInfo(id)
+    const workspaceRef = await this.getWorkspaceInfo(id);
+    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.TEXT_CHANNEL).onSnapshot(snapshot => {
+      snapshot.docs.forEach(async doc =>{
+        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.TEXT_CHANNEL).doc(doc.id).delete()
+      })
+    });
+    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.VOICE_CHANNEL).onSnapshot(snapshot => {
+      snapshot.docs.forEach(async doc =>{
+        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.VOICE_CHANNEL).doc(doc.id).delete()
+      })
+    });
+    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.CODE_CHANNEL).onSnapshot(snapshot => {
+      snapshot.docs.forEach(async doc =>{
+        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.CODE_CHANNEL).doc(doc.id).delete()
+      })
+    });
     await db
       .collection(Collection.WORK_SPACE)
       .doc(id)
