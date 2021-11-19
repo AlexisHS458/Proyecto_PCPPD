@@ -9,6 +9,8 @@ import { ChannelType } from "@/utils/channels_types";
  * Conexión a servicios de información de los canales.
  */
 class ChannelsService {
+  public permisos: string[] = [];
+
   /**
    * Agrega un nuevo canal de texto
    * @param workSpaceID ID del espacio de trabajo
@@ -220,27 +222,27 @@ class ChannelsService {
           .collection(Collection.TEXT_CHANNEL)
           .doc(channelUID)
           .get();
-        return (<TextChannel>snapshot.data()).nombre  
+        return (<TextChannel>snapshot.data()).nombre;
       }
       case ChannelType.VOICE: {
         const snapshot = await db
-        .collection(Collection.WORK_SPACE)
-        .doc(workspaceUID)
-        .collection(Collection.VOICE_CHANNEL)
-        .doc(channelUID)
-        .get();
-      return (<VoiceChannel>snapshot.data()).nombre 
+          .collection(Collection.WORK_SPACE)
+          .doc(workspaceUID)
+          .collection(Collection.VOICE_CHANNEL)
+          .doc(channelUID)
+          .get();
+        return (<VoiceChannel>snapshot.data()).nombre;
       }
-      case ChannelType.CODE: {        
+      case ChannelType.CODE: {
         const snapshot = await db
-        .collection(Collection.WORK_SPACE)
-        .doc(workspaceUID)
-        .collection(Collection.CODE_CHANNEL)
-        .doc(channelUID)
-        .get();
-      const codeData = <CodeChannel>snapshot.data();
+          .collection(Collection.WORK_SPACE)
+          .doc(workspaceUID)
+          .collection(Collection.CODE_CHANNEL)
+          .doc(channelUID)
+          .get();
+        const codeData = <CodeChannel>snapshot.data();
 
-      return codeData.nombre;
+        return codeData.nombre;
       }
       default: {
         return "";
@@ -254,47 +256,52 @@ class ChannelsService {
     workspaceUID: string,
     channelUID: string
   ): Promise<boolean> {
-    var permisos: string[];
     switch (type) {
-      case ChannelType.TEXT: {
-        const snapshot = await db
-          .collection(Collection.WORK_SPACE)
-          .doc(workspaceUID)
-          .collection(Collection.TEXT_CHANNEL)
-          .doc(channelUID)
-          .get();
-        permisos = (<TextChannel>snapshot.data()).permisos  
-      }
-      case ChannelType.VOICE: {
-        const snapshot = await db
-        .collection(Collection.WORK_SPACE)
-        .doc(workspaceUID)
-        .collection(Collection.VOICE_CHANNEL)
-        .doc(channelUID)
-        .get();
-        permisos = (<VoiceChannel>snapshot.data()).permisos
-      }
-      case ChannelType.CODE: {        
-        const snapshot = await db
-        .collection(Collection.WORK_SPACE)
-        .doc(workspaceUID)
-        .collection(Collection.CODE_CHANNEL)
-        .doc(channelUID)
-        .get();
-      const codeData = <CodeChannel>snapshot.data();
-      permisos = codeData.permisos;
-      }
+      case ChannelType.TEXT:
+        {
+          const snapshot = await db
+            .collection(Collection.WORK_SPACE)
+            .doc(workspaceUID)
+            .collection(Collection.TEXT_CHANNEL)
+            .doc(channelUID)
+            .get();
+          this.permisos = (<TextChannel>snapshot.data()).permisos;
+        }
+        break;
+      case ChannelType.VOICE:
+        {
+          const snapshot = await db
+            .collection(Collection.WORK_SPACE)
+            .doc(workspaceUID)
+            .collection(Collection.VOICE_CHANNEL)
+            .doc(channelUID)
+            .get();
+          this.permisos = (<VoiceChannel>snapshot.data()).permisos;
+        }
+        break;
+      case ChannelType.CODE:
+        {
+          const snapshot = await db
+            .collection(Collection.WORK_SPACE)
+            .doc(workspaceUID)
+            .collection(Collection.CODE_CHANNEL)
+            .doc(channelUID)
+            .get();
+          const codeData = <CodeChannel>snapshot.data();
+          this.permisos = codeData.permisos;
+        }
+        break;
       default: {
-        permisos= [];
+        this.permisos = [];
       }
     }
-    var hasAccess = permisos.find(UID=>{UID === UserUID});
-    if(hasAccess){
+    const hasAccess = this.permisos.find(UID => UID === UserUID);
+
+    if (hasAccess) {
       return true;
-    }else{
+    } else {
       return false;
     }
-    
   }
 }
 
