@@ -4,6 +4,8 @@ import { TextChannel } from "@/models/textChannel";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { Collection } from "@/utils/collections";
 import { ChannelType } from "@/utils/channels_types";
+import PermissionsService from "./permissions.service";
+import WorkspaceService from "./work_space.service";
 
 /**
  * Conexión a servicios de información de los canales.
@@ -67,11 +69,16 @@ class ChannelsService {
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<TextChannel>(doc => {
-            const textChannel = {
+            const textChannel: TextChannel = {
               ...doc.data(),
               uid: doc.id
-            };
-            return <TextChannel>textChannel;
+            } as TextChannel;
+            if(textChannel.permisos.length === 0){
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
+                PermissionsService.AddPermission(workSpaceID,textChannel.uid!, value.usuarios[0])
+              });
+            }
+            return textChannel;
           })
         );
       });
@@ -133,11 +140,16 @@ class ChannelsService {
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<VoiceChannel>(doc => {
-            const voiceChannel = {
+            const voiceChannel: VoiceChannel = {
               ...doc.data(),
               uid: doc.id
-            };
-            return <VoiceChannel>voiceChannel;
+            } as VoiceChannel;
+            if(voiceChannel.permisos.length === 0){
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
+                PermissionsService.AddVoicePermission(workSpaceID,voiceChannel.uid!, value.usuarios[0])
+              });
+            }
+            return voiceChannel;
           })
         );
       });
@@ -199,10 +211,15 @@ class ChannelsService {
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<CodeChannel>(doc => {
-            const codeChannel = {
+            const codeChannel: CodeChannel = {
               ...doc.data(),
               uid: doc.id
-            };
+            } as CodeChannel;
+            if(codeChannel.permisos.length === 0){
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
+                PermissionsService.AddCodePermission(workSpaceID,codeChannel.uid!, value.usuarios[0])
+              });
+            }
             return <CodeChannel>codeChannel;
           })
         );

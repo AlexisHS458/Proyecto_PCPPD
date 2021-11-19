@@ -3,9 +3,6 @@ import { Collection } from "@/utils/collections";
 import { User } from "@/models/user";
 import { db, FieldValue } from "@/utils/firebase";
 import UserService from "@/services/user.service";
-import PermissionsService from "@/services/permissions.service";
-import ChannelsService from "@/services/channels.service";
-import { TextChannel } from "@/models/textChannel";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -17,9 +14,10 @@ class WorkSpaceService {
    * @returns WorkSpace. Referencia del espacio de trabajo creado.
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
-    const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    const workspaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    const workspaceData = <Workspace>(await workspaceRef).data()
     UserService.updateUserWorkspaceCount(workspace.uid_usuario, true);
-    return <Workspace>(await workSpaceRef).data();
+    return workspaceData;
   }
 
   /**
