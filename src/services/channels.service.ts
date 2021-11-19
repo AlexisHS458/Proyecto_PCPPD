@@ -247,6 +247,55 @@ class ChannelsService {
       }
     }
   }
+
+  async getUsersInChannel(
+    UserUID: string,
+    type: ChannelType,
+    workspaceUID: string,
+    channelUID: string
+  ): Promise<boolean> {
+    var permisos: string[];
+    switch (type) {
+      case ChannelType.TEXT: {
+        const snapshot = await db
+          .collection(Collection.WORK_SPACE)
+          .doc(workspaceUID)
+          .collection(Collection.TEXT_CHANNEL)
+          .doc(channelUID)
+          .get();
+        permisos = (<TextChannel>snapshot.data()).permisos  
+      }
+      case ChannelType.VOICE: {
+        const snapshot = await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceUID)
+        .collection(Collection.VOICE_CHANNEL)
+        .doc(channelUID)
+        .get();
+        permisos = (<VoiceChannel>snapshot.data()).permisos
+      }
+      case ChannelType.CODE: {        
+        const snapshot = await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceUID)
+        .collection(Collection.CODE_CHANNEL)
+        .doc(channelUID)
+        .get();
+      const codeData = <CodeChannel>snapshot.data();
+      permisos = codeData.permisos;
+      }
+      default: {
+        permisos= [];
+      }
+    }
+    var hasAccess = permisos.find(UID=>{UID === UserUID});
+    if(hasAccess){
+      return true;
+    }else{
+      return false;
+    }
+    
+  }
 }
 
 export default new ChannelsService();
