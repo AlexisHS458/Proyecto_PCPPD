@@ -1,114 +1,68 @@
 <template>
-  <v-navigation-drawer
-    app
-    clipped
-    right
-    v-model="status.showTreeView"
-    color="primaryDark"
-    dark
-  >
-    <v-treeview
-      v-model="tree"
-      :open="initiallyOpen"
-      :items="items"
-      activatable
-      item-key="name"
-      open-on-click
-      style="color: white"
+  <v-list dark>
+    <v-list-item
+      v-for="treeEntry in treeEntries"
+      :key="treeEntry.object.id"
+      @click="goToPath(treeEntry)"
     >
-      <template v-slot:prepend="{ item, open }">
-        <v-icon v-if="!item.file" color="white">
-          {{ open ? "mdi-folder-open" : "mdi-folder" }}
-        </v-icon>
-        <v-icon color="white" v-else>
-          {{ files[item.file] }}
-        </v-icon>
-      </template>
-    </v-treeview>
-  </v-navigation-drawer>
+      <v-list-item-avatar>
+        <v-icon dark v-if="treeEntry.type == 'tree'"> mdi-folder </v-icon>
+        <v-icon dark v-else-if="treeEntry.type == 'blob'"> mdi-file </v-icon>
+      </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title v-text="treeEntry.name"></v-list-item-title>
+      </v-list-item-content>
+    </v-list-item>
+  </v-list>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { Maybe, Tree, TreeEntry, Blob } from "@/generated/graphql";
 import { namespace } from "vuex-class";
-const CodeChannel = namespace("CodeChannelModule");
-
+const CodeChannelModule = namespace("CodeChannelModule");
+const User = namespace("UserModule");
+import { User } from "@/models/user";
 @Component
-export default class ViewTreeViwe extends Vue {
-  @CodeChannel.State("status")
-  private status!: any;
+export default class ViewTreeView extends Vue {
+  @Prop({
+    required: true
+  })
+  public treeEntries!: Maybe<TreeEntry[]>;
 
-  public drawer = null;
-  public initiallyOpen = ["public"];
-  public files = {
-    html: "mdi-language-html5",
-    js: "mdi-nodejs",
-    json: "mdi-code-json",
-    md: "mdi-language-markdown",
-    pdf: "mdi-file-pdf",
-    png: "mdi-file-image",
-    txt: "mdi-file-document-outline",
-    xls: "mdi-file-excel",
-  };
-  public tree = [];
-  public items = [
-    {
-      name: ".git",
-    },
-    {
-      name: "node_modules",
-    },
-    {
-      name: "public",
-      children: [
-        {
-          name: "static",
-          children: [
-            {
-              name: "logo.png",
-              file: "png",
-            },
-          ],
-        },
-        {
-          name: "favicon.ico",
-          file: "png",
-        },
-        {
-          name: "index.html",
-          file: "html",
-        },
-      ],
-    },
-    {
-      name: ".gitignore",
-      file: "txt",
-    },
-    {
-      name: "babel.config.js",
-      file: "js",
-    },
-    {
-      name: "package.json",
-      file: "json",
-    },
-    {
-      name: "README.md",
-      file: "md",
-    },
-    {
-      name: "vue.config.js",
-      file: "js",
-    },
-    {
-      name: "yarn.lock",
-      file: "txt",
-    },
-  ];
+  @CodeChannelModule.Action
+  private addPathState!: (path: string) => void;
+
+  @CodeChannelModule.Action
+  private setCodeData!: (data: TreeEntry) => void;
+
+  @CodeChannelModule.State("driverUID")
+  private driverUID!: string;
+
+  @User.State("user")
+  private currentUser!: User;
+
+  goToPath(treeEntry: TreeEntry) {
+    switch ((treeEntry.object as any)?.__typename) {
+      case "Tree":
+        const tree = treeEntry.object as Tree;
+        this.addPathState(tree.id);
+        break;
+      case "Blob":
+        if (this.driverUID === this.currentUser.uid!) {
+          const blob = treeEntry.object as Blob;
+          if (blob.isBinary == false) {
+            this.setCodeData(treeEntry);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
 }
 </script>
-
-
 
 <style scoped>
 .f {

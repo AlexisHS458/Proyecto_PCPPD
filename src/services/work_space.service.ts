@@ -14,9 +14,10 @@ class WorkSpaceService {
    * @returns WorkSpace. Referencia del espacio de trabajo creado.
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
-    const workSpaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    const workspaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
+    const workspaceData = <Workspace>(await workspaceRef).data()
     UserService.updateUserWorkspaceCount(workspace.uid_usuario, true);
-    return <Workspace>(await workSpaceRef).data();
+    return workspaceData;
   }
 
   /**
@@ -24,7 +25,22 @@ class WorkSpaceService {
    * @param id ID del documento a eliminar
    */
   async deleteWorkSpace(id: string): Promise<void> {
-    const workspaceRef = await this.getWorkspaceInfo(id)
+    const workspaceRef = await this.getWorkspaceInfo(id);
+    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.TEXT_CHANNEL).onSnapshot(snapshot => {
+      snapshot.docs.forEach(async doc =>{
+        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.TEXT_CHANNEL).doc(doc.id).delete()
+      })
+    });
+    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.VOICE_CHANNEL).onSnapshot(snapshot => {
+      snapshot.docs.forEach(async doc =>{
+        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.VOICE_CHANNEL).doc(doc.id).delete()
+      })
+    });
+    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.CODE_CHANNEL).onSnapshot(snapshot => {
+      snapshot.docs.forEach(async doc =>{
+        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.CODE_CHANNEL).doc(doc.id).delete()
+      })
+    });
     await db
       .collection(Collection.WORK_SPACE)
       .doc(id)

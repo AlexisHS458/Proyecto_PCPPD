@@ -2,11 +2,16 @@
   <v-hover>
     <v-list-item
       slot-scope="{ hover }"
-      :to="{
-        name: 'messages',
-        params: { idChannel: channel.uid },
-      }"
-      :class="`${hover ? 'select-item' : 'no-select-item'}`"
+      @click="goToTextChannel"
+      :class="[
+        `${hover ? 'select-item' : 'no-select-item'}`,
+        `${
+          '/space/' + workspaceUID + '/' + channel.uid !== $route.path
+            ? ''
+            : 'active'
+        }`,
+      ]"
+      active-class="active"
       color="white"
       class="mb-1"
     >
@@ -198,6 +203,8 @@ import { namespace } from "vuex-class";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
+import ChannelService from "@/services/channels.service";
+import { ChannelType } from "@/utils/channels_types";
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -274,7 +281,7 @@ export default class NameChannels extends Vue {
   };
   public permissions = {} as PermissionsPath;
   public statusCheckbox = false;
-
+ 
   /**
    * Editar información de un canal de texto
    */
@@ -337,6 +344,28 @@ export default class NameChannels extends Vue {
     this.form.reset();
     this.dialogRenameChanel = false;
   }
+
+  async goToTextChannel() {
+    const hasAcces = await ChannelService.getUsersInChannel(
+      this.currentUser.uid!,
+      ChannelType.TEXT,
+      this.workspaceUID,
+      this.channel.uid!
+    );
+    if (hasAcces) {
+      if (
+        this.$route.path !=
+        "/space/" + this.workspaceUID + "/" + this.channel.uid!
+      ) {
+        this.$router.push({
+          name: "messages",
+          params: { idChannel: this.channel.uid! },
+        });
+      }
+    } else {
+      alert("Tas wey");
+    }
+  }
 }
 </script>
 
@@ -384,5 +413,9 @@ export default class NameChannels extends Vue {
 
 .no-select-item {
   background-color: #000029;
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 </style>

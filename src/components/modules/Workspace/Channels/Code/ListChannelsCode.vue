@@ -181,7 +181,9 @@ export default class ListChannels extends Vue {
       this.loading = true;
       this.codeChannel.nombre = this.nameChannel;
       this.codeChannel.permisos = [];
-
+      this.codeChannel.propietario = "RamiroEstradaG";
+      this.codeChannel.nombre = "SAES-para-Alumnos";
+     
       await this.createCodeChannel(this.codeChannel);
       if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.loading = false;

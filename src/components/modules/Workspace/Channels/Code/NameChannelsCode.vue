@@ -3,13 +3,18 @@
     <v-hover>
       <v-list-item
         slot-scope="{ hover }"
-        :to="{
-          name: 'codeChannel',
-          params: { idChannelCode: channel.uid }
-        }"
+        @click="goToTextChannel"
         color="white"
-        :class="`${hover ? 'select-item' : 'no-select-item'}`"
+        :class="[
+          `${hover ? 'select-item' : 'no-select-item'}`,
+          `${
+            '/space/' + workspaceUID + '/code/' + channel.uid !== $route.path
+              ? ''
+              : 'active'
+          }`,
+        ]"
         class="mb-1"
+        active-class=""
       >
         <v-list-item-icon>
           <v-icon color="white">{{ icon }}</v-icon>
@@ -22,9 +27,19 @@
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-menu v-if="workspace.uid_usuario == currentUser.uid" v-model="menu" offset-y>
+          <v-menu
+            v-if="workspace.uid_usuario == currentUser.uid"
+            v-model="menu"
+            offset-y
+          >
             <template #activator="{ on }">
-              <v-btn text icon v-on="on" v-on:click.prevent :class="{ hidden: !hover && !menu }">
+              <v-btn
+                text
+                icon
+                v-on="on"
+                v-on:click.prevent
+                :class="{ hidden: !hover && !menu }"
+              >
                 <v-icon color="white">mdi-cog</v-icon>
               </v-btn>
             </template>
@@ -74,7 +89,14 @@
                     v-model="dialogRenameChanel"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <v-btn depressed text block class="btn" v-bind="attrs" v-on="on">
+                      <v-btn
+                        depressed
+                        text
+                        block
+                        class="btn"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
                         <v-icon color="info" class="mr-6"> mdi-pencil </v-icon>
                         Renombrar canal
                       </v-btn>
@@ -84,7 +106,12 @@
                         Ingresa el nuevo nombre del canal
                       </v-toolbar>
                       <v-card-text>
-                        <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+                        <v-form
+                          ref="form"
+                          v-model="valid"
+                          lazy-validation
+                          @submit.prevent
+                        >
                           <v-row align="center" justify="center" class="mt-6">
                             <v-col cols="9">
                               <v-text-field
@@ -95,7 +122,10 @@
                                 color="primary"
                                 prepend-inner-icon="mdi-code-tags"
                                 v-model="newNameChannel"
-                                :rules="[rules.required, rules.regexNameChannel]"
+                                :rules="[
+                                  rules.required,
+                                  rules.regexNameChannel,
+                                ]"
                                 @keyup.enter="editChannel"
                                 @keydown.esc="closeAddSpace"
                               ></v-text-field>
@@ -104,7 +134,10 @@
                         </v-form>
                       </v-card-text>
                       <v-card-actions class="justify-end">
-                        <v-btn color="success" :loading="loadingRenameChanel" @click="editChannel"
+                        <v-btn
+                          color="success"
+                          :loading="loadingRenameChanel"
+                          @click="editChannel"
                           >Aceptar</v-btn
                         >
                         <v-btn text @click="closeAddSpace">Cancelar</v-btn>
@@ -117,7 +150,14 @@
                     v-model="dialogDelete"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <v-btn depressed text block class="btn" v-bind="attrs" v-on="on">
+                      <v-btn
+                        depressed
+                        text
+                        block
+                        class="btn"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
                         <v-icon color="error" class="mr-6"> mdi-delete </v-icon>
                         Eliminar
                       </v-btn>
@@ -132,13 +172,19 @@
                           <p>ESTA ACCIÓN NO SE PUEDE DESAHACER</p>
                         </div>
                         <v-row align="center" justify="center">
-                          <v-btn color="error" @click="deleteChannel" :loading="loadingDelete">
+                          <v-btn
+                            color="error"
+                            @click="deleteChannel"
+                            :loading="loadingDelete"
+                          >
                             SI, QUIERO ELIMINARLO
                           </v-btn>
                         </v-row>
                       </v-card-text>
                       <v-card-actions class="justify-end">
-                        <v-btn text @click="dialogDelete = false">Cancelar</v-btn>
+                        <v-btn text @click="dialogDelete = false"
+                          >Cancelar</v-btn
+                        >
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
@@ -184,29 +230,31 @@ const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
 const CodeChannel = namespace("CodeChannelModule");
 import UserService from "@/services/user.service";
+import ChannelService from "@/services/channels.service";
 /* eslint-disable */
 // @ts-ignore
 import image from "@/assets/userProfile.png";
+import { ChannelType } from "@/utils/channels_types";
 /* eslint-enable */
 @Component
 export default class NameChannels extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public channel!: CodeChannel;
 
   @Prop({
-    required: true
+    required: true,
   })
   public icon!: string;
 
   @Prop({
-    required: true
+    required: true,
   })
   public users!: User[];
 
   @Prop({
-    required: true
+    required: true,
   })
   public workspaceUID!: string;
 
@@ -245,9 +293,13 @@ export default class NameChannels extends Vue {
    * Acciones obtenidas del @module Permissions
    */
   @Permissions.Action
-  private AddCodePermission!: (permissionsPath: PermissionsPath) => Promise<void>;
+  private AddCodePermission!: (
+    permissionsPath: PermissionsPath
+  ) => Promise<void>;
   @Permissions.Action
-  private RemoveCodePermission!: (permissionsPath: PermissionsPath) => Promise<void>;
+  private RemoveCodePermission!: (
+    permissionsPath: PermissionsPath
+  ) => Promise<void>;
 
   @CodeChannel.Action
   private setDriverUIDStatus!: (uid: string) => void;
@@ -257,6 +309,9 @@ export default class NameChannels extends Vue {
 
   @CodeChannel.Getter
   private driverID!: string;
+
+  @CodeChannel.Action
+  private setShowRequestDriverStatus!: (status: boolean) => void;
 
   @Ref("form") readonly form!: VForm;
 
@@ -274,9 +329,10 @@ export default class NameChannels extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
-      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido"
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
   public usersDisplay: User[] = [];
+  public activeIndex: undefined;
   /**
    * Editar información de un canal de voz
    */
@@ -318,7 +374,7 @@ export default class NameChannels extends Vue {
       uidWorkSpace: this.workspaceUID,
       uidChannel: this.channel.uid!,
       nameUser: userName,
-      nameChannel: this.channel.nombre
+      nameChannel: this.channel.nombre,
     };
     if (e.includes(userUID)) {
       await this.AddCodePermission(this.permissions);
@@ -332,11 +388,15 @@ export default class NameChannels extends Vue {
   } */
 
   mounted() {
-    CodeService.allUsers(this.currentUser.uid!, this.channel.uid!, async users => {
-      this.usersDisplay = await Promise.all(
-        users.map(user => UserService.getUserInfoByID(user.uid))
-      );
-    });
+    CodeService.allUsers(
+      this.currentUser.uid!,
+      this.channel.uid!,
+      async (users) => {
+        this.usersDisplay = await Promise.all(
+          users.map((user) => UserService.getUserInfoByID(user.uid))
+        );
+      }
+    );
     /*    CodeService.currentDriver(this.currentUser.uid!, async uid => {
       this.currentDriver = uid;
       this.setDriverUIDStatus(uid);
@@ -348,6 +408,28 @@ export default class NameChannels extends Vue {
     e.target.src = image;
   }
 
+  async goToTextChannel() {
+    const hasAcces = await ChannelService.getUsersInChannel(
+      this.currentUser.uid!,
+      ChannelType.CODE,
+      this.workspaceUID,
+      this.channel.uid!
+    );
+    if (hasAcces) {
+    /*  if (
+        this.$route.path !=
+        "/space/" + this.workspaceUID + "/code/" + this.channel.uid!
+      ) { */
+        this.$router.push({
+          name: "codeChannel",
+          params: { idChannelCode: this.channel.uid! },
+        });
+    //  }
+    } else {
+      alert("Tas wey");
+    }
+  }
+
   closeAddSpace() {
     this.form.resetValidation();
     this.form.reset();
@@ -356,6 +438,7 @@ export default class NameChannels extends Vue {
 
   sendRequestDriver() {
     CodeService.sendRequestToDriver(this.currentUser.uid!);
+    this.setShowRequestDriverStatus(true);
   }
 }
 </script>
@@ -407,5 +490,9 @@ export default class NameChannels extends Vue {
 
 .no-select-item {
   background-color: #000029;
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 </style>

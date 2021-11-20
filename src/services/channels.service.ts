@@ -4,11 +4,15 @@ import { TextChannel } from "@/models/textChannel";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { Collection } from "@/utils/collections";
 import { ChannelType } from "@/utils/channels_types";
+import PermissionsService from "./permissions.service";
+import WorkspaceService from "./work_space.service";
 
 /**
  * Conexión a servicios de información de los canales.
  */
 class ChannelsService {
+  public permisos: string[] = [];
+
   /**
    * Agrega un nuevo canal de texto
    * @param workSpaceID ID del espacio de trabajo
@@ -65,11 +69,16 @@ class ChannelsService {
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<TextChannel>(doc => {
-            const textChannel = {
+            const textChannel: TextChannel = {
               ...doc.data(),
               uid: doc.id
-            };
-            return <TextChannel>textChannel;
+            } as TextChannel;
+            if(textChannel.permisos.length === 0){
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
+                PermissionsService.AddPermission(workSpaceID,textChannel.uid!, value.usuarios[0])
+              });
+            }
+            return textChannel;
           })
         );
       });
@@ -131,11 +140,16 @@ class ChannelsService {
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<VoiceChannel>(doc => {
-            const voiceChannel = {
+            const voiceChannel: VoiceChannel = {
               ...doc.data(),
               uid: doc.id
-            };
-            return <VoiceChannel>voiceChannel;
+            } as VoiceChannel;
+            if(voiceChannel.permisos.length === 0){
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
+                PermissionsService.AddVoicePermission(workSpaceID,voiceChannel.uid!, value.usuarios[0])
+              });
+            }
+            return voiceChannel;
           })
         );
       });
@@ -197,10 +211,15 @@ class ChannelsService {
       .onSnapshot(snapshot => {
         onSnapshot(
           snapshot.docs.map<CodeChannel>(doc => {
-            const codeChannel = {
+            const codeChannel: CodeChannel = {
               ...doc.data(),
               uid: doc.id
-            };
+            } as CodeChannel;
+            if(codeChannel.permisos.length === 0){
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
+                PermissionsService.AddCodePermission(workSpaceID,codeChannel.uid!, value.usuarios[0])
+              });
+            }
             return <CodeChannel>codeChannel;
           })
         );
@@ -220,31 +239,85 @@ class ChannelsService {
           .collection(Collection.TEXT_CHANNEL)
           .doc(channelUID)
           .get();
-        return (<TextChannel>snapshot.data()).nombre  
+        return (<TextChannel>snapshot.data()).nombre;
       }
       case ChannelType.VOICE: {
         const snapshot = await db
-        .collection(Collection.WORK_SPACE)
-        .doc(workspaceUID)
-        .collection(Collection.VOICE_CHANNEL)
-        .doc(channelUID)
-        .get();
-      return (<VoiceChannel>snapshot.data()).nombre 
+          .collection(Collection.WORK_SPACE)
+          .doc(workspaceUID)
+          .collection(Collection.VOICE_CHANNEL)
+          .doc(channelUID)
+          .get();
+        return (<VoiceChannel>snapshot.data()).nombre;
       }
-      case ChannelType.CODE: {        
+      case ChannelType.CODE: {
         const snapshot = await db
-        .collection(Collection.WORK_SPACE)
-        .doc(workspaceUID)
-        .collection(Collection.CODE_CHANNEL)
-        .doc(channelUID)
-        .get();
-      const codeData = <CodeChannel>snapshot.data();
+          .collection(Collection.WORK_SPACE)
+          .doc(workspaceUID)
+          .collection(Collection.CODE_CHANNEL)
+          .doc(channelUID)
+          .get();
+        const codeData = <CodeChannel>snapshot.data();
 
-      return codeData.nombre;
+        return codeData.nombre;
       }
       default: {
         return "";
       }
+    }
+  }
+
+  async getUsersInChannel(
+    UserUID: string,
+    type: ChannelType,
+    workspaceUID: string,
+    channelUID: string
+  ): Promise<boolean> {
+    switch (type) {
+      case ChannelType.TEXT:
+        {
+          const snapshot = await db
+            .collection(Collection.WORK_SPACE)
+            .doc(workspaceUID)
+            .collection(Collection.TEXT_CHANNEL)
+            .doc(channelUID)
+            .get();
+          this.permisos = (<TextChannel>snapshot.data()).permisos;
+        }
+        break;
+      case ChannelType.VOICE:
+        {
+          const snapshot = await db
+            .collection(Collection.WORK_SPACE)
+            .doc(workspaceUID)
+            .collection(Collection.VOICE_CHANNEL)
+            .doc(channelUID)
+            .get();
+          this.permisos = (<VoiceChannel>snapshot.data()).permisos;
+        }
+        break;
+      case ChannelType.CODE:
+        {
+          const snapshot = await db
+            .collection(Collection.WORK_SPACE)
+            .doc(workspaceUID)
+            .collection(Collection.CODE_CHANNEL)
+            .doc(channelUID)
+            .get();
+          const codeData = <CodeChannel>snapshot.data();
+          this.permisos = codeData.permisos;
+        }
+        break;
+      default: {
+        this.permisos = [];
+      }
+    }
+    const hasAccess = this.permisos.find(UID => UID === UserUID);
+
+    if (hasAccess) {
+      return true;
+    } else {
+      return false;
     }
   }
 }

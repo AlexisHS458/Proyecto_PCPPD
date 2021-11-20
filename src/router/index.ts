@@ -10,7 +10,7 @@ import NotFound from "../views/PageNotFound.vue";
 import NotChannels from "../components/modules/Workspace/NotChannels.vue";
 import CodeChannel from "../components/modules/Workspace/Channels/Code/EditCode.vue";
 import NavigationDrawer from "../components/modules/Workspace/ViewNavigationDrawer.vue";
-import ViewTreeView from "../components/modules/Workspace/ViewTreeView.vue";
+import ViewTreeView from "../components/modules/Workspace/Channels/Code/Files/RepoFilesView.vue";
 import { auth } from "@/utils/firebase";
 import store from "@/store";
 
@@ -53,7 +53,6 @@ const routes: Array<RouteConfig> = [
     beforeEnter: async (to, from, next) => {
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
-      console.log(currentUser);
       next();
     },
     meta: {
@@ -84,12 +83,16 @@ const routes: Array<RouteConfig> = [
         components: /*  MessagesPage */ {
           default: NotChannels,
           NavigationDrawer: NavigationDrawer
+        },
+        meta: {
+          requiresAuth: true
         }
       },
       {
         name: "codeChannel",
-        path: "code/:idChannelCode",
+        path: "code/:idChannelCode/",
         components: /* CodeChannel */ { default: CodeChannel, tree: ViewTreeView },
+
         props: {
           default: true,
           tree: false
@@ -130,8 +133,6 @@ router.beforeEach(
         next({ name: "Home" });
       } else if (!requiresAuth && user) {
         next("/Mainscreen");
-      } else if (!requiresAuth && !user) {
-        next();
       } else next();
     });
   }
