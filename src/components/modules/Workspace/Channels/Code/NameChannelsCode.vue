@@ -3,13 +3,18 @@
     <v-hover>
       <v-list-item
         slot-scope="{ hover }"
-        :to="{
-          name: 'codeChannel',
-          params: { idChannelCode: channel.uid },
-        }"
+        @click="goToTextChannel"
         color="white"
-        :class="`${hover ? 'select-item' : 'no-select-item'}`"
+        :class="[
+          `${hover ? 'select-item' : 'no-select-item'}`,
+          `${
+            '/space/' + workspaceUID + '/code/' + channel.uid !== $route.path
+              ? ''
+              : 'active'
+          }`,
+        ]"
         class="mb-1"
+        active-class=""
       >
         <v-list-item-icon>
           <v-icon color="white">{{ icon }}</v-icon>
@@ -225,9 +230,11 @@ const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
 const CodeChannel = namespace("CodeChannelModule");
 import UserService from "@/services/user.service";
+import ChannelService from "@/services/channels.service";
 /* eslint-disable */
 // @ts-ignore
 import image from "@/assets/userProfile.png";
+import { ChannelType } from "@/utils/channels_types";
 /* eslint-enable */
 @Component
 export default class NameChannels extends Vue {
@@ -325,6 +332,7 @@ export default class NameChannels extends Vue {
       /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
   public usersDisplay: User[] = [];
+  public activeIndex: undefined;
   /**
    * Editar información de un canal de voz
    */
@@ -400,6 +408,28 @@ export default class NameChannels extends Vue {
     e.target.src = image;
   }
 
+  async goToTextChannel() {
+    const hasAcces = await ChannelService.getUsersInChannel(
+      this.currentUser.uid!,
+      ChannelType.CODE,
+      this.workspaceUID,
+      this.channel.uid!
+    );
+    if (hasAcces) {
+    /*  if (
+        this.$route.path !=
+        "/space/" + this.workspaceUID + "/code/" + this.channel.uid!
+      ) { */
+        this.$router.push({
+          name: "codeChannel",
+          params: { idChannelCode: this.channel.uid! },
+        });
+    //  }
+    } else {
+      alert("Tas wey");
+    }
+  }
+
   closeAddSpace() {
     this.form.resetValidation();
     this.form.reset();
@@ -460,5 +490,9 @@ export default class NameChannels extends Vue {
 
 .no-select-item {
   background-color: #000029;
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 </style>

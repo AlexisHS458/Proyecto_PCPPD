@@ -76,16 +76,14 @@
       </v-expansion-panel-header>
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
         <v-list color="primaryDark" shaped>
-          <v-list-item-group color="primary">
-            <namechannels
-              v-for="channel in channels"
-              :key="channel.uid"
-              :channel="channel"
-              :icon="item.icon"
-              :users="users"
-              :workspaceUID="workspaceUID"
-            ></namechannels>
-          </v-list-item-group>
+          <namechannels
+            v-for="channel in channels"
+            :key="channel.uid"
+            :channel="channel"
+            :icon="item.icon"
+            :users="users"
+            :workspaceUID="workspaceUID"
+          ></namechannels>
         </v-list>
       </v-expansion-panel-content>
     </v-expansion-panel>
