@@ -1,137 +1,66 @@
 <template>
-  <v-navigation-drawer app clipped right v-model="status.showTreeView" color="primaryDark" dark>
-    {{ nameFile }}
-    <v-treeview
-      v-model="tree"
-      :open="initiallyOpen"
-      :items="items"
-      activatable
-      item-key="name"
-      open-on-click
-      style="color: white"
+  <v-list dark>
+    <v-list-item
+      v-for="treeEntry in treeEntries"
+      :key="treeEntry.object.id"
+      @click="goToPath(treeEntry)"
     >
-      <template v-slot:prepend="{ item, open }">
-        <v-icon v-if="!item.file" color="white">
-          {{ open ? "mdi-folder-open" : "mdi-folder" }}
-        </v-icon>
-        <v-icon color="white" v-else>
-          {{ files[item.file] }}
-        </v-icon>
-      </template>
-    </v-treeview>
-  </v-navigation-drawer>
+      <v-list-item-avatar>
+        <v-icon dark v-if="treeEntry.type == 'tree'"> mdi-folder </v-icon>
+        <v-icon dark v-else-if="treeEntry.type == 'blob'"> mdi-file </v-icon>
+      </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title v-text="treeEntry.name"></v-list-item-title>
+      </v-list-item-content>
+    </v-list-item>
+  </v-list>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { Maybe, Tree, TreeEntry, Blob } from "@/generated/graphql";
 import { namespace } from "vuex-class";
-import CodeChannelService from "@/services/code_channel.service";
-const CodeChannel = namespace("CodeChannelModule");
-
+const CodeChannelModule = namespace("CodeChannelModule");
+const User = namespace("UserModule");
+import { User } from "@/models/user";
 @Component
-export default class ViewTreeViwe extends Vue {
-  @CodeChannel.State("status")
-  private status!: any;
+export default class ViewTreeView extends Vue {
+  @Prop({
+    required: true
+  })
+  public treeEntries!: Maybe<TreeEntry[]>;
 
-  public drawer = null;
-  public initiallyOpen = ["public"];
-  public files = {
-    html: "mdi-language-html5",
-    js: "mdi-nodejs",
-    json: "mdi-code-json",
-    md: "mdi-language-markdown",
-    pdf: "mdi-file-pdf",
-    png: "mdi-file-image",
-    txt: "mdi-file-document-outline",
-    xls: "mdi-file-excel"
-  };
-  public tree = [];
-  public nameFile: string | undefined = undefined;
+  @CodeChannelModule.Action
+  private addPathState!: (path: string) => void;
 
-  public items = [
-    {
-      name: ".git"
-    },
-    {
-      name: "node_modules"
-    },
-    {
-      name: "public",
-      children: [
-        {
-          name: "static",
-          children: [
-            {
-              name: "logo.png",
-              file: "png"
-            }
-          ]
-        },
-        {
-          name: "favicon.ico",
-          file: "png"
-        },
-        {
-          name: "index.html",
-          file: "html"
+  @CodeChannelModule.Action
+  private setCodeData!: (data: TreeEntry) => void;
+
+  @CodeChannelModule.State("driverUID")
+  private driverUID!: string;
+
+  @User.State("user")
+  private currentUser!: User;
+
+  goToPath(treeEntry: TreeEntry) {
+    switch ((treeEntry.object as any)?.__typename) {
+      case "Tree":
+        const tree = treeEntry.object as Tree;
+        this.addPathState(tree.id);
+        break;
+      case "Blob":
+        if (this.driverUID === this.currentUser.uid!) {
+          const blob = treeEntry.object as Blob;
+          if (blob.isBinary == false) {
+            this.setCodeData(treeEntry);
+          }
         }
-      ]
-    },
-    {
-      name: ".gitignore",
-      file: "txt"
-    },
-    {
-      name: "babel.config.js",
-      file: "js"
-    },
-    {
-      name: "package.json",
-      file: "json"
-
-  public files = [
-    {
-      color: "blue",
-      icon: "mdi-clipboard-text",
-      subtitle: "Jan 20, 2014",
-      title: "Vacation itinerary",
-    },
-    {
-      color: "amber",
-      icon: "mdi-gesture-tap-button",
-      subtitle: "Jan 10, 2014",
-      title: "Kitchen remodel",
-    },
-  ];
-  public folders = [
-    {
-      name: "README.md",
-      file: "md"
-    },
-    {
-      name: "vue.config.js",
-      file: "js"
-    },
-    {
-      name: "yarn.lock",
-      file: "txt"
+        break;
+      default:
+        break;
     }
-      subtitle: "Jan 9, 2014",
-      title: "Photos",
-    },
-    {
-      subtitle: "Jan 17, 2014",
-      title: "Recipes",
-    },
-    {
-      subtitle: "Jan 28, 2014",
-      title: "Work",
-    },
-  ];
-  async mounted() {
-    this.nameFile = await CodeChannelService.getFileTree();
   }
-  
 }
 </script>
 

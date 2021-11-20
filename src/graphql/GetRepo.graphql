@@ -1,0 +1,32 @@
+query GetRepo($name: String!, $owner: String!) {
+  repository(name: $name, owner: $owner) {
+    defaultBranchRef {
+      target {
+        ... on Commit {
+          id
+          tree {
+            ...FilesInTree
+          }
+        }
+      }
+    }
+  }
+}
+
+
+fragment FilesInTree on Tree {
+  entries {
+    name
+    extension
+    object {
+      ... on Blob {
+        text
+        isBinary
+      }
+      ... on Tree {
+        id
+      }
+    }
+    type
+  }
+}

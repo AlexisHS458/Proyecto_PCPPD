@@ -47,8 +47,8 @@ const User = namespace("UserModule");
 import { User } from "@/models/user";
 import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { ChannelType } from "@/utils/channels_types";
-import CodeChannelService from "@/services/code_channel.service";
-import { watch } from "original-fs";
+import { Maybe, Blob, TreeEntry } from "@/generated/graphql";
+
 const CodeChannel = namespace("CodeChannelModule");
 @Component({
   components: {
@@ -69,6 +69,19 @@ export default class EditCode extends Vue {
     this.changeView();
   }
 
+  @Watch("codeData")
+  onChildChangedData() {
+    console.log(this.codeData?.extension);
+
+    monaco.editor.setModelLanguage(
+      this.options.getModel()!,
+      this.codeData?.extension?.replace(".", "") ?? "cpp"
+    );
+    const blob = this.codeData?.object as Blob;
+    this.options.setValue(blob.text ?? "");
+    this.sendCode()
+  }
+
   /**
    * Estado obtenido del @module User
    */
@@ -77,6 +90,9 @@ export default class EditCode extends Vue {
 
   @CodeChannel.State("status")
   private status!: any;
+
+  @CodeChannel.State("codeData")
+  private codeData!: Maybe<TreeEntry>;
 
   @CodeChannel.Getter
   private isLoading!: boolean;
@@ -95,6 +111,9 @@ export default class EditCode extends Vue {
 
   @CodeChannel.Action
   private setDriverUIDStatus!: (uid: string) => void;
+
+  @CodeChannel.Action
+  private clearPathState!: () => void;
 
   /*   @Watch("driverUID")
   currentDriverWatch(val: string) {
@@ -127,6 +146,7 @@ export default class EditCode extends Vue {
   }
 
   changeView() {
+    this.clearPathState();
     CodeService.joinToCodeChannel(this.currentUser.uid!, this.$route.params.idChannelCode);
     this.initEditor();
     const code = this.$refs.codeappbar as any;
@@ -159,7 +179,7 @@ export default class EditCode extends Vue {
   initEditor() {
     this.options = monaco.editor.create(document.getElementById("container") as HTMLElement, {
       value: "",
-      language: "cpp",
+      language: "html",
       theme: "vs-dark",
       automaticLayout: true,
       columnSelection: true

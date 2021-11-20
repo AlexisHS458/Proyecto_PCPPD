@@ -1,0 +1,12 @@
+query GetRepositories {
+  viewer {
+    repositories(first: 100) {
+      nodes {
+        name
+        owner {
+          login
+        }
+      }
+    }
+  }
+}

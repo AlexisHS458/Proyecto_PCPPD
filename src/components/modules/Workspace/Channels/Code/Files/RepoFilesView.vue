@@ -1,0 +1,44 @@
+<template>
+  <v-navigation-drawer app clipped right v-model="status.showTreeView" color="primaryDark" dark>
+    <div v-if="treeEntries">
+      <view-tree v-if="codePath.length === 0" :treeEntries="treeEntries"></view-tree>
+      <sub-tree v-else></sub-tree>
+    </div>
+  </v-navigation-drawer>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import ViewTree from "@/components/modules/Workspace/ViewTreeView.vue";
+import SubTree from "@/components/modules/Workspace/Channels/Code/Files/SubTreeFile.vue";
+import { Maybe, TreeEntry } from "@/generated/graphql";
+import CodeService from "@/services/code_channel.service";
+import { namespace } from "vuex-class";
+import { CodeChannel } from "@/models/codeChannel";
+const CodeChannelModule = namespace("CodeChannelModule");
+const WorkspaceModule = namespace("WorkspaceModule");
+@Component({
+  components: { ViewTree, SubTree }
+})
+export default class RepoFilesView extends Vue {
+  @CodeChannelModule.State("status")
+  private status!: any;
+
+  @CodeChannelModule.State("codePath")
+  private codePath!: string[];
+
+  @WorkspaceModule.State("codeChannels")
+  public codeChannels!: CodeChannel[];
+
+  public treeEntries: Maybe<TreeEntry[]> | undefined = null;
+
+  async mounted() {
+    const codeChannel = this.codeChannels.find(channel => {
+      return channel.uid == this.$route.params.idChannelCode;
+    });
+    console.log(codeChannel);
+
+    this.treeEntries = await CodeService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+  }
+}
+</script>

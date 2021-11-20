@@ -10,7 +10,7 @@ import NotFound from "../views/PageNotFound.vue";
 import NotChannels from "../components/modules/Workspace/NotChannels.vue";
 import CodeChannel from "../components/modules/Workspace/Channels/Code/EditCode.vue";
 import NavigationDrawer from "../components/modules/Workspace/ViewNavigationDrawer.vue";
-import ViewTreeView from "../components/modules/Workspace/ViewTreeView.vue";
+import ViewTreeView from "../components/modules/Workspace/Channels/Code/Files/RepoFilesView.vue";
 import { auth } from "@/utils/firebase";
 import store from "@/store";
 
@@ -90,12 +90,12 @@ const routes: Array<RouteConfig> = [
       },
       {
         name: "codeChannel",
-        path: "code/:idChannelCode/tree/:path",
+        path: "code/:idChannelCode/",
         components: /* CodeChannel */ { default: CodeChannel, tree: ViewTreeView },
 
         props: {
           default: true,
-          tree: true
+          tree: false
         },
         meta: {
           requiresAuth: true

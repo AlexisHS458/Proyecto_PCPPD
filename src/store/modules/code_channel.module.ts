@@ -1,5 +1,6 @@
 import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
 import CodeChannelService from "@/services/code_channel.service";
+import { Maybe, TreeEntry } from "@/generated/graphql";
 
 @Module({ namespaced: true })
 class CodeChannelModule extends VuexModule {
@@ -14,6 +15,11 @@ class CodeChannelModule extends VuexModule {
   */
  public snackbarMessageError = "";
 
+
+ public codePath: string[] = [];
+
+ public codeData: Maybe<TreeEntry> = null;
+
   public codeChannelName = "";
   public driverUID = "";
   public status = {
@@ -25,6 +31,22 @@ class CodeChannelModule extends VuexModule {
     showSnackbar: false,
     showSnackbarError: false
   };
+
+  @Mutation
+  public clearPath(): void{
+    this.codePath = [];
+  }
+
+  @Mutation
+  public addPath(path: string): void{
+    this.codePath.push(path)
+  }
+  @Mutation
+  public goBackPath(): void{
+    this.codePath.pop()
+  }
+
+
 
   @Mutation
   public setShowTreeViewStatus(status: boolean): void {
@@ -84,12 +106,36 @@ class CodeChannelModule extends VuexModule {
     this.status.showSnackbar = status;
   }
 
+  @Mutation
+  public setInitialCodeData(blob: TreeEntry): void {
+    this.codeData = blob;
+  }
+
+  @Action
+  public setCodeData(blob: TreeEntry): void {
+    this.context.commit("setInitialCodeData", blob);
+  }
+
   @Action
   toggleShowNavigationDrawerChannels(): void {
     this.context.commit(
       "setShowNavigationDrawerChannels",
       !this.status.showNavigationDrawerChannels
     );
+  }
+
+  @Action
+  addPathState(path: string): void {
+    this.context.commit("addPath", path);
+  }
+
+  @Action
+  clearPathState(): void {
+    this.context.commit("clearPath");
+  }
+  @Action
+  goBackAction(): void {
+    this.context.commit("goBackPath");
   }
 
   @Action
@@ -100,9 +146,7 @@ class CodeChannelModule extends VuexModule {
   @Action
   setDriverUIDStatus(uid: string): void {
     this.context.commit("setLoading", true);
-    CodeChannelService.currentDriver(uid, driverID => {
-      console.log('se detono');
-      
+    CodeChannelService.currentDriver(uid, driverID => {      
       this.context.commit("setDriverUID", driverID);
       this.context.commit("setLoading", false);
     });
@@ -171,6 +215,10 @@ class CodeChannelModule extends VuexModule {
   }
   get showSnackbar(): boolean {
     return this.status.showSnackbar;
+  }
+
+  get pathSize(): number{
+    return this.codePath.length;
   }
 
 }

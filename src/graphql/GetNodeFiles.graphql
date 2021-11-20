@@ -1,0 +1,8 @@
+query GetNodeFiles($id: ID!) {
+  node(id: $id){
+    id
+    ... on Tree {
+      ...FilesInTree
+    }
+  }
+}

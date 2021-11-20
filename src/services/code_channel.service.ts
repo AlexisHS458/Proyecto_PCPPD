@@ -1,4 +1,16 @@
-import { GetRepoFiles, GetRepoFilesQuery } from "@/generated/graphql";
+import {
+  Commit,
+  GetNodeFiles,
+  GetNodeFilesQuery,
+  GetRepo,
+  GetRepoQuery,
+  GetRepositories,
+  GetRepositoriesQuery,
+  Maybe,
+  Node,
+  TreeEntry,
+  Tree
+} from "@/generated/graphql";
 import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { SocketUser } from "@/models/socketUser";
 import { codeChannelSocket } from "@/socketio";
@@ -117,12 +129,58 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.GET_DRIVER, codeChannelID);
   }
 
-  async getFileTree(): Promise<string | undefined> {
-    const response: GetRepoFilesQuery = (await apollo_client.query({
-      query: GetRepoFiles,
-    })).data
+  async getUserRepos(): Promise<Node[]> {
+    const response: GetRepositoriesQuery = (
+      await apollo_client.query({
+        query: GetRepositories
+      })
+    ).data;
 
-    return response.repository?.name;
+    return response.viewer.repositories.nodes as any;
+  }
+
+  async getRepo(userName: string, repoName: string): Promise<Maybe<TreeEntry[]> | undefined> {
+    console.log(`userName: |${userName}|`);
+    console.log(`repoName: |${repoName}|`);
+
+    const response: GetRepoQuery = (
+      await apollo_client.query({
+        query: GetRepo,
+        variables: {
+          name: repoName,
+          owner: userName
+        }
+      })
+    ).data;
+
+    const commit = response.repository?.defaultBranchRef?.target as Commit;
+    return commit.tree.entries?.sort((a, b) => {
+      const aType = a.type === "tree" ? -1 : 1;
+      const bType = b.type === "tree" ? -1 : 1;
+      return aType - bType;
+    });
+  }
+
+  async getNodeFiles(id: string): Promise<Maybe<TreeEntry[]> | undefined> {
+    const response: GetNodeFilesQuery = (
+      await apollo_client.query({
+        query: GetNodeFiles,
+        variables: {
+          id
+        }
+      }).then((res)=> {
+        console.log(res);
+        
+        return res
+      })
+    ).data;
+    const tree = response.node as Tree;
+
+    return tree.entries?.sort((a, b) => {
+      const aType = a.type === "tree" ? -1 : 1;
+      const bType = b.type === "tree" ? -1 : 1;
+      return aType - bType;
+    });
   }
 }
 
