@@ -3,7 +3,15 @@
     <v-list-item
       slot-scope="{ hover }"
       @click="goToTextChannel"
-      :class="`${hover ? 'select-item' : 'no-select-item'}`"
+      :class="[
+        `${hover ? 'select-item' : 'no-select-item'}`,
+        `${
+          '/space/' + workspaceUID + '/' + channel.uid !== $route.path
+            ? ''
+            : 'active'
+        }`,
+      ]"
+      active-class="active"
       color="white"
       class="mb-1"
     >
@@ -273,7 +281,7 @@ export default class NameChannels extends Vue {
   };
   public permissions = {} as PermissionsPath;
   public statusCheckbox = false;
-
+ 
   /**
    * Editar información de un canal de texto
    */
@@ -405,5 +413,9 @@ export default class NameChannels extends Vue {
 
 .no-select-item {
   background-color: #000029;
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 </style>

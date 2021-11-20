@@ -7,24 +7,30 @@
     color="primaryDark"
     dark
   >
-    <v-treeview
-      v-model="tree"
-      :open="initiallyOpen"
-      :items="items"
-      activatable
-      item-key="name"
-      open-on-click
-      style="color: white"
-    >
-      <template v-slot:prepend="{ item, open }">
-        <v-icon v-if="!item.file" color="white">
-          {{ open ? "mdi-folder-open" : "mdi-folder" }}
-        </v-icon>
-        <v-icon color="white" v-else>
-          {{ files[item.file] }}
-        </v-icon>
-      </template>
-    </v-treeview>
+    <v-list dark>
+      <v-list-item
+        v-for="folder in folders"
+        :key="folder.title"
+        @click="() => {}"
+      >
+        <v-list-item-avatar>
+          <v-icon dark> mdi-folder </v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title v-text="folder.title"></v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item v-for="file in files" :key="file.title">
+        <v-list-item-avatar>
+          <v-icon :class="file.color" v-text="file.icon"></v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title v-text="file.title"></v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
   </v-navigation-drawer>
 </template>
 
@@ -39,70 +45,33 @@ export default class ViewTreeViwe extends Vue {
   private status!: any;
 
   public drawer = null;
-  public initiallyOpen = ["public"];
-  public files = {
-    html: "mdi-language-html5",
-    js: "mdi-nodejs",
-    json: "mdi-code-json",
-    md: "mdi-language-markdown",
-    pdf: "mdi-file-pdf",
-    png: "mdi-file-image",
-    txt: "mdi-file-document-outline",
-    xls: "mdi-file-excel",
-  };
-  public tree = [];
-  public items = [
+
+  public files = [
     {
-      name: ".git",
+      color: "blue",
+      icon: "mdi-clipboard-text",
+      subtitle: "Jan 20, 2014",
+      title: "Vacation itinerary",
     },
     {
-      name: "node_modules",
+      color: "amber",
+      icon: "mdi-gesture-tap-button",
+      subtitle: "Jan 10, 2014",
+      title: "Kitchen remodel",
+    },
+  ];
+  public folders = [
+    {
+      subtitle: "Jan 9, 2014",
+      title: "Photos",
     },
     {
-      name: "public",
-      children: [
-        {
-          name: "static",
-          children: [
-            {
-              name: "logo.png",
-              file: "png",
-            },
-          ],
-        },
-        {
-          name: "favicon.ico",
-          file: "png",
-        },
-        {
-          name: "index.html",
-          file: "html",
-        },
-      ],
+      subtitle: "Jan 17, 2014",
+      title: "Recipes",
     },
     {
-      name: ".gitignore",
-      file: "txt",
-    },
-    {
-      name: "babel.config.js",
-      file: "js",
-    },
-    {
-      name: "package.json",
-      file: "json",
-    },
-    {
-      name: "README.md",
-      file: "md",
-    },
-    {
-      name: "vue.config.js",
-      file: "js",
-    },
-    {
-      name: "yarn.lock",
-      file: "txt",
+      subtitle: "Jan 28, 2014",
+      title: "Work",
     },
   ];
 }

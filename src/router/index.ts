@@ -84,15 +84,19 @@ const routes: Array<RouteConfig> = [
         components: /*  MessagesPage */ {
           default: NotChannels,
           NavigationDrawer: NavigationDrawer
+        },
+        meta: {
+          requiresAuth: true
         }
       },
       {
         name: "codeChannel",
-        path: "code/:idChannelCode",
+        path: "code/:idChannelCode/tree/:path",
         components: /* CodeChannel */ { default: CodeChannel, tree: ViewTreeView },
+
         props: {
           default: true,
-          tree: false
+          tree: true
         },
         meta: {
           requiresAuth: true
