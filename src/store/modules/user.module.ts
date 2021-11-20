@@ -4,6 +4,7 @@ import UserService from "@/services/user.service";
 import AuthService from "@/services/auth.service";
 import presenceServices from "@/services/presence.service";
 import { Status } from "@/models/status";
+import { auth } from "@/utils/firebase";
 
 
 /**
@@ -107,6 +108,7 @@ class UserModule extends VuexModule {
     this.context.commit("setLoadingStatus", true);
     await UserService.getUserAuthInfo(user => {
       this.context.commit("setUser", user);
+      
       this.context.commit("setLoadingStatus", false);
     });
   }

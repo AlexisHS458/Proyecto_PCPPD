@@ -1,12 +1,6 @@
 <template>
-  <v-navigation-drawer
-    app
-    clipped
-    right
-    v-model="status.showTreeView"
-    color="primaryDark"
-    dark
-  >
+  <v-navigation-drawer app clipped right v-model="status.showTreeView" color="primaryDark" dark>
+    {{ nameFile }}
     <v-treeview
       v-model="tree"
       :open="initiallyOpen"
@@ -31,6 +25,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import CodeChannelService from "@/services/code_channel.service";
 const CodeChannel = namespace("CodeChannelModule");
 
 @Component
@@ -48,15 +43,17 @@ export default class ViewTreeViwe extends Vue {
     pdf: "mdi-file-pdf",
     png: "mdi-file-image",
     txt: "mdi-file-document-outline",
-    xls: "mdi-file-excel",
+    xls: "mdi-file-excel"
   };
   public tree = [];
+  public nameFile: string | undefined = undefined;
+
   public items = [
     {
-      name: ".git",
+      name: ".git"
     },
     {
-      name: "node_modules",
+      name: "node_modules"
     },
     {
       name: "public",
@@ -66,49 +63,51 @@ export default class ViewTreeViwe extends Vue {
           children: [
             {
               name: "logo.png",
-              file: "png",
-            },
-          ],
+              file: "png"
+            }
+          ]
         },
         {
           name: "favicon.ico",
-          file: "png",
+          file: "png"
         },
         {
           name: "index.html",
-          file: "html",
-        },
-      ],
+          file: "html"
+        }
+      ]
     },
     {
       name: ".gitignore",
-      file: "txt",
+      file: "txt"
     },
     {
       name: "babel.config.js",
-      file: "js",
+      file: "js"
     },
     {
       name: "package.json",
-      file: "json",
+      file: "json"
     },
     {
       name: "README.md",
-      file: "md",
+      file: "md"
     },
     {
       name: "vue.config.js",
-      file: "js",
+      file: "js"
     },
     {
       name: "yarn.lock",
-      file: "txt",
-    },
+      file: "txt"
+    }
   ];
+  async mounted() {
+    this.nameFile = await CodeChannelService.getFileTree();
+  }
+  
 }
 </script>
-
-
 
 <style scoped>
 .f {
