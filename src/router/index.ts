@@ -53,7 +53,6 @@ const routes: Array<RouteConfig> = [
     beforeEnter: async (to, from, next) => {
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
-      console.log(currentUser);
       next();
     },
     meta: {
@@ -130,8 +129,6 @@ router.beforeEach(
         next({ name: "Home" });
       } else if (!requiresAuth && user) {
         next("/Mainscreen");
-      } else if (!requiresAuth && !user) {
-        next();
       } else next();
     });
   }

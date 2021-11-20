@@ -1,0 +1,17 @@
+query GetRepoFiles {
+  repository(name: "ProyectoCpp", owner: "zamudio1243") {
+    name
+    defaultBranchRef {
+      target {
+        ... on Commit {
+          tree {
+            entries {
+              name
+              type
+            }
+          }
+        }
+      }
+    }
+  }
+}

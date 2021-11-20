@@ -1,6 +1,8 @@
+import { GetRepoFiles, GetRepoFilesQuery } from "@/generated/graphql";
 import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { SocketUser } from "@/models/socketUser";
 import { codeChannelSocket } from "@/socketio";
+import apollo_client from "@/utils/apollo_client";
 import { EventName } from "@/utils/event_name";
 import { ResponseEventName } from "@/utils/response_event_name";
 import { Socket } from "socket.io-client";
@@ -77,7 +79,7 @@ class CodeChannelService {
    * @param onEvent evento cuando cambia el driver
    */
   currentDriver(uid: string, onEvent: (driverID: string) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.DRIVER,payload => {
+    return codeChannelSocket(uid).on(ResponseEventName.DRIVER, payload => {
       onEvent(payload);
     });
   }
@@ -111,15 +113,16 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.ACCEPT_REQUEST, newDriverID);
   }
 
-  requestCurrentDriver(
-    uid: string,
-    codeChannelID: string,
-  ): Socket {
+  requestCurrentDriver(uid: string, codeChannelID: string): Socket {
     return codeChannelSocket(uid).emit(EventName.GET_DRIVER, codeChannelID);
   }
 
-  delay(ms: number){
-    return new Promise(resolve => setTimeout(resolve,ms));
+  async getFileTree(): Promise<string | undefined> {
+    const response: GetRepoFilesQuery = (await apollo_client.query({
+      query: GetRepoFiles,
+    })).data
+
+    return response.repository?.name;
   }
 }
 
