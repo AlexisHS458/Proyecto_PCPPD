@@ -30,15 +30,25 @@ export default class RepoFilesView extends Vue {
   @WorkspaceModule.State("codeChannels")
   public codeChannels!: CodeChannel[];
 
+  @Watch("codeChannels")
+  async onChildChanged() {
+    const codeChannel = this.codeChannels.find(channel => {
+      return channel.uid == this.$route.params.idChannelCode;
+    });
+    if (codeChannel) {
+      this.treeEntries = await CodeService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+    }
+  }
+
   public treeEntries: Maybe<TreeEntry[]> | undefined = null;
 
   async mounted() {
     const codeChannel = this.codeChannels.find(channel => {
       return channel.uid == this.$route.params.idChannelCode;
     });
-    console.log(codeChannel);
-
-    this.treeEntries = await CodeService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+    if (codeChannel) {
+      this.treeEntries = await CodeService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+    }
   }
 }
 </script>
