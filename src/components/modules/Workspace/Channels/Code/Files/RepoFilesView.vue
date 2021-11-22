@@ -1,7 +1,17 @@
 <template>
-  <v-navigation-drawer app clipped right v-model="status.showTreeView" color="primaryDark" dark>
-    <div v-if="treeEntries">
-      <view-tree v-if="codePath.length === 0" :treeEntries="treeEntries"></view-tree>
+  <v-navigation-drawer
+    app
+    clipped
+    right
+    v-model="status.showTreeView"
+    color="primaryDark"
+    dark
+  >
+    <div v-if="treeEntries" class="v-navigation-drawer__content">
+      <view-tree
+        v-if="codePath.length === 0"
+        :treeEntries="treeEntries"
+      ></view-tree>
       <sub-tree v-else></sub-tree>
     </div>
   </v-navigation-drawer>
@@ -15,40 +25,69 @@ import { Maybe, TreeEntry } from "@/generated/graphql";
 import CodeService from "@/services/code_channel.service";
 import { namespace } from "vuex-class";
 import { CodeChannel } from "@/models/codeChannel";
+import { CodePath } from "@/models/codePath";
 const CodeChannelModule = namespace("CodeChannelModule");
 const WorkspaceModule = namespace("WorkspaceModule");
 @Component({
-  components: { ViewTree, SubTree }
+  components: { ViewTree, SubTree },
 })
 export default class RepoFilesView extends Vue {
   @CodeChannelModule.State("status")
   private status!: any;
 
   @CodeChannelModule.State("codePath")
-  private codePath!: string[];
+  private codePath!: CodePath[];
 
   @WorkspaceModule.State("codeChannels")
   public codeChannels!: CodeChannel[];
 
   @Watch("codeChannels")
   async onChildChanged() {
-    const codeChannel = this.codeChannels.find(channel => {
+    const codeChannel = this.codeChannels.find((channel) => {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      this.treeEntries = await CodeService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+      this.treeEntries = await CodeService.getRepo(
+        codeChannel!.propietario,
+        codeChannel!.nombre
+      );
     }
   }
 
   public treeEntries: Maybe<TreeEntry[]> | undefined = null;
 
   async mounted() {
-    const codeChannel = this.codeChannels.find(channel => {
+    const codeChannel = this.codeChannels.find((channel) => {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      this.treeEntries = await CodeService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+      this.treeEntries = await CodeService.getRepo(
+        codeChannel!.propietario,
+        codeChannel!.nombre
+      );
     }
   }
 }
 </script>
+
+<style scoped>
+.f {
+  color: white;
+}
+.scrolls {
+  overflow-y: auto;
+  height: 100%;
+}
+.v-navigation-drawer__content::-webkit-scrollbar {
+  width: 5px !important;
+  margin-right: 200px !important;
+}
+.v-navigation-drawer__content::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+}
+.v-navigation-drawer__content::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
+}
+</style>

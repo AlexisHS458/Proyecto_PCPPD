@@ -1,24 +1,23 @@
 import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
 import CodeChannelService from "@/services/code_channel.service";
 import { Maybe, TreeEntry } from "@/generated/graphql";
+import { CodePath } from "@/models/codePath";
 
 @Module({ namespaced: true })
 class CodeChannelModule extends VuexModule {
-
-/**
+  /**
    * Mensaje a mostrar en snackbar
    */
- public snackbarMessage = "";
+  public snackbarMessage = "";
 
- /**
-  * Mensaje a mostrar error en snackbar
-  */
- public snackbarMessageError = "";
+  /**
+   * Mensaje a mostrar error en snackbar
+   */
+  public snackbarMessageError = "";
 
+  public codePath: CodePath[] = [];
 
- public codePath: string[] = [];
-
- public codeData: Maybe<TreeEntry> = null;
+  public codeData: Maybe<TreeEntry> = null;
 
   public codeChannelName = "";
   public driverUID = "";
@@ -33,20 +32,18 @@ class CodeChannelModule extends VuexModule {
   };
 
   @Mutation
-  public clearPath(): void{
+  public clearPath(): void {
     this.codePath = [];
   }
 
   @Mutation
-  public addPath(path: string): void{
-    this.codePath.push(path)
+  public addPath(path: CodePath): void {
+    this.codePath.push(path);
   }
   @Mutation
-  public goBackPath(): void{
-    this.codePath.pop()
+  public goBackPath(): void {
+    this.codePath.pop();
   }
-
-
 
   @Mutation
   public setShowTreeViewStatus(status: boolean): void {
@@ -63,23 +60,19 @@ class CodeChannelModule extends VuexModule {
     this.driverUID = status;
   }
 
-  @Mutation	setLoading(status: boolean): void {
+  @Mutation setLoading(status: boolean): void {
     this.status.isLoading = status;
   }
-
-  
 
   @Mutation
   public setShowNavigationDrawer(status: boolean): void {
     this.status.showNavigationDrawerUsers = status;
   }
 
-  
   @Mutation
   public setShowNavigationDrawerChannels(status: boolean): void {
     this.status.showNavigationDrawerChannels = status;
   }
-
 
   @Mutation
   public setShowRequestInfo(status: boolean): void {
@@ -125,7 +118,7 @@ class CodeChannelModule extends VuexModule {
   }
 
   @Action
-  addPathState(path: string): void {
+  addPathState(path: CodePath): void {
     this.context.commit("addPath", path);
   }
 
@@ -139,14 +132,14 @@ class CodeChannelModule extends VuexModule {
   }
 
   @Action
-  setCodeChannelNameStatus(name: string): void{
-    this.context.commit("setCodeChannelName",name);
+  setCodeChannelNameStatus(name: string): void {
+    this.context.commit("setCodeChannelName", name);
   }
 
   @Action
   setDriverUIDStatus(uid: string): void {
     this.context.commit("setLoading", true);
-    CodeChannelService.currentDriver(uid, driverID => {      
+    CodeChannelService.currentDriver(uid, driverID => {
       this.context.commit("setDriverUID", driverID);
       this.context.commit("setLoading", false);
     });
@@ -163,64 +156,63 @@ class CodeChannelModule extends VuexModule {
 
   @Action
   setShowRequestDriverStatus(status: boolean): void {
-    this.context.commit("setShowRequestInfo",status);
+    this.context.commit("setShowRequestInfo", status);
   }
 
   /**
    * Coloca un mensaje en el snackbar
    * @param message mensaje a mostrar en el snackbar
    */
-   @Action
-   setMessageOnSnackbar(message: string): void {
-     this.context.commit("setSnackBarMessage", message);
-   }
- 
-   /**
-    * Hace visible el snackbar
-    */
-   @Action
-   setVisibleSnackBar(): void {
-     this.context.commit("setShowSnackBarMessage", true);
-   }
- 
-   /**
-    * Hace visible el snackbar de error
-    */
-   @Action
-   setVisibleSnackBarError(): void {
-     this.context.commit("setShowSnackBarMessageError", true);
-   }
- 
-   /**
-    * Hace no visible el snackbar
-    */
-   @Action
-   setNotVisibleSnackBar(): void {
-     this.context.commit("setShowSnackBarMessage", false);
-   }
- 
-   /**
-    * Hace no visible el snackbar de error
-    */
-   @Action
-   setNotVisibleSnackBarError(): void {
-     this.context.commit("setShowSnackBarMessageError", false);
-   }
+  @Action
+  setMessageOnSnackbar(message: string): void {
+    this.context.commit("setSnackBarMessage", message);
+  }
 
-  get getDriverID(): string{
+  /**
+   * Hace visible el snackbar
+   */
+  @Action
+  setVisibleSnackBar(): void {
+    this.context.commit("setShowSnackBarMessage", true);
+  }
+
+  /**
+   * Hace visible el snackbar de error
+   */
+  @Action
+  setVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", true);
+  }
+
+  /**
+   * Hace no visible el snackbar
+   */
+  @Action
+  setNotVisibleSnackBar(): void {
+    this.context.commit("setShowSnackBarMessage", false);
+  }
+
+  /**
+   * Hace no visible el snackbar de error
+   */
+  @Action
+  setNotVisibleSnackBarError(): void {
+    this.context.commit("setShowSnackBarMessageError", false);
+  }
+
+  get getDriverID(): string {
     return this.driverUID!;
   }
-  get isLoading() : boolean{
+  get isLoading(): boolean {
     return this.status.isLoading;
   }
   get showSnackbar(): boolean {
     return this.status.showSnackbar;
   }
 
-  get pathSize(): number{
+  get pathSize(): number {
     return this.codePath.length;
   }
-
 }
 
 export default CodeChannelModule;
