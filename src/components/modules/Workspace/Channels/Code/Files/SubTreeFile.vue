@@ -5,10 +5,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component,  Vue, Watch } from "vue-property-decorator";
 import ViewTree from "@/components/modules/Workspace/ViewTreeView.vue";
 import { Maybe, TreeEntry } from "@/generated/graphql";
-import CodeService from "@/services/code_channel.service";
+import GitHubService from "@/services/github.service";
 import { namespace } from "vuex-class";
 import { CodePath } from "@/models/codePath";
 
@@ -23,7 +23,7 @@ export default class SubTreeFile extends Vue {
   @Watch("codePath")
   async onChildChanged() {
     this.treeEntries = null;
-    this.treeEntries = await CodeService.getNodeFiles(
+    this.treeEntries = await GitHubService.getNodeFiles(
       this.codePath[this.codePath.length - 1].id
     );
     console.log(this.treeEntries);
@@ -32,7 +32,7 @@ export default class SubTreeFile extends Vue {
   public treeEntries: Maybe<TreeEntry[]> | undefined = null;
 
   async mounted() {
-    this.treeEntries = await CodeService.getNodeFiles(
+    this.treeEntries = await GitHubService.getNodeFiles(
       this.codePath[this.codePath.length - 1].id
     );
   }

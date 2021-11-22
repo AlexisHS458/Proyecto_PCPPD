@@ -18,11 +18,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import ViewTree from "@/components/modules/Workspace/ViewTreeView.vue";
 import SubTree from "@/components/modules/Workspace/Channels/Code/Files/SubTreeFile.vue";
 import { Maybe, TreeEntry } from "@/generated/graphql";
-import CodeService from "@/services/code_channel.service";
+import GitHubService from "@/services/github.service";
 import { namespace } from "vuex-class";
 import { CodeChannel } from "@/models/codeChannel";
 import { CodePath } from "@/models/codePath";
@@ -47,7 +47,7 @@ export default class RepoFilesView extends Vue {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      this.treeEntries = await CodeService.getRepo(
+      this.treeEntries = await GitHubService.getRepo(
         codeChannel!.propietario,
         codeChannel!.nombre
       );
@@ -61,7 +61,7 @@ export default class RepoFilesView extends Vue {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      this.treeEntries = await CodeService.getRepo(
+      this.treeEntries = await GitHubService.getRepo(
         codeChannel!.propietario,
         codeChannel!.nombre
       );
