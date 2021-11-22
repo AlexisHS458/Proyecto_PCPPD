@@ -69,6 +69,7 @@ export default class EditCode extends Vue {
 
   @Watch("idChannelCode")
   onChildChanged() {
+    console.log("entro edit");
     this.changeView();
   }
 

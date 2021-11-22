@@ -1,7 +1,17 @@
 <template>
-  <v-navigation-drawer app clipped right v-model="status.showTreeView" color="primaryDark" dark>
+  <v-navigation-drawer
+    app
+    clipped
+    right
+    v-model="status.showTreeView"
+    color="primaryDark"
+    dark
+  >
     <div v-if="treeEntries" class="v-navigation-drawer__content">
-      <view-tree v-if="codePath.length === 0" :treeEntries="treeEntries"></view-tree>
+      <view-tree
+        v-if="codePath.length === 0"
+        :treeEntries="treeEntries"
+      ></view-tree>
       <sub-tree v-else></sub-tree>
     </div>
     <div v-else class="div-progress-circular">
@@ -12,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import ViewTree from "@/components/modules/Workspace/ViewTreeView.vue";
 import SubTree from "@/components/modules/Workspace/Channels/Code/Files/SubTreeFile.vue";
 import { Maybe, TreeEntry } from "@/generated/graphql";
@@ -23,9 +33,14 @@ import { CodePath } from "@/models/codePath";
 const CodeChannelModule = namespace("CodeChannelModule");
 const WorkspaceModule = namespace("WorkspaceModule");
 @Component({
-  components: { ViewTree, SubTree }
+  components: { ViewTree, SubTree },
 })
 export default class RepoFilesView extends Vue {
+  @Prop({
+    required: true,
+  })
+  public idChannelCode!: string;
+
   @CodeChannelModule.State("status")
   private status!: any;
 
@@ -35,25 +50,32 @@ export default class RepoFilesView extends Vue {
   @WorkspaceModule.State("codeChannels")
   public codeChannels!: CodeChannel[];
 
-  @Watch("codeChannels")
-  async onChildChanged() {
-    const codeChannel = this.codeChannels.find(channel => {
-      return channel.uid == this.$route.params.idChannelCode;
-    });
+  @Watch("idChannelCode")
+  async onChildChangedView() {
+    console.log("entro");
+    this.viewTree();
+  }
 
-    if (codeChannel) {
-      this.treeEntries = await GitHubService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
-    }
+  @Watch("codeChannels")
+  onChildChanged() {
+    this.viewTree();
   }
 
   public treeEntries: Maybe<TreeEntry[]> | undefined = null;
 
   async mounted() {
-    const codeChannel = this.codeChannels.find(channel => {
+    this.viewTree();
+  }
+
+  async viewTree() {
+    const codeChannel = this.codeChannels.find((channel) => {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      this.treeEntries = await GitHubService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+      this.treeEntries = await GitHubService.getRepo(
+        codeChannel!.propietario,
+        codeChannel!.nombre
+      );
     }
   }
 }

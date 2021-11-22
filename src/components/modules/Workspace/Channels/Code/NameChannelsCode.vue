@@ -416,15 +416,15 @@ export default class NameChannels extends Vue {
       this.channel.uid!
     );
     if (hasAcces) {
-      /*  if (
+      if (
         this.$route.path !=
         "/space/" + this.workspaceUID + "/code/" + this.channel.uid!
-      ) { */
-      this.$router.push({
-        name: "codeChannel",
-        params: { idChannelCode: this.channel.uid! },
-      });
-      //  }
+      ) {
+        this.$router.push({
+          name: "codeChannel",
+          params: { idChannelCode: this.channel.uid! },
+        });
+      }
     } else {
       alert("Tas wey");
     }

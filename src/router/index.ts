@@ -92,10 +92,9 @@ const routes: Array<RouteConfig> = [
         name: "codeChannel",
         path: "code/:idChannelCode",
         components: /* CodeChannel */ { default: CodeChannel, tree: ViewTreeView },
-
         props: {
           default: true,
-          tree: false
+          tree: true
         },
         meta: {
           requiresAuth: true
