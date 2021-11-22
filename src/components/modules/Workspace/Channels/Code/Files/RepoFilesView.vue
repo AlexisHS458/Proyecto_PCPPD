@@ -1,18 +1,12 @@
 <template>
-  <v-navigation-drawer
-    app
-    clipped
-    right
-    v-model="status.showTreeView"
-    color="primaryDark"
-    dark
-  >
+  <v-navigation-drawer app clipped right v-model="status.showTreeView" color="primaryDark" dark>
     <div v-if="treeEntries" class="v-navigation-drawer__content">
-      <view-tree
-        v-if="codePath.length === 0"
-        :treeEntries="treeEntries"
-      ></view-tree>
+      <view-tree v-if="codePath.length === 0" :treeEntries="treeEntries"></view-tree>
       <sub-tree v-else></sub-tree>
+    </div>
+    <div v-else class="div-progress-circular">
+      <v-progress-circular indeterminate :size="120" :width="4" color="primary">
+      </v-progress-circular>
     </div>
   </v-navigation-drawer>
 </template>
@@ -29,7 +23,7 @@ import { CodePath } from "@/models/codePath";
 const CodeChannelModule = namespace("CodeChannelModule");
 const WorkspaceModule = namespace("WorkspaceModule");
 @Component({
-  components: { ViewTree, SubTree },
+  components: { ViewTree, SubTree }
 })
 export default class RepoFilesView extends Vue {
   @CodeChannelModule.State("status")
@@ -43,28 +37,23 @@ export default class RepoFilesView extends Vue {
 
   @Watch("codeChannels")
   async onChildChanged() {
-    const codeChannel = this.codeChannels.find((channel) => {
+    const codeChannel = this.codeChannels.find(channel => {
       return channel.uid == this.$route.params.idChannelCode;
     });
+
     if (codeChannel) {
-      this.treeEntries = await GitHubService.getRepo(
-        codeChannel!.propietario,
-        codeChannel!.nombre
-      );
+      this.treeEntries = await GitHubService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
     }
   }
 
   public treeEntries: Maybe<TreeEntry[]> | undefined = null;
 
   async mounted() {
-    const codeChannel = this.codeChannels.find((channel) => {
+    const codeChannel = this.codeChannels.find(channel => {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      this.treeEntries = await GitHubService.getRepo(
-        codeChannel!.propietario,
-        codeChannel!.nombre
-      );
+      this.treeEntries = await GitHubService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
     }
   }
 }
@@ -89,5 +78,14 @@ export default class RepoFilesView extends Vue {
 .v-navigation-drawer__content::-webkit-scrollbar-thumb {
   background-color: #3e527e;
   border-radius: 10px;
+}
+
+.div-progress-circular {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -7,13 +7,13 @@ import {
   GetRepositories,
   GetRepositoriesQuery,
   Maybe,
-  Node,
+  Repository,
   TreeEntry,
   Tree
 } from "@/generated/graphql";
 import apollo_client from "@/utils/apollo_client";
 class GitHubService {
-  async getUserRepos(): Promise<Node[]> {
+  async getUserRepos(): Promise<Repository[]> {
     const response: GetRepositoriesQuery = (
       await apollo_client.query({
         query: GetRepositories
@@ -24,9 +24,6 @@ class GitHubService {
   }
 
   async getRepo(userName: string, repoName: string): Promise<Maybe<TreeEntry[]> | undefined> {
-    console.log(`userName: |${userName}|`);
-    console.log(`repoName: |${repoName}|`);
-
     const response: GetRepoQuery = (
       await apollo_client.query({
         query: GetRepo,

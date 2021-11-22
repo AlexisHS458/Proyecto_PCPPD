@@ -90,7 +90,7 @@ const routes: Array<RouteConfig> = [
       },
       {
         name: "codeChannel",
-        path: "code/:idChannelCode/",
+        path: "code/:idChannelCode",
         components: /* CodeChannel */ { default: CodeChannel, tree: ViewTreeView },
 
         props: {

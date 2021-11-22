@@ -1,21 +1,13 @@
 <template>
   <v-expansion-panels v-model="panel" class="expansion-panels" multiple dark>
     <v-expansion-panel>
-      <v-expansion-panel-header
-        color="primaryDark"
-        class="title d-flex flex-row"
-      >
+      <v-expansion-panel-header color="primaryDark" class="title d-flex flex-row">
         <template v-slot:actions>
-          <v-icon
-            color="white"
-            class="icon mr-2 flex-shrink-1 flex-grow-0 mb-1"
-          >
+          <v-icon color="white" class="icon mr-2 flex-shrink-1 flex-grow-0 mb-1">
             $expand
           </v-icon>
         </template>
-        <span class="header font-weight-bold flex-shrink-0 flex-grow-1">
-          {{ item.title }}</span
-        >
+        <span class="header font-weight-bold flex-shrink-0 flex-grow-1"> {{ item.title }}</span>
         <v-dialog
           v-if="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
@@ -36,16 +28,9 @@
             </v-btn>
           </template>
           <v-card>
-            <v-toolbar color="secondary" dark>
-              Crear nuevo canal de {{ item.text }}
-            </v-toolbar>
+            <v-toolbar color="secondary" dark> Crear nuevo canal de {{ item.text }} </v-toolbar>
             <v-card-text>
-              <v-form
-                ref="form"
-                v-model="valid"
-                lazy-validation
-                @submit.prevent
-              >
+              <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
                 <v-row align="center" justify="center" class="mt-6">
                   <v-col cols="9">
                     <!-- <v-text-field
@@ -74,17 +59,14 @@
                       :items="infoNodes"
                       item-text="name"
                       item-value="id"
+                      return-object
                       :rules="[rules.required]"
                       hide-no-data
                     >
                       <template v-slot:item="{ item }">
                         <v-list-item-content>
-                          <v-list-item-title
-                            v-text="item.name"
-                          ></v-list-item-title>
-                          <v-list-item-subtitle
-                            v-text="item.owner.login"
-                          ></v-list-item-subtitle>
+                          <v-list-item-title v-text="item.name"></v-list-item-title>
+                          <v-list-item-subtitle v-text="item.owner.login"></v-list-item-subtitle>
                         </v-list-item-content>
                       </template>
                       <template slot="selection" slot-scope="{ item }">
@@ -96,18 +78,13 @@
               </v-form>
             </v-card-text>
             <v-card-actions class="justify-end">
-              <v-btn color="success" :loading="loading" @click="addChannelCode"
-                >Crear</v-btn
-              >
+              <v-btn color="success" :loading="loading" @click="addChannelCode">Crear</v-btn>
               <v-btn text @click="closeAddSpace">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
       </v-expansion-panel-header>
-      <v-expansion-panel-content
-        color="primaryDark"
-        class="expansion-content p-0"
-      >
+      <v-expansion-panel-content color="primaryDark" class="expansion-content p-0">
         <v-list color="primaryDark" shaped>
           <namechannelscode
             v-for="channel in channels"
@@ -132,37 +109,37 @@ import { VForm } from "@/utils/types";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import { CodeChannel } from "@/models/codeChannel";
-import { Node } from "@/generated/graphql";
+import { Maybe, Node, Repository } from "@/generated/graphql";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 @Component({
   components: {
-    namechannelscode,
-  },
+    namechannelscode
+  }
 })
 export default class ListChannels extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public item!: [];
 
   @Prop({
-    required: true,
+    required: true
   })
   public users!: User[];
 
   @Prop({
-    required: false,
+    required: false
   })
   public channels!: [];
 
   @Prop({
-    required: false,
+    required: false
   })
   public workspaceUID!: string;
 
   @Prop({
-    required: false,
+    required: false
   })
   public workspaceChannels!: any;
 
@@ -198,15 +175,15 @@ export default class ListChannels extends Vue {
   public valid = true;
   public nameChannel = "";
   public codeChannel = {} as CodeChannel;
-  public infoNodes: Node[] = [];
+  public infoNodes: Repository[] = [];
   public isLoading = false;
-  public repo = "";
+  public repo: Maybe<Repository> = null;
   public tab: any = null;
   public search = null;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
-      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido"
   };
 
   @Watch("search")
@@ -227,21 +204,24 @@ export default class ListChannels extends Vue {
    */
   async addChannelCode() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      console.log(this.repo);
+
       this.loading = true;
       this.codeChannel.nombre = this.nameChannel;
       this.codeChannel.permisos = [];
-      this.codeChannel.propietario = "RamiroEstradaG";
-      this.codeChannel.nombre = "SAES-para-Alumnos";
-
-      await this.createCodeChannel(this.codeChannel);
-      if (this.status.showSnackbar && !this.status.showSnackbarError) {
-        this.loading = false;
-        this.form.reset();
-        this.dialog = false;
-      } else {
-        this.loading = false;
-        this.form.reset();
-        this.dialog = false;
+      if (this.repo) {
+        this.codeChannel.propietario = this.repo.owner.login;
+        this.codeChannel.nombre = this.repo.name;
+        await this.createCodeChannel(this.codeChannel);
+        if (this.status.showSnackbar && !this.status.showSnackbarError) {
+          this.loading = false;
+          this.form.reset();
+          this.dialog = false;
+        } else {
+          this.loading = false;
+          this.form.reset();
+          this.dialog = false;
+        }
       }
     }
   }
