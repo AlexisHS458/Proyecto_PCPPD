@@ -1,11 +1,6 @@
 <template>
   <v-app-bar app clipped-right flat height="48px" color="primary">
-    <v-icon
-      color="white"
-      class="mr-4"
-      @click="toggleShowNavigationDrawerChannels"
-      >mdi-menu</v-icon
-    >
+    <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
     <v-toolbar-title class="font-weight-medium">
       {{ nameChannel }}
     </v-toolbar-title>
@@ -32,9 +27,7 @@
               </v-list>
               <v-divider></v-divider>
               <v-card-actions class="justify-center">
-                <v-btn color="success" small @click="acceptRequest"
-                  >Aceptar</v-btn
-                >
+                <v-btn color="success" small @click="acceptRequest">Aceptar</v-btn>
                 <v-btn color="error" small>Rechazar</v-btn>
               </v-card-actions>
             </template>
@@ -50,11 +43,7 @@
           </v-card>
         </v-menu>
 
-        <v-icon
-          size="25px"
-          color="info"
-          :disabled="currentUser.uid != driverUID"
-        >
+        <v-icon size="25px" color="info" :disabled="currentUser.uid != driverUID">
           mdi-content-save
         </v-icon>
         <v-menu offset-y>
@@ -79,11 +68,7 @@
             <v-divider></v-divider>
 
             <v-list color="secondary" dark>
-              <v-dialog
-                transition="dialog-top-transition"
-                max-width="600"
-                v-model="dialogImport"
-              >
+              <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogImport">
                 <template v-slot:activator="{ on, attrs }">
                   <v-list-item v-bind="attrs" v-on="on">
                     <v-list-item-action>
@@ -97,12 +82,7 @@
                 <v-card>
                   <v-toolbar color="primary" dark> Importar código </v-toolbar>
                   <v-card-text>
-                    <v-form
-                      ref="form"
-                      v-model="validImport"
-                      lazy-validation
-                      @submit.prevent
-                    >
+                    <v-form ref="form" v-model="validImport" lazy-validation @submit.prevent>
                       <v-row align="center" justify="center" class="mt-6">
                         <v-col cols="9">
                           <v-text-field
@@ -124,30 +104,19 @@
                   </v-card-actions>
                 </v-card>
               </v-dialog>
-              <v-dialog
-                transition="dialog-top-transition"
-                max-width="600"
-                v-model="dialogExport"
-              >
+              <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogExport">
                 <template v-slot:activator="{ on, attrs }">
                   <v-list-item v-bind="attrs" v-on="on">
                     <v-list-item-action>
                       <v-icon color="info"> mdi-file-export-outline</v-icon>
                     </v-list-item-action>
-                    <v-list-item-title
-                      >Exportar código de GitHub</v-list-item-title
-                    >
+                    <v-list-item-title>Exportar código de GitHub</v-list-item-title>
                   </v-list-item>
                 </template>
                 <v-card>
                   <v-toolbar color="primary" dark> Importar código </v-toolbar>
                   <v-card-text>
-                    <v-form
-                      ref="form"
-                      v-model="validExport"
-                      lazy-validation
-                      @submit.prevent
-                    >
+                    <v-form ref="form" v-model="validExport" lazy-validation @submit.prevent>
                       <v-row align="center" justify="center" class="mt-6">
                         <v-col cols="9">
                           <v-text-field
@@ -169,11 +138,7 @@
                   </v-card-actions>
                 </v-card>
               </v-dialog>
-              <v-dialog
-                transition="dialog-top-transition"
-                max-width="600"
-                v-model="dialogExit"
-              >
+              <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogExit">
                 <template v-slot:activator="{ on, attrs }">
                   <v-list-item v-bind="attrs" v-on="on">
                     <v-list-item-action>
@@ -224,7 +189,6 @@
   </v-app-bar>
 </template>
 
-
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
@@ -233,22 +197,13 @@ import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
 const User = namespace("UserModule");
 import UserService from "@/services/user.service";
+import { Maybe } from "@/generated/graphql";
 @Component
 export default class AppBarOptions extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public nameChannel!: string;
-
-  @Watch("driverUID")
-  currentDriverWatch(val: string) {
-    this.driverUID = val;
-  }
-
-  @Watch("status.showRequestDriver")
-  Watch(val: string) {
-    console.log(val);
-  }
 
   @CodeChannel.Action
   private toggleShowTreeView!: () => void;
@@ -278,7 +233,7 @@ export default class AppBarOptions extends Vue {
   public validExport = true;
   public dialogExit = false;
   public validExit = false;
-  public userRequest: User | undefined = undefined;
+  public userRequest: Maybe<User> = null;
   public test = false;
 
   acceptRequest() {
@@ -286,7 +241,7 @@ export default class AppBarOptions extends Vue {
   }
 
   mounted() {
-    CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
+    CodeService.listenForRequest(this.currentUser.uid!, async uidRequest => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
       this.test = true;
     });

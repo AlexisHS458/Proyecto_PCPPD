@@ -66,6 +66,7 @@ export default class EditCode extends Vue {
 
   @Watch("idChannelCode")
   onChildChanged() {
+    console.log("entro edit");
     this.changeView();
   }
 
@@ -79,7 +80,7 @@ export default class EditCode extends Vue {
     );
     const blob = this.codeData?.object as Blob;
     this.options.setValue(blob.text ?? "");
-    this.sendCode()
+    this.sendCode();
   }
 
   /**
@@ -146,6 +147,7 @@ export default class EditCode extends Vue {
   }
 
   changeView() {
+    monaco.editor.getModels().forEach(model => model.dispose());
     this.clearPathState();
     CodeService.joinToCodeChannel(this.currentUser.uid!, this.$route.params.idChannelCode);
     this.initEditor();
@@ -178,7 +180,7 @@ export default class EditCode extends Vue {
 
   initEditor() {
     this.options = monaco.editor.create(document.getElementById("container") as HTMLElement, {
-      value: "",
+      value: "Selecciona un archivo",
       language: "html",
       theme: "vs-dark",
       automaticLayout: true,
@@ -241,6 +243,7 @@ export default class EditCode extends Vue {
 
   destroyed() {
     document.onkeydown = e => true;
+    monaco.editor.getModels().forEach(model => model.dispose());
   }
 }
 </script>

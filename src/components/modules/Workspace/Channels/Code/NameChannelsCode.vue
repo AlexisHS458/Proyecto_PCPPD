@@ -83,7 +83,7 @@
                     </v-list>
                   </v-menu>
 
-                  <v-dialog
+                  <!--     <v-dialog
                     transition="dialog-top-transition"
                     max-width="600"
                     v-model="dialogRenameChanel"
@@ -114,21 +114,21 @@
                         >
                           <v-row align="center" justify="center" class="mt-6">
                             <v-col cols="9">
+                              
                               <v-text-field
-                                label="Nuevo nombre del canal"
+                           label="Nuevo nombre del canal"
                                 :placeholder="channel.nombre"
                                 outlined
                                 dense
                                 color="primary"
                                 prepend-inner-icon="mdi-code-tags"
                                 v-model="newNameChannel"
-                                :rules="[
-                                  rules.required,
-                                  rules.regexNameChannel,
-                                ]"
+                                :rules="[rules.required, rules.regexNameChannel]"
                                 @keyup.enter="editChannel"
                                 @keydown.esc="closeAddSpace"
                               ></v-text-field>
+
+                        
                             </v-col>
                           </v-row>
                         </v-form>
@@ -144,6 +144,7 @@
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
+                  -->
                   <v-dialog
                     transition="dialog-top-transition"
                     max-width="600"
@@ -206,7 +207,9 @@
         <v-list-item-action v-if="user.uid == driverUID">
           <v-chip small color="error"> Driver </v-chip>
         </v-list-item-action>
-        <v-list-item-action v-if="user.uid == driverUID">
+        <v-list-item-action
+          v-if="currentUser.uid != driverUID && user.uid == driverUID"
+        >
           <v-btn icon @click="sendRequestDriver">
             <v-icon>mdi-swap-horizontal</v-icon>
           </v-btn>
@@ -231,6 +234,7 @@ const Permissions = namespace("PermissionsModule");
 const CodeChannel = namespace("CodeChannelModule");
 import UserService from "@/services/user.service";
 import ChannelService from "@/services/channels.service";
+
 /* eslint-disable */
 // @ts-ignore
 import image from "@/assets/userProfile.png";
@@ -257,11 +261,6 @@ export default class NameChannels extends Vue {
     required: true,
   })
   public workspaceUID!: string;
-
-  @Watch("driverUID")
-  currentDriverWatch(val: string) {
-    this.driverUID = val;
-  }
 
   /**
    * Acciones obtenidas del @module Workspace
@@ -333,6 +332,7 @@ export default class NameChannels extends Vue {
   };
   public usersDisplay: User[] = [];
   public activeIndex: undefined;
+
   /**
    * Editar información de un canal de voz
    */
@@ -416,15 +416,15 @@ export default class NameChannels extends Vue {
       this.channel.uid!
     );
     if (hasAcces) {
-    /*  if (
+      if (
         this.$route.path !=
         "/space/" + this.workspaceUID + "/code/" + this.channel.uid!
-      ) { */
+      ) {
         this.$router.push({
           name: "codeChannel",
           params: { idChannelCode: this.channel.uid! },
         });
-    //  }
+      }
     } else {
       alert("Tas wey");
     }
