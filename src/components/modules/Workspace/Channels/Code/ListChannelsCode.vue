@@ -48,7 +48,7 @@
               >
                 <v-row align="center" justify="center" class="mt-6">
                   <v-col cols="9">
-                    <v-text-field
+                    <!-- <v-text-field
                       label="Nombre del canal"
                       placeholder="Nombre del canal"
                       outlined
@@ -59,7 +59,38 @@
                       v-model="nameChannel"
                       @keyup.enter="addChannelCode"
                       @keydown.esc="closeAddSpace"
-                    ></v-text-field>
+                    ></v-text-field> -->
+
+                    <v-autocomplete
+                      v-model="repo"
+                      label="Nombre del repositorio"
+                      placeholder="Nombre del repositorio"
+                      outlined
+                      dense
+                      color="primary"
+                      prepend-inner-icon="mdi-code-tags"
+                      :loading="isLoading"
+                      :search-input.sync="search"
+                      :items="infoNodes"
+                      item-text="name"
+                      item-value="id"
+                      :rules="[rules.required]"
+                      hide-no-data
+                    >
+                      <template v-slot:item="{ item }">
+                        <v-list-item-content>
+                          <v-list-item-title
+                            v-text="item.name"
+                          ></v-list-item-title>
+                          <v-list-item-subtitle
+                            v-text="item.owner.login"
+                          ></v-list-item-subtitle>
+                        </v-list-item-content>
+                      </template>
+                      <template slot="selection" slot-scope="{ item }">
+                        {{ item.name }}
+                      </template>
+                    </v-autocomplete>
                   </v-col>
                 </v-row>
               </v-form>
@@ -93,14 +124,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref, Vue } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import namechannelscode from "@/components/modules/Workspace/Channels/Code/NameChannelsCode.vue";
 import { namespace } from "vuex-class";
-
+import GitHubService from "@/services/github.service";
 import { VForm } from "@/utils/types";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
 import { CodeChannel } from "@/models/codeChannel";
+import { Node } from "@/generated/graphql";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 @Component({
@@ -166,13 +198,30 @@ export default class ListChannels extends Vue {
   public valid = true;
   public nameChannel = "";
   public codeChannel = {} as CodeChannel;
-
+  public infoNodes: Node[] = [];
+  public isLoading = false;
+  public repo = "";
+  public tab: any = null;
+  public search = null;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
       /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
 
+  @Watch("search")
+  async onChildChangedSearch() {
+    if (this.infoNodes.length > 0) return;
+    this.isLoading = true;
+    this.infoNodes = await GitHubService.getUserRepos();
+    this.isLoading = false;
+  }
+
+  @Watch("repo")
+  onChildChanged(val: string) {
+    if (val != null) this.tab = 0;
+    else this.tab = null;
+  }
   /**
    * Crear nuevo canal de voz
    */
@@ -183,7 +232,7 @@ export default class ListChannels extends Vue {
       this.codeChannel.permisos = [];
       this.codeChannel.propietario = "RamiroEstradaG";
       this.codeChannel.nombre = "SAES-para-Alumnos";
-     
+
       await this.createCodeChannel(this.codeChannel);
       if (this.status.showSnackbar && !this.status.showSnackbarError) {
         this.loading = false;
