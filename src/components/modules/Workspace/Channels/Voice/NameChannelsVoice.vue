@@ -279,7 +279,7 @@ export default class NameChannels extends Vue {
   public usersDisplay: User[] = [];
   public isConnected = false;
   public activeItem = "";
-  public peers: Map<string, Peer.Instance> = new Map<string, Peer.Instance>();
+  public peers: { [id: string]: Peer.Instance } = {};
   public stream: MediaStream | undefined = undefined;
 
   editChannel(): void {
@@ -340,7 +340,7 @@ export default class NameChannels extends Vue {
 
     if (hasAcces) {
       this.setIsConnectedStatus(VoiceState.CONNECTING);
-      await this.initSignaling();
+      await this.initStream();
       VoiceService.joinToVoiceChannel(this.currentUser.uid!, this.channel.uid!);
       VoiceService.userStatus(this.currentUser.uid!, isConnected => {
         this.isConnected = !!isConnected;
@@ -365,15 +365,16 @@ export default class NameChannels extends Vue {
         this.stream?.getTracks().forEach(track => {
           track.stop();
         });
-        this.peers.forEach((v, k) => {
+        Object.keys(this.peers).forEach(k => {
           this.disconnect(k);
         });
-        this.stream = undefined;
+        delete this.stream;
       }
       this.usersDisplay = await Promise.all(
         users.map(user => UserService.getUserInfoByID(user.uid))
       );
     });
+    this.initSignaling();
   }
 
   imgError(e: any) {
@@ -417,17 +418,25 @@ export default class NameChannels extends Vue {
       this.disconnect(userSocketIDToSignal);
     });
 
-    peer.on("error", () => {
+    peer.on("error", err => {
+      console.log(err);
       this.disconnect(userSocketIDToSignal);
     });
+
+    console.log("Soy nuevo y estoy llamando");
+    console.log(this.peers);
 
     return peer;
   }
 
   disconnect(peerID: string) {
     document.getElementById(peerID)?.remove();
-    this.peers.get(peerID)?.destroy();
-    this.peers.delete(peerID);
+    this.peers[peerID]?.destroy();
+    delete this.peers[peerID];
+
+    console.log("alguien se fue");
+
+    console.log(this.peers);
   }
 
   addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream): Peer.Instance {
@@ -461,9 +470,14 @@ export default class NameChannels extends Vue {
       this.disconnect(callerID);
     });
 
-    peer.on("error", () => {
+    peer.on("error", err => {
+      console.log(err);
+
       this.disconnect(callerID);
     });
+
+    console.log("Alguien me llama");
+    console.log(this.peers);
 
     return peer;
   }
@@ -473,28 +487,35 @@ export default class NameChannels extends Vue {
       track.enabled = !this.isMute;
     });
   }
+  async initStream(): Promise<void> {
+    if (!this.stream) {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: true
+      });
+    }
+  }
 
-  async initSignaling(): Promise<void> {
-    this.stream = await navigator.mediaDevices.getUserMedia({
-      video: false,
-      audio: true
-    });
+  initSignaling(): void {
     VoiceService.joinedUsers(this.currentUser.uid!, users => {
-      this.peers = new Map<string, Peer.Instance>(
-        users
-          .filter(user => user.uid != this.currentUser.uid)
-          .map(user => [user.uid, this.createPeer(user.uid, this.currentUser.uid!, this.stream!)])
-      );
+      console.log('entro a joined');
+      
+      users
+        .filter(user => user.uid != this.currentUser.uid)
+        .forEach(user => {
+          this.disconnect(user.uid);
+          this.peers[user.uid] = this.createPeer(user.uid, this.currentUser.uid!, this.stream!);
+        });
     });
 
     VoiceService.listenUserJoined(this.currentUser.uid!, payloadSignal => {
       const peer = this.addPeer(payloadSignal.signal, payloadSignal.callerID, this.stream!);
-      this.peers.set(payloadSignal.callerID, peer);
+      this.peers[payloadSignal.callerID] = peer;
     });
 
     VoiceService.listenReturningSignal(this.currentUser.uid!, payloadSignal => {
       if (payloadSignal.userIDToSignal) {
-        const item = this.peers.get(payloadSignal.userIDToSignal);
+        const item = this.peers[payloadSignal.userIDToSignal];
         item?.signal(payloadSignal.signal);
       }
     });
