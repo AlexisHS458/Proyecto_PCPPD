@@ -124,6 +124,7 @@ import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
 import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
+const WorkspaceOptions = namespace("WorkspaceModule");
 import UserService from "@/services/user.service";
 import { Maybe, Repository } from "@/generated/graphql";
 import { VForm } from "@/utils/types";
@@ -158,6 +159,12 @@ export default class AppBarOptions extends Vue {
 
   @CodeChannel.State("codeFilePath")
   private codeFilePath!: string;
+
+  @WorkspaceOptions.Action
+  private setMessageOnSnackbar!: (message: string) => void;
+
+  @WorkspaceOptions.Action
+  private setVisibleSnackBar!: () => void;
 
   @Ref("form") readonly form!: VForm;
 
@@ -203,7 +210,7 @@ export default class AppBarOptions extends Vue {
   async doCommit() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingExport = true;
-      await GitHubService.makeCommit({
+      const url = await GitHubService.makeCommit({
         branch: {
           repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
           branchName: this.repository?.defaultBranchRef?.name
@@ -221,6 +228,12 @@ export default class AppBarOptions extends Vue {
       });
       this.loadingExport = false;
       this.dialogExport = false;
+      this.setVisibleSnackBar();
+      const urlShort = url.slice(0,-25) + "..."
+      this.setMessageOnSnackbar(
+        "Puedes consultar tu commit copiando esta URL en tu navegador:\n" +
+        `<a href="${url}"  target="_blank">${urlShort}</a>`
+      );
     }
   }
 

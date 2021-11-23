@@ -11,8 +11,8 @@ class VoiceChannelService {
    * @param uid ID del usuario a conectar
    * @param voiceChannelID ID del canal de voz al cual para conectar al usuario
    */
-  joinToVoiceChannel(uid: string, voiceChannelID: string): Socket {
-    return voiceChannelSocket(uid).emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
+  joinToVoiceChannel(voiceChannelID: string, socket: Socket): Socket {
+    return socket.emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
   }
 
   /**
@@ -51,10 +51,11 @@ class VoiceChannelService {
   /**
    * Obtiene la lista de usuario cuando un usuario nuevo se une al canal de voz
    * @param uid ID del usuario
+   * @param channelID: ID del canal a conectar
    * @param onEvent suscripción al eventro
    */
-  joinedUsers(uid: string, onEvent: (users: SocketUser[]) => void): Socket {
-    return voiceChannelSocket(uid).on(ResponseEventName.JOINED_USERS, payload => {
+  joinedUsers(socket: Socket,channelID: string, onEvent: (users: SocketUser[]) => void): Socket {
+    return socket.on(`${ResponseEventName.JOINED_USERS}-${channelID}`, payload => {
       onEvent(Object.values(payload));
     });
   }
@@ -65,8 +66,8 @@ class VoiceChannelService {
     });
   }
 
-  listenUserJoined(uid: string, onEvent: (signalPayload: SignalPayload) => void): Socket {
-    return voiceChannelSocket(uid).on(ResponseEventName.USER_JOINED, payload => {
+  listenUserJoined(socket: Socket,channelID:string, onEvent: (signalPayload: SignalPayload) => void): Socket {
+    return socket.on(ResponseEventName.USER_JOINED, payload => {
       onEvent(payload);
     });
   }
