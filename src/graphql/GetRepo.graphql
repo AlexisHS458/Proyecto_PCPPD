@@ -1,7 +1,13 @@
 query GetRepo($name: String!, $owner: String!) {
   repository(name: $name, owner: $owner) {
+    name
+    owner{
+      login
+    }
     defaultBranchRef {
+      name
       target {
+        oid
         ... on Commit {
           id
           tree {

@@ -1,7 +1,10 @@
 <template>
   <div>
     <div id="editCode" @mousemove="mouseIsMoving">
-      <app-bar-options ref="codeappbar" :nameChannel="nameCodeChannel"></app-bar-options>
+      <app-bar-options
+        ref="codeappbar"
+        :nameChannel="nameCodeChannel"
+      ></app-bar-options>
       <div
         id="container"
         :style="calculatedHeight"
@@ -21,7 +24,7 @@
         :key="cursor.userID"
         :style="{
           top: getMyScroll() + cursor.y + 41 - cursor.scroll + 'px',
-          left: cursor.x + getOffSet() + 'px'
+          left: cursor.x + getOffSet() + 'px',
         }"
         :cursor="cursor"
       ></cursor-component>
@@ -40,6 +43,7 @@ import CursorComponent from "@/components/modules/Workspace/Channels/Code/Cursor
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
+
 import ServiceChannels from "@/services/channels.service";
 import CodeService from "@/services/code_channel.service";
 import { namespace } from "vuex-class";
@@ -49,18 +53,23 @@ import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { ChannelType } from "@/utils/channels_types";
 import { Maybe, Blob, TreeEntry } from "@/generated/graphql";
 
+/* eslint-disable */
+// @ts-ignore
+import { languageDefinitions } from "monaco-editor/esm/vs/basic-languages/_.contribution";
+/* eslint-enable */
+
 const CodeChannel = namespace("CodeChannelModule");
 @Component({
   components: {
     /* MonacoEditor, */
     CursorComponent,
     FooterOptionsCode,
-    AppBarOptions
-  }
+    AppBarOptions,
+  },
 })
 export default class EditCode extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public idChannelCode!: string;
 
@@ -72,12 +81,15 @@ export default class EditCode extends Vue {
 
   @Watch("codeData")
   onChildChangedData() {
-    console.log(this.codeData?.extension);
+    const language = monaco.languages.getLanguages().find((language) => {
+      return language.extensions?.includes(
+        this.codeData?.extension ?? "plaintext"
+      );
+    })?.id;
 
-    monaco.editor.setModelLanguage(
-      this.options.getModel()!,
-      this.codeData?.extension?.replace(".", "") ?? "cpp"
-    );
+    console.log(language);
+
+    monaco.editor.setModelLanguage(this.options.getModel()!, language ?? "cpp");
     const blob = this.codeData?.object as Blob;
     this.options.setValue(blob.text ?? "");
     this.sendCode();
@@ -147,24 +159,31 @@ export default class EditCode extends Vue {
   }
 
   changeView() {
-    monaco.editor.getModels().forEach(model => model.dispose());
+    monaco.editor.getModels().forEach((model) => model.dispose());
     this.clearPathState();
-    CodeService.joinToCodeChannel(this.currentUser.uid!, this.$route.params.idChannelCode);
+    CodeService.joinToCodeChannel(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode
+    );
     this.initEditor();
     const code = this.$refs.codeappbar as any;
     window.visualViewport.addEventListener("resize", () => {
-      this.calculatedHeight = `height: ${window.innerHeight - code.$el.offsetHeight}px;`;
+      this.calculatedHeight = `height: ${
+        window.innerHeight - code.$el.offsetHeight
+      }px;`;
       this.options.layout();
     });
-    this.calculatedHeight = `height: ${window.innerHeight - code.$el.offsetHeight}px;`;
+    this.calculatedHeight = `height: ${
+      window.innerHeight - code.$el.offsetHeight
+    }px;`;
     this.options.layout();
 
-    CodeService.getCoordinates(this.currentUser.uid!, coordinates => {
-      this.userPointers = coordinates.filter(cursor => {
+    CodeService.getCoordinates(this.currentUser.uid!, (coordinates) => {
+      this.userPointers = coordinates.filter((cursor) => {
         return cursor.userID !== this.currentUser.uid;
       });
     });
-    CodeService.getDataCode(this.currentUser.uid!, code => {
+    CodeService.getDataCode(this.currentUser.uid!, (code) => {
       this.options.setValue(code);
     });
     var audio = new Audio(require("@/assets/connected.mp3"));
@@ -174,18 +193,23 @@ export default class EditCode extends Vue {
 
   updated() {
     const code = this.$refs.codeappbar as any;
-    this.calculatedHeight = `height: ${window.innerHeight - code.$el.offsetHeight}px;`;
+    this.calculatedHeight = `height: ${
+      window.innerHeight - code.$el.offsetHeight
+    }px;`;
     this.options.layout();
   }
 
   initEditor() {
-    this.options = monaco.editor.create(document.getElementById("container") as HTMLElement, {
-      value: "Selecciona un archivo",
-      language: "html",
-      theme: "vs-dark",
-      automaticLayout: true,
-      columnSelection: true
-    });
+    this.options = monaco.editor.create(
+      document.getElementById("container") as HTMLElement,
+      {
+        value: "Selecciona un archivo",
+        language: "html",
+        theme: "vs-dark",
+        automaticLayout: true,
+        columnSelection: true,
+      }
+    );
   }
   /*   getValue() {
     this.options.getValue();
@@ -198,15 +222,19 @@ export default class EditCode extends Vue {
   sendCode(): void {
     CodeService.sendCode(this.currentUser.uid!, {
       channelID: this.$route.params.idChannelCode,
-      code: this.options.getValue()
+      code: this.options.getValue(),
     });
   }
 
   mouseIsMoving(e: MouseEvent): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const target: any = document.getElementsByClassName("monaco-editor-background")[0];
+    const target: any = document.getElementsByClassName(
+      "monaco-editor-background"
+    )[0];
 
-    const editor = document.getElementById("container")!.getBoundingClientRect();
+    const editor = document
+      .getElementById("container")!
+      .getBoundingClientRect();
     const x = e.clientX - editor.left;
     const y = e.clientY - editor.top;
 
@@ -215,7 +243,7 @@ export default class EditCode extends Vue {
       nombre: this.currentUser.nombre,
       x,
       y,
-      scroll: parseInt(target.style.top.replace("px", ""))
+      scroll: parseInt(target.style.top.replace("px", "")),
     });
   }
 
@@ -224,26 +252,30 @@ export default class EditCode extends Vue {
   }
 
   getMyScroll(): number {
-    const target: any = document.getElementsByClassName("monaco-editor-background")[0];
+    const target: any = document.getElementsByClassName(
+      "monaco-editor-background"
+    )[0];
     return parseInt(target.style.top.replace("px", ""));
   }
 
   getOffSet(): number {
-    const editor = document.getElementById("container")!.getBoundingClientRect();
+    const editor = document
+      .getElementById("container")!
+      .getBoundingClientRect();
     return editor.left;
   }
 
   keyboardState(): void {
     if (this.driverUID !== this.currentUser.uid) {
-      document.onkeydown = e => false;
+      document.onkeydown = (e) => false;
     } else {
-      document.onkeydown = e => true;
+      document.onkeydown = (e) => true;
     }
   }
 
   destroyed() {
-    document.onkeydown = e => true;
-    monaco.editor.getModels().forEach(model => model.dispose());
+    document.onkeydown = (e) => true;
+    monaco.editor.getModels().forEach((model) => model.dispose());
   }
 }
 </script>

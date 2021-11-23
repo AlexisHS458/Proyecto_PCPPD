@@ -43,129 +43,56 @@
           </v-card>
         </v-menu>
 
-        <v-icon size="25px" color="info" :disabled="currentUser.uid != driverUID">
-          mdi-content-save
-        </v-icon>
-        <v-menu offset-y>
+        <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogExport">
           <template v-slot:activator="{ on, attrs }">
             <v-icon
+              v-bind="attrs"
+              v-on="on"
               size="25px"
               color="info"
-              v-on="on"
-              v-bind="attrs"
               :disabled="currentUser.uid != driverUID"
             >
-              mdi-github
+              mdi-content-save
             </v-icon>
           </template>
-          <v-card color="secondary">
-            <v-list color="secondary" dark>
-              <v-list-item>
-                <v-list-item-title>Opciones de GitHub</v-list-item-title>
-              </v-list-item>
-            </v-list>
-
-            <v-divider></v-divider>
-
-            <v-list color="secondary" dark>
-              <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogImport">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item v-bind="attrs" v-on="on">
-                    <v-list-item-action>
-                      <v-icon color="info"> mdi-file-import-outline</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-title>
-                      Importar código de GitHub
-                    </v-list-item-title>
-                  </v-list-item>
-                </template>
-                <v-card>
-                  <v-toolbar color="primary" dark> Importar código </v-toolbar>
-                  <v-card-text>
-                    <v-form ref="form" v-model="validImport" lazy-validation @submit.prevent>
-                      <v-row align="center" justify="center" class="mt-6">
-                        <v-col cols="9">
-                          <v-text-field
-                            label="URL"
-                            placeholder="Ingresa URL de repositorio a clonar"
-                            outlined
-                            dense
-                            color="primary"
-                            prepend-inner-icon="mdi-code-tags"
-                            autocomplete="off"
-                          ></v-text-field>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn color="success">Aceptar</v-btn>
-                    <v-btn text>Cerrar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-              <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogExport">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item v-bind="attrs" v-on="on">
-                    <v-list-item-action>
-                      <v-icon color="info"> mdi-file-export-outline</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-title>Exportar código de GitHub</v-list-item-title>
-                  </v-list-item>
-                </template>
-                <v-card>
-                  <v-toolbar color="primary" dark> Importar código </v-toolbar>
-                  <v-card-text>
-                    <v-form ref="form" v-model="validExport" lazy-validation @submit.prevent>
-                      <v-row align="center" justify="center" class="mt-6">
-                        <v-col cols="9">
-                          <v-text-field
-                            label="Descripción"
-                            placeholder="Exportar código"
-                            outlined
-                            dense
-                            color="primary"
-                            prepend-inner-icon="mdi-text "
-                            autocomplete="off"
-                          ></v-text-field>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn color="success">Aceptar</v-btn>
-                    <v-btn text>Cerrar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-              <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogExit">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item v-bind="attrs" v-on="on">
-                    <v-list-item-action>
-                      <v-icon color="error"> mdi-logout</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-title>
-                      Desvicular cuenta de GitHub
-                    </v-list-item-title>
-                  </v-list-item>
-                </template>
-                <v-card>
-                  <v-toolbar color="warning" dark> Cerrar Sesión </v-toolbar>
-                  <v-card-text>
-                    <div class="text-h6 pa-5 text-center">
-                      <p>¿ESTAS SEGURO QUE QUIERES DESVINCULAR</p>
-                      <p>TU CUENTA DE GITHUB?</p>
-                    </div>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn color="warning">Aceptar</v-btn>
-                    <v-btn text>Cerrar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-list>
+          <v-card>
+            <v-toolbar color="secondary" dark> Realizar Commit </v-toolbar>
+            <v-card-text>
+              <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+                <v-row align="center" justify="center" class="mt-6">
+                  <v-col cols="9">
+                    <v-text-field
+                      label="Summary"
+                      outlined
+                      dense
+                      color="primary"
+                      prepend-inner-icon="mdi-message-text "
+                      :rules="[rules.required]"
+                      autocomplete="off"
+                      v-model="summary"
+                    ></v-text-field>
+                    <v-textarea
+                      v-model.trim="description"
+                      label="Descripción"
+                      class="chat-input"
+                      outlined
+                      dense
+                      color="primary"
+                      prepend-inner-icon="mdi-message"
+                      @keydown="inputHandler"
+                      autocomplete="off"
+                      no-resize
+                    ></v-textarea>
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn color="success" :loading="loadingExport" @click="doCommit"> Commit </v-btn>
+              <v-btn text @click="closeDialogExport">Cancelar</v-btn>
+            </v-card-actions>
           </v-card>
-        </v-menu>
+        </v-dialog>
 
         <v-icon size="25px" color="info" @click="toggleShowTreeView">
           mdi-folder-open
@@ -190,14 +117,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
+import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
 import UserService from "@/services/user.service";
-import { Maybe } from "@/generated/graphql";
+import { Maybe, Repository } from "@/generated/graphql";
+import { VForm } from "@/utils/types";
+import * as monaco from "monaco-editor";
 @Component
 export default class AppBarOptions extends Vue {
   @Prop({
@@ -220,13 +150,24 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.State("driverUID")
   private driverUID!: string | undefined;
 
+  @CodeChannel.State("repository")
+  private repository!: Maybe<Repository>;
+
+  @CodeChannel.State("branchOid")
+  private branchOid!: string;
+
+  @CodeChannel.State("codeFilePath")
+  private codeFilePath!: string;
+
+  @Ref("form") readonly form!: VForm;
+
   /**
    * Estado obtenido del @module User
    */
-
   @User.State("user")
   private currentUser!: User;
 
+  public loadingExport = false;
   public dialogImport = false;
   public validImport = true;
   public dialogExport = false;
@@ -235,9 +176,52 @@ export default class AppBarOptions extends Vue {
   public validExit = false;
   public userRequest: Maybe<User> = null;
   public test = false;
+  public description = "";
+  public summary = "";
+  public valid = false;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido"
+  };
+
+  closeDialogExport() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialogExport = false;
+  }
 
   acceptRequest() {
     CodeService.acceptRequest(this.currentUser.uid!, this.userRequest!.uid!);
+  }
+
+  inputHandler(e: KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      // this.editMessages();
+    }
+  }
+
+  async doCommit() {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loadingExport = true;
+      await GitHubService.makeCommit({
+        branch: {
+          repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+          branchName: this.repository?.defaultBranchRef?.name
+        },
+        fileChanges: {
+          additions: [
+            {
+              path: this.codeFilePath,
+              contents: window.btoa(monaco.editor.getModels()[0].getValue())
+            }
+          ]
+        },
+        message: { headline: this.summary, body: this.description },
+        expectedHeadOid: this.branchOid
+      });
+      this.loadingExport = false;
+      this.dialogExport = false;
+    }
   }
 
   mounted() {

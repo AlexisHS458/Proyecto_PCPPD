@@ -20,6 +20,7 @@ export default class SubTreeFile extends Vue {
   @CodeChannelModule.State("codePath")
   private codePath!: CodePath[];
 
+
   @Watch("codePath")
   async onChildChanged() {
     this.treeEntries = null;

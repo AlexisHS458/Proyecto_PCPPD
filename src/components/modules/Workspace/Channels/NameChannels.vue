@@ -236,6 +236,12 @@ export default class NameChannels extends Vue {
   @WorkspaceOptions.Action
   private deleteTextChannel!: (textChannelID: string) => Promise<void>;
 
+  @WorkspaceOptions.Action
+  private setMessageOnSnackbarWarning!: (message: string) => void;
+
+  @WorkspaceOptions.Action
+  private setVisibleSnackBarWarning!: () => void;
+
   /**
    * Estado obtenido del @module Workspace
    */
@@ -281,7 +287,7 @@ export default class NameChannels extends Vue {
   };
   public permissions = {} as PermissionsPath;
   public statusCheckbox = false;
- 
+
   /**
    * Editar información de un canal de texto
    */
@@ -363,7 +369,12 @@ export default class NameChannels extends Vue {
         });
       }
     } else {
-      alert("Tas wey");
+      this.setVisibleSnackBarWarning();
+      this.setMessageOnSnackbarWarning(
+        "No tienes permiso para entrar a " +
+          this.channel.nombre +
+          ". Comunícate con el administrador."
+      );
     }
   }
 }

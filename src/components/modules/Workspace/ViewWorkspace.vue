@@ -62,6 +62,14 @@
       :method="setNotVisibleSnackBarErrorWorkspace"
     ></snackbar>
 
+    <snackbar
+      :color="'warning'"
+      :snackText="snackbarMessageWarningWorkspace"
+      :status="statusWorkspace.showSnackbarWarning"
+      :timeout="timeout"
+      :method="setNotVisibleSnackBarWarningWorkspace"
+    ></snackbar>
+
     <!--   Peticiones exitosas del modulo de Permissions -->
     <snackbar
       :color="'success'"
@@ -159,6 +167,9 @@ export default class Spacework extends Vue {
   @MyWorkSpace.Action("setNotVisibleSnackBarError")
   setNotVisibleSnackBarErrorWorkspace!: () => void;
 
+  @MyWorkSpace.Action("setNotVisibleSnackBarWarning")
+  setNotVisibleSnackBarWarningWorkspace!: () => void;
+
   /**
    * Estados obtenidos del @module Workspace
    */
@@ -185,6 +196,9 @@ export default class Spacework extends Vue {
 
   @MyWorkSpace.State("snackbarMessageError")
   private snackbarMessageErrorWorkspace!: string;
+
+  @MyWorkSpace.State("snackbarMessageWarning")
+  private snackbarMessageWarningWorkspace!: string;
 
   /**
    * Getter obtenido del @module Workspace

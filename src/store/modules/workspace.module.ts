@@ -51,16 +51,16 @@ class WorkspaceModule extends VuexModule {
    * Mensaje a mostrar error en snackbar
    */
   public snackbarMessageError = "";
-  
+
+  /**
+   * Mensaje a mostrar warning en snackbar
+   */
+  public snackbarMessageWarning = "";
+
   /**
    * Todos los usuarios dentro de la base de datos
    */
   public allUsers: User[] = [];
-
-
-
-
-
 
   /**
    * Status de la consulta del espacio de trabajo
@@ -73,8 +73,19 @@ class WorkspaceModule extends VuexModule {
     channelDeleted: false,
     userRemoved: false,
     showSnackbar: false,
-    showSnackbarError: false
+    showSnackbarError: false,
+    showSnackbarWarning: false
   };
+
+  @Mutation
+  public setShowSnackBarMessageWarning(status: boolean): void {
+    this.status.showSnackbarWarning = status;
+  }
+
+  @Mutation
+  public setSnackBarMessageWarning(message: string): void {
+    this.snackbarMessageWarning = message;
+  }
 
   @Mutation
   public setWorkspace(workspace: Workspace): void {
@@ -158,12 +169,10 @@ class WorkspaceModule extends VuexModule {
     this.status.showSnackbar = status;
   }
 
-
   @Mutation
   public setAllUsers(allUsers: User[]): void {
-      this.allUsers = allUsers;
+    this.allUsers = allUsers;
   }
-
 
   /**
    * Consulta la información de un espacio de trabajo.
@@ -222,14 +231,13 @@ class WorkspaceModule extends VuexModule {
   @Action
   async fetchUsersInWorkspace() {
     this.context.commit("setLoadingUsersStatus", true);
-    await UserService.getUserAuthInfo((user)=> {
+    await UserService.getUserAuthInfo(user => {
       this.context.commit("setUser", user);
       WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
         this.context.commit("setUsers", users);
         this.context.commit("setLoadingUsersStatus", false);
       });
     });
-    
   }
 
   /**
@@ -360,7 +368,7 @@ class WorkspaceModule extends VuexModule {
   @Action
   async createCodeChannel(codeChannel: CodeChannel): Promise<void> {
     this.context.commit("setChannelCreatedStatus", false);
-   
+
     ChannelsService.createCodeChannel(this.workspace.uid, codeChannel)
       .then(() => {
         this.context.commit("setChannelCreatedStatus", true);
@@ -427,12 +435,33 @@ class WorkspaceModule extends VuexModule {
   }
 
   /**
+   * Hace visible el snackbar de warning
+   */
+  @Action
+  setVisibleSnackBarWarning(): void {
+    this.context.commit("setShowSnackBarMessageWarning", true);
+  }
+
+  /**
+   * Hace no visible el snackbar de warning
+   */
+  @Action
+  setNotVisibleSnackBarWarning(): void {
+    this.context.commit("setShowSnackBarMessageWarning", false);
+  }
+
+  /**
    * Coloca un mensaje en el snackbar
    * @param message mensaje a mostrar en el snackbar
    */
   @Action
   setMessageOnSnackbar(message: string): void {
     this.context.commit("setSnackBarMessage", message);
+  }
+
+  @Action
+  setMessageOnSnackbarWarning(message: string): void {
+    this.context.commit("setSnackBarMessageWarning", message);
   }
 
   /**
@@ -467,18 +496,17 @@ class WorkspaceModule extends VuexModule {
     this.context.commit("setShowSnackBarMessageError", false);
   }
 
-
   /**
-  * Recupera los usuarios de la base de datos para enviar invitación
-  * @param userIDs IDs de los usuarios dentro del workspace
-  */
-   @Action
-   async fetchAllUsers(): Promise<void> {
+   * Recupera los usuarios de la base de datos para enviar invitación
+   * @param userIDs IDs de los usuarios dentro del workspace
+   */
+  @Action
+  async fetchAllUsers(): Promise<void> {
     this.context.commit("setAllUsers", await UserService.getUsers());
-   }
-     
+  }
+
   get getUserList(): User[] {
-    return this.users
+    return this.users;
   }
 
   get isLoadingWorkspace(): boolean {
