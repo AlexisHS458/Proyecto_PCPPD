@@ -36,7 +36,7 @@
                   <strong> Bienvenido a Kun </strong>
                 </p>
                 <p class="text-h5 white--text text-center" align="center" justify="center">
-                  Inicia sesión con tu cuenta de Google
+                  Inicia sesión con tu cuenta de GitHub
                 </p>
               </v-img>
             </v-col>
@@ -67,7 +67,10 @@ export default class LoginForm extends Vue {
     }
     var uiConfig: firebaseui.auth.Config = {
       signInSuccessUrl: "/register",
-      signInOptions: [firebase.auth.GithubAuthProvider.PROVIDER_ID],
+      signInOptions: [{
+        provider: firebase.auth.GithubAuthProvider.PROVIDER_ID,
+        scopes:["repo"]
+      }],
       callbacks: {
         signInSuccessWithAuthResult: function (result,redirect){          
            localStorage.setItem('github-token',result.credential.accessToken);

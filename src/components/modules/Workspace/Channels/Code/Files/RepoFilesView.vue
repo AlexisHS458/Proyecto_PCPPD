@@ -1,12 +1,5 @@
 <template>
-  <v-navigation-drawer
-    app
-    clipped
-    right
-    v-model="status.showTreeView"
-    color="primaryDark"
-    dark
-  >
+  <v-navigation-drawer app clipped right v-model="status.showTreeView" color="primaryDark" dark>
     <div v-if="treeEntries" class="v-navigation-drawer__content">
       <view-tree
         :codeChanel="idChannelCode"
@@ -26,7 +19,7 @@
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import ViewTree from "@/components/modules/Workspace/ViewTreeView.vue";
 import SubTree from "@/components/modules/Workspace/Channels/Code/Files/SubTreeFile.vue";
-import { Maybe, TreeEntry } from "@/generated/graphql";
+import { Maybe, TreeEntry, Commit, Repository } from "@/generated/graphql";
 import GitHubService from "@/services/github.service";
 import { namespace } from "vuex-class";
 import { CodeChannel } from "@/models/codeChannel";
@@ -34,11 +27,11 @@ import { CodePath } from "@/models/codePath";
 const CodeChannelModule = namespace("CodeChannelModule");
 const WorkspaceModule = namespace("WorkspaceModule");
 @Component({
-  components: { ViewTree, SubTree },
+  components: { ViewTree, SubTree }
 })
 export default class RepoFilesView extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public idChannelCode!: string;
 
@@ -47,6 +40,9 @@ export default class RepoFilesView extends Vue {
 
   @CodeChannelModule.State("codePath")
   private codePath!: CodePath[];
+
+  @CodeChannelModule.Action("setRepository")
+  private setRepository!: (repo: Repository) => void;
 
   @WorkspaceModule.State("codeChannels")
   public codeChannels!: CodeChannel[];
@@ -68,14 +64,22 @@ export default class RepoFilesView extends Vue {
   }
 
   async viewTree() {
-    const codeChannel = this.codeChannels.find((channel) => {
+    const codeChannel = this.codeChannels.find(channel => {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      this.treeEntries = await GitHubService.getRepo(
+      const repo = await GitHubService.getRepo(
         codeChannel!.propietario,
         codeChannel!.nombre
       );
+      this.treeEntries = (repo?.defaultBranchRef?.target as Commit).tree.entries?.sort((a, b) => {
+        const aType = a.type === "tree" ? -1 : 1;
+        const bType = b.type === "tree" ? -1 : 1;
+        return aType - bType;
+      });
+      if(repo){
+        this.setRepository(repo);
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
 import CodeChannelService from "@/services/code_channel.service";
-import { Maybe, TreeEntry } from "@/generated/graphql";
+import { Maybe, Repository, TreeEntry } from "@/generated/graphql";
 import { CodePath } from "@/models/codePath";
 
 @Module({ namespaced: true })
@@ -18,6 +18,12 @@ class CodeChannelModule extends VuexModule {
   public codePath: CodePath[] = [];
 
   public codeData: Maybe<TreeEntry> = null;
+
+  public codeFilePath = "";
+
+  public branchOid = ""
+
+  public repository: Maybe<Repository> = null
 
   public codeChannelName = "";
   public driverUID = "";
@@ -102,10 +108,27 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public setInitialCodeData(blob: TreeEntry): void {
     this.codeData = blob;
+    console.log(this.codePath);
+    let prefix = "";
+    if(this.codePath.length > 0){
+      prefix = this.codePath.map(path => path.nombre).join("/") + "/"
+    }
+    this.codeFilePath = prefix + blob.name;
+  }
+
+  @Mutation
+  public setRepoState(repo: Repository): void {
+    this.repository = repo;
+    this.branchOid = repo.defaultBranchRef?.target?.oid;
   }
 
   @Action
-  public setCodeData(blob: TreeEntry): void {
+  setRepository(repo: Repository): void{
+    this.context.commit("setRepoState", repo);
+  }
+
+  @Action
+  setCodeData(blob: TreeEntry): void {
     this.context.commit("setInitialCodeData", blob);
   }
 

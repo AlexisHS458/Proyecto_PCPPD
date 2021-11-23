@@ -9,7 +9,11 @@ import {
   Maybe,
   Repository,
   TreeEntry,
-  Tree
+  Tree,
+  Ref,
+  CreateCommitOnBranchInput,
+  MakeCommitMutation,
+  MakeCommit
 } from "@/generated/graphql";
 import apollo_client from "@/utils/apollo_client";
 class GitHubService {
@@ -23,23 +27,19 @@ class GitHubService {
     return response.viewer.repositories.nodes as any;
   }
 
-  async getRepo(userName: string, repoName: string): Promise<Maybe<TreeEntry[]> | undefined> {
+  async getRepo(userName: string, repoName: string): Promise<Maybe<Repository> | undefined> {
     const response: GetRepoQuery = (
       await apollo_client.query({
         query: GetRepo,
         variables: {
           name: repoName,
           owner: userName
-        }
+        },
+        fetchPolicy: "network-only"
       })
     ).data;
 
-    const commit = response.repository?.defaultBranchRef?.target as Commit;
-    return commit.tree.entries?.sort((a, b) => {
-      const aType = a.type === "tree" ? -1 : 1;
-      const bType = b.type === "tree" ? -1 : 1;
-      return aType - bType;
-    });
+    return response.repository as Repository;
   }
 
   async getNodeFiles(id: string): Promise<Maybe<TreeEntry[]> | undefined> {
@@ -49,7 +49,8 @@ class GitHubService {
           query: GetNodeFiles,
           variables: {
             id
-          }
+          },
+          fetchPolicy: "network-only"
         })
         .then(res => {
           console.log(res);
@@ -64,6 +65,19 @@ class GitHubService {
       const bType = b.type === "tree" ? -1 : 1;
       return aType - bType;
     });
+  }
+
+  async makeCommit(commitInput: CreateCommitOnBranchInput): Promise<string> {
+    const response: MakeCommitMutation = (
+      await apollo_client.mutate({
+        mutation: MakeCommit,
+        variables: {
+          input: commitInput
+        }
+      })
+    ).data;
+
+    return response.createCommitOnBranch?.commit?.url;
   }
 }
 

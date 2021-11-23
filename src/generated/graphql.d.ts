@@ -34,3 +34,12 @@ declare module '*/GetRepositories.graphql' {
   export default defaultDocument;
 }
     
+
+declare module '*/MakeCommit.graphql' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const makeCommit: DocumentNode;
+
+  export default defaultDocument;
+}
+    

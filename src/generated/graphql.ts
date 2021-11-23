@@ -22472,12 +22472,19 @@ export type GetRepoQueryVariables = Exact<{
 }>;
 
 
-export type GetRepoQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', target?: { __typename?: 'Blob' } | { __typename?: 'Commit', id: string, tree: { __typename?: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, extension?: string | null | undefined, type: string, object?: { __typename?: 'Blob', text?: string | null | undefined, isBinary?: boolean | null | undefined } | { __typename?: 'Commit' } | { __typename?: 'Tag' } | { __typename?: 'Tree', id: string } | null | undefined }> | null | undefined } } | { __typename?: 'Tag' } | { __typename?: 'Tree' } | null | undefined } | null | undefined } | null | undefined };
+export type GetRepoQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string }, defaultBranchRef?: { __typename?: 'Ref', name: string, target?: { __typename?: 'Blob', oid: any } | { __typename?: 'Commit', id: string, oid: any, tree: { __typename?: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, extension?: string | null | undefined, type: string, object?: { __typename?: 'Blob', text?: string | null | undefined, isBinary?: boolean | null | undefined } | { __typename?: 'Commit' } | { __typename?: 'Tag' } | { __typename?: 'Tree', id: string } | null | undefined }> | null | undefined } } | { __typename?: 'Tag', oid: any } | { __typename?: 'Tree', oid: any } | null | undefined } | null | undefined } | null | undefined };
 
 export type GetRepositoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetRepositoriesQuery = { __typename?: 'Query', viewer: { __typename?: 'User', repositories: { __typename?: 'RepositoryConnection', nodes?: Array<{ __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } | null | undefined> | null | undefined } } };
+
+export type MakeCommitMutationVariables = Exact<{
+  input: CreateCommitOnBranchInput;
+}>;
+
+
+export type MakeCommitMutation = { __typename?: 'Mutation', createCommitOnBranch?: { __typename?: 'CreateCommitOnBranchPayload', commit?: { __typename?: 'Commit', url: any } | null | undefined } | null | undefined };
 
 export const FilesInTree = gql`
     fragment FilesInTree on Tree {
@@ -22510,8 +22517,14 @@ export const GetNodeFiles = gql`
 export const GetRepo = gql`
     query GetRepo($name: String!, $owner: String!) {
   repository(name: $name, owner: $owner) {
+    name
+    owner {
+      login
+    }
     defaultBranchRef {
+      name
       target {
+        oid
         ... on Commit {
           id
           tree {
@@ -22533,6 +22546,15 @@ export const GetRepositories = gql`
           login
         }
       }
+    }
+  }
+}
+    `;
+export const MakeCommit = gql`
+    mutation makeCommit($input: CreateCommitOnBranchInput!) {
+  createCommitOnBranch(input: $input) {
+    commit {
+      url
     }
   }
 }

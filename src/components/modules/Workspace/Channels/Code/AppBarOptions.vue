@@ -1,11 +1,6 @@
 <template>
   <v-app-bar app clipped-right flat height="48px" color="primary">
-    <v-icon
-      color="white"
-      class="mr-4"
-      @click="toggleShowNavigationDrawerChannels"
-      >mdi-menu</v-icon
-    >
+    <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
     <v-toolbar-title class="font-weight-medium">
       {{ nameChannel }}
     </v-toolbar-title>
@@ -32,9 +27,7 @@
               </v-list>
               <v-divider></v-divider>
               <v-card-actions class="justify-center">
-                <v-btn color="success" small @click="acceptRequest"
-                  >Aceptar</v-btn
-                >
+                <v-btn color="success" small @click="acceptRequest">Aceptar</v-btn>
                 <v-btn color="error" small>Rechazar</v-btn>
               </v-card-actions>
             </template>
@@ -50,11 +43,7 @@
           </v-card>
         </v-menu>
 
-        <v-dialog
-          transition="dialog-top-transition"
-          max-width="600"
-          v-model="dialogExport"
-        >
+        <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogExport">
           <template v-slot:activator="{ on, attrs }">
             <v-icon
               v-bind="attrs"
@@ -69,12 +58,7 @@
           <v-card>
             <v-toolbar color="secondary" dark> Realizar Commit </v-toolbar>
             <v-card-text>
-              <v-form
-                ref="form"
-                v-model="valid"
-                lazy-validation
-                @submit.prevent
-              >
+              <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
                 <v-row align="center" justify="center" class="mt-6">
                   <v-col cols="9">
                     <v-text-field
@@ -85,16 +69,16 @@
                       prepend-inner-icon="mdi-message-text "
                       :rules="[rules.required]"
                       autocomplete="off"
+                      v-model="summary"
                     ></v-text-field>
                     <v-textarea
-                      v-model.trim="text"
+                      v-model.trim="description"
                       label="Descripción"
                       class="chat-input"
                       outlined
                       dense
                       color="primary"
                       prepend-inner-icon="mdi-message"
-                      :rules="[rules.required]"
                       @keydown="inputHandler"
                       autocomplete="off"
                       no-resize
@@ -104,7 +88,7 @@
               </v-form>
             </v-card-text>
             <v-card-actions class="justify-end">
-              <v-btn color="success" :loading="loadingExport"> Commit </v-btn>
+              <v-btn color="success" :loading="loadingExport" @click="doCommit"> Commit </v-btn>
               <v-btn text @click="closeDialogExport">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
@@ -138,14 +122,16 @@ import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
+import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
 import UserService from "@/services/user.service";
-import { Maybe } from "@/generated/graphql";
+import { Maybe, Repository } from "@/generated/graphql";
 import { VForm } from "@/utils/types";
+import * as monaco from "monaco-editor";
 @Component
 export default class AppBarOptions extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public nameChannel!: string;
 
@@ -164,12 +150,20 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.State("driverUID")
   private driverUID!: string | undefined;
 
+  @CodeChannel.State("repository")
+  private repository!: Maybe<Repository>;
+
+  @CodeChannel.State("branchOid")
+  private branchOid!: string;
+
+  @CodeChannel.State("codeFilePath")
+  private codeFilePath!: string;
+
   @Ref("form") readonly form!: VForm;
 
   /**
    * Estado obtenido del @module User
    */
-
   @User.State("user")
   private currentUser!: User;
 
@@ -182,10 +176,11 @@ export default class AppBarOptions extends Vue {
   public validExit = false;
   public userRequest: Maybe<User> = null;
   public test = false;
-  public text = "";
+  public description = "";
+  public summary = "";
   public valid = false;
   public rules = {
-    required: (v: string): string | boolean => !!v || "Campo requerido",
+    required: (v: string): string | boolean => !!v || "Campo requerido"
   };
 
   closeDialogExport() {
@@ -205,8 +200,32 @@ export default class AppBarOptions extends Vue {
     }
   }
 
+  async doCommit() {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loadingExport = true;
+      await GitHubService.makeCommit({
+        branch: {
+          repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+          branchName: this.repository?.defaultBranchRef?.name
+        },
+        fileChanges: {
+          additions: [
+            {
+              path: this.codeFilePath,
+              contents: window.btoa(monaco.editor.getModels()[0].getValue())
+            }
+          ]
+        },
+        message: { headline: this.summary, body: this.description },
+        expectedHeadOid: this.branchOid
+      });
+      this.loadingExport = false;
+      this.dialogExport = false;
+    }
+  }
+
   mounted() {
-    CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
+    CodeService.listenForRequest(this.currentUser.uid!, async uidRequest => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
       this.test = true;
     });
