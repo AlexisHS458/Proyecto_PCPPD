@@ -61,6 +61,16 @@ export default class ViewTreeView extends Vue {
   })
   public treeEntries!: Maybe<TreeEntry[]>;
 
+  @Prop({
+    required: false,
+  })
+  public codeChanel!: string;
+
+  @Watch("codeChanel")
+  onChildChangedView() {
+    this.nameCode();
+  }
+
   @CodeChannelModule.Action
   private addPathState!: (path: CodePath) => void;
 

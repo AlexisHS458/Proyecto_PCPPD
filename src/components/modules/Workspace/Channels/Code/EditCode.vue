@@ -43,7 +43,7 @@ import CursorComponent from "@/components/modules/Workspace/Channels/Code/Cursor
 import FooterOptionsCode from "@/components/modules/Workspace/Channels/Code/FooterOptionsCode.vue";
 import AppBarOptions from "@/components/modules/Workspace/Channels/Code/AppBarOptions.vue";
 import * as monaco from "monaco-editor";
-import { languages } from "monaco-editor-core";
+
 import ServiceChannels from "@/services/channels.service";
 import CodeService from "@/services/code_channel.service";
 import { namespace } from "vuex-class";

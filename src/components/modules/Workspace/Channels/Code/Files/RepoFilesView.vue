@@ -9,6 +9,7 @@
   >
     <div v-if="treeEntries" class="v-navigation-drawer__content">
       <view-tree
+        :codeChanel="idChannelCode"
         v-if="codePath.length === 0"
         :treeEntries="treeEntries"
       ></view-tree>
@@ -51,8 +52,7 @@ export default class RepoFilesView extends Vue {
   public codeChannels!: CodeChannel[];
 
   @Watch("idChannelCode")
-  async onChildChangedView() {
-    console.log("entro");
+  onChildChangedView() {
     this.viewTree();
   }
 

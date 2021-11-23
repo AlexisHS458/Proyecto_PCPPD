@@ -132,7 +132,8 @@ router.beforeEach(
         next({ name: "Home" });
       } else if (!requiresAuth && user) {
         next("/Mainscreen");
-      } else next();
+      } else if (!requiresAuth && !user) next();
+      else next();
     });
   }
 );
