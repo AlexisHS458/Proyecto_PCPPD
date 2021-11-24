@@ -34,7 +34,8 @@ class CodeChannelModule extends VuexModule {
     showNavigationDrawerChannels: true,
     showRequestDriver: false,
     showSnackbar: false,
-    showSnackbarError: false
+    showSnackbarError: false,
+    showCloseDialog: false
   };
 
   @Mutation
@@ -126,6 +127,18 @@ class CodeChannelModule extends VuexModule {
   public setBranchOidState(ref: Ref): void {
     this.branchOid = ref.target?.oid
   }
+
+  @Mutation
+  public setShowDialogState(state: boolean): void {
+    this.status.showCloseDialog = state;
+  }
+
+  @Action
+  public setShowDialog(state: boolean): void {
+    this.context.commit("setShowDialogState", state);
+  }
+
+
 
   @Action
   public setBranchOid(ref: Ref): void {

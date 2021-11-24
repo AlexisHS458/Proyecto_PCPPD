@@ -103,41 +103,7 @@ export default class ViewTreeView extends Vue {
     this.nameCode();
   }
 
-  async getServerHash(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      CodeService.getInitialHash(this.currentUser.uid!, hash => {
-        console.log("tengo el hash del server");
-        resolve(hash);
-      });
-    });
-  }
-
-  compareHash(): boolean {
-    console.log("entro");
-
-    if (!this.serverHash) {
-      console.log("se salio");
-      return true;
-    }
-
-    const currentCode = monaco.editor.getModels()[0].getValue();
-    // const secret = process.env.VUE_APP_SOCKET_SECRET
-    //   ? process.env.VUE_APP_SOCKET_SECRET
-    //   : "secreto";
-    const secret = "Plataforma colaborativa para el pair programming distribuido";
-    const encryp = CryptoJS.AES.encrypt(currentCode, secret).toString();
-    console.log(
-      CryptoJS.AES.decrypt(this.serverHash, secret)
-        .toString(CryptoJS.enc.Utf8)
-        .substring(0, 200)
-    );
-    console.log(this.serverHash == encryp);
-
-    return this.serverHash == encryp;
-  }
-  delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  
 
   async goToPath(treeEntry: TreeEntry) {
     switch ((treeEntry.object as any)?.__typename) {
@@ -146,15 +112,10 @@ export default class ViewTreeView extends Vue {
         this.addPathState({ id: tree.id, nombre: treeEntry.name });
         break;
       case "Blob":
-        //this.serverHash = await this.getServerHash();
         if (this.driverUID === this.currentUser.uid!) {
           const blob = treeEntry.object as Blob;
           if (blob.isBinary == false) {
-            if (this.compareHash() == true) {
-              this.setCodeData(treeEntry);
-            } else {
-              console.log("decirle que guarde");
-            }
+            this.setCodeData(treeEntry);
           }
         }
         break;

@@ -81,11 +81,6 @@ export default class EditCode extends Vue {
 
     monaco.editor.setModelLanguage(this.options.getModel()!, language ?? "cpp");
     const blob = this.codeData?.object as Blob;
-    CodeService.updateInitialHash(this.currentUser.uid!, {
-      channelID: this.$route.params.idChannelCode,
-      code: blob.text ?? ""
-    });
-    CodeService.requestInitialHash(this.currentUser.uid!, this.$route.params.idChannelCode);
     this.options.setValue(blob.text ?? "");
     this.sendCode(language ?? "cpp");
   }
@@ -110,6 +105,11 @@ export default class EditCode extends Vue {
 
   @CodeChannel.State("driverUID")
   private driverUID!: string;
+
+@CodeChannel.State("codeFilePath")
+  private codeFilePath!: string;
+
+
 
   @CodeChannel.Getter
   private getDriverID!: string;
@@ -179,8 +179,15 @@ export default class EditCode extends Vue {
       });
     });
     CodeService.getDataCode(this.currentUser.uid!, code => {
-      this.options.setValue(code.data);
-      monaco.editor.setModelLanguage(this.options.getModel()!, code.extension ?? "cpp");
+      console.log(code);
+
+      if (this.driverUID !== this.currentUser.uid) {
+        this.options.setValue(code.data);
+        monaco.editor.setModelLanguage(this.options.getModel()!, code.extension ?? "cpp");
+        
+      } else if(code.hash !== code.currentHash) {
+        console.log('Crear vista de Seguro que quieres cerrar');
+      }
     });
     var audio = new Audio(require("@/assets/connected.mp3"));
     audio.play();
@@ -214,7 +221,8 @@ export default class EditCode extends Vue {
     CodeService.sendCode(this.currentUser.uid!, {
       channelID: this.$route.params.idChannelCode,
       code: this.options.getValue(),
-      extension: extension
+      extension: extension,
+      path: this.codeFilePath!
     });
   }
 
