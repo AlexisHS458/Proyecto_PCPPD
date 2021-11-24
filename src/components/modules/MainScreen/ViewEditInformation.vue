@@ -1,10 +1,15 @@
 <template>
-  <v-container v-if="!isLoading" class="fill-height" fluid>
+  <v-container v-if="!isLoading" class="fill-height scroll" fluid>
     <v-row align="center" justify="center">
-      <v-col cols="6">
+      <v-col cols="12" sm="12" lg="6" xl="6" md="12">
         <v-card rounded="lg" height="100%" width="100%">
           <v-row no-gutters>
-            <v-col cols="7" class="arrow">
+            <v-col cols="7" class="arrow hidden-sm-and-down">
+              <v-btn class="ma-2" text icon to="/Mainscreen">
+                <v-icon large> mdi-arrow-left </v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="12" sm="7" xs="7" class="hidden-md-and-up">
               <v-btn class="ma-2" text icon to="/Mainscreen">
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
@@ -13,10 +18,10 @@
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-img
-                    class="img mb-12"
+                    class="img mb-12 hidden-sm-and-down"
                     :src="require('@/assets/logo.png')"
                   />
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Nombre"
                       outlined
@@ -26,7 +31,7 @@
                       prepend-inner-icon="mdi-account "
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Apellidos"
                       :rules="[rules.required, rules.regexLastName]"
@@ -37,16 +42,22 @@
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Boleta o Número de empleado"
-                      :rules="[rules.required, rules.regexBoleta]"
+                      :rules="[
+                        rules.required,
+                        rules.regexBoleta,
+                        rules.caracteres,
+                        rules.caracteresMayor,
+                      ]"
                       v-model="user.boleta"
                       outlined
                       dense
                       color="primary"
                       prepend-inner-icon="mdi-credit-card-outline"
                       :error-messages="textError"
+                      required
                     ></v-text-field>
                   </v-col>
                   <v-col cols="4">
@@ -113,10 +124,10 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
-import { Ref } from "vue-property-decorator";
+import { Ref, Watch } from "vue-property-decorator";
 import { VForm } from "@/utils/types";
 const EditUser = namespace("UserModule");
-const GetUsers = namespace("InvitationsModule");
+const Workspace = namespace("WorkspaceModule");
 
 @Component
 export default class ViewEdit extends Vue {
@@ -145,30 +156,35 @@ export default class ViewEdit extends Vue {
   private isLoading!: boolean;
 
   /**
-   * Accion obtenida del @module Invitations
+   * Accion obtenida del @module Worksapce
    */
-  @GetUsers.Action
-  private fetchUserNames!: () => void;
+  @Workspace.State("allUsers")
+  private allUsers!: User[];
 
-  /**
-   * Estado obtenido del @module Invitations
-   */
-  @GetUsers.State("users")
-  private users!: User[];
+  @Workspace.Action
+  private fetchAllUsers!: () => Promise<void>;
 
   @Ref("form") readonly form!: VForm;
 
   public user = {} as User;
+  public boletas: string[] = [];
+
   public loading = false;
   public valid = true;
   public snackbarFailture = false;
   public snackbarSuccess = false;
   public textFailture = "Ocurrio un error al registrarte";
-  public textSuccess = "Se actualizo tu información";
+  public textSuccess = "Se actualizó tu información";
   public timeout = 2000;
   public textError = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    caracteres: (v: string): string | boolean =>
+      (v || "").length >= 6 ||
+      "Este campo no puede tener menor de 6 caracteres",
+    caracteresMayor: (v: string): string | boolean =>
+      (v || "").length <= 15 ||
+      "Este campo no puede tener más de 15 caracteres",
     regex: (v: string): string | boolean =>
       /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
         v
@@ -178,21 +194,19 @@ export default class ViewEdit extends Vue {
         v
       ) || "Apellido inválido",
     regexBoleta: (v: string): string | boolean =>
-      /^[a-zA-Z0-9]+$/.test(v) || "Apellido inválido",
+      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválido",
   };
 
-  /*  @Watch("user")
+  @Watch("user.boleta")
   onChildChanged() {
-    this.getMessages();
-  } */
+    this.textError = "";
+  }
 
   async created() {
     if (!this.isLoggedIn) {
       await this.fetchCurrentUser();
     }
-    /*  await this.fetchCurrentUser(); */
     this.user = JSON.parse(JSON.stringify(this.currentUser));
-    this.fetchUserNames();
   }
 
   /**
@@ -204,11 +218,13 @@ export default class ViewEdit extends Vue {
       this.loading = true;
       this.snackbarFailture = false;
       this.snackbarSuccess = false;
-      /*   let index = this.users.findIndex((user) => user.uid === this.user.uid);
-      if (index > -1) {
-        this.users.splice(index, 1);
-      } */
-      if (!this.users.find((user) => user.boleta === this.user.boleta)) {
+
+      await this.fetchAllUsers();
+      const allUsersBoletas = this.allUsers.map((user) => user.boleta);
+      this.boletas = allUsersBoletas.filter(
+        (boleta) => boleta !== this.currentUser.boleta
+      );
+      if (!this.boletas.includes(this.user.boleta)) {
         await this.saveUser(this.user);
         if (this.isLoggedIn) {
           this.loading = false;
@@ -217,8 +233,7 @@ export default class ViewEdit extends Vue {
           this.loading = false;
           this.snackbarFailture = true;
         }
-      }
-      {
+      } else {
         this.loading = false;
         this.textError = "Boleta duplicada";
       }
@@ -227,7 +242,7 @@ export default class ViewEdit extends Vue {
 }
 </script>
 
-<style scoped >
+<style scoped>
 .img {
   border-radius: 1rem;
   width: 14rem;
@@ -245,5 +260,22 @@ export default class ViewEdit extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.scroll {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: #000029;
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
 }
 </style>

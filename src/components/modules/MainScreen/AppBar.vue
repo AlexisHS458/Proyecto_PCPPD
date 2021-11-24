@@ -6,7 +6,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-list-item v-on="on" v-bind="attrs">
           <v-list-item-avatar>
-            <v-img :src="currentUser.fotoURL"></v-img>
+            <img :src="currentUser.fotoURL" @error="imgError" />
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>{{
@@ -48,7 +48,10 @@ import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
 const User = namespace("UserModule");
-
+/* eslint-disable */
+// @ts-ignore
+import image from "@/assets/userProfile.png";
+/* eslint-enable */
 @Component
 export default class AppBar extends Vue {
   /**
@@ -73,6 +76,10 @@ export default class AppBar extends Vue {
     await this.logout();
     this.loading = false;
     this.$router.push({ path: "/" });
+  }
+
+  imgError(e: any) {
+    e.target.src = image;
   }
 }
 </script>

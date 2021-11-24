@@ -1,12 +1,22 @@
 <template>
-  <v-expansion-panels v-model="panel" class="expansion-panels" multiple>
+  <v-expansion-panels v-model="panel" class="expansion-panels" multiple dark>
     <v-expansion-panel>
-      <v-expansion-panel-header color="primaryDark" class="title">
+      <v-expansion-panel-header
+        color="primaryDark"
+        class="title d-flex flex-row"
+      >
         <template v-slot:actions>
-          <v-icon color="white" class="icon"> $expand </v-icon>
+          <v-icon
+            color="white"
+            class="icon mr-2 flex-shrink-1 flex-grow-0 mb-1"
+          >
+            $expand
+          </v-icon>
         </template>
 
-        <span class="header"> {{ item.title }}</span>
+        <span class="header font-weight-bold flex-shrink-0 flex-grow-1">
+          {{ item.title }}</span
+        >
         <v-dialog
           v-if="workspace.uid_usuario == currentUser.uid"
           transition="dialog-top-transition"
@@ -15,8 +25,8 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              v-show="channels.length < 2"
-              class="add mx-2"
+              v-show="channels.length < 3"
+              class="add flex-shrink-1 flex-grow-0 mx-2"
               icon
               color="white"
               small
@@ -46,9 +56,10 @@
                       dense
                       color="primary"
                       prepend-inner-icon="mdi-account-voice"
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.regexNameChannel]"
                       v-model="nameChannel"
                       @keyup.enter="addChannelVoice"
+                      @keydown.esc="closeAddSpace"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -58,16 +69,16 @@
               <v-btn color="success" :loading="loading" @click="addChannelVoice"
                 >Crear</v-btn
               >
-              <v-btn text @click="dialog = false">Cancelar</v-btn>
+              <v-btn text @click="closeAddSpace">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
       </v-expansion-panel-header>
       <v-expansion-panel-content color="primaryDark" class="expansion-content">
-        <v-list color="primaryDark">
+        <v-list color="primaryDark" shaped>
           <namechannelsvoice
-            v-for="(channel, index) in channels"
-            :key="index"
+            v-for="channel in channels"
+            :key="channel.uid"
             :channel="channel"
             :icon="item.icon"
             :users="users"
@@ -155,13 +166,14 @@ export default class ListChannels extends Vue {
   public voiceChannel = {} as VoiceChannel;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    regexNameChannel: (v: string): string | boolean =>
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
 
   /**
    * Crear nuevo canal de voz
    */
   async addChannelVoice() {
-    console.log(this.nameChannel);
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loading = true;
       this.voiceChannel = {
@@ -179,6 +191,12 @@ export default class ListChannels extends Vue {
         this.dialog = false;
       }
     }
+  }
+
+  closeAddSpace() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialog = false;
   }
 }
 </script>
@@ -219,6 +237,7 @@ export default class ListChannels extends Vue {
 
 .header {
   order: 1;
+  font-size: 1.13rem !important;
 }
 
 .add {

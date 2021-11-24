@@ -27,10 +27,11 @@
                 outlined
                 dense
                 color="primary"
-                prepend-inner-icon="mdi-account"
+                prepend-inner-icon="mdi-text"
                 v-model="workspaceName"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.regexNameChannel]"
                 @keyup.enter="handleAddSpace"
+                @keydown.esc="closeAddSpace"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -87,6 +88,8 @@ export default class AddCard extends Vue {
   public workspaceName = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    regexNameChannel: (v: string): string | boolean =>
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
 
   /**
@@ -99,17 +102,10 @@ export default class AddCard extends Vue {
       this.workspace.nombre = this.workspaceName;
       this.workspace.usuarios = [this.currentUser.uid!];
       await this.addWorkSpace(this.workspace);
-      if (this.status.showSnackbar && !this.status.showSnackbarError) {
-        this.form.resetValidation();
-        this.form.reset();
-        this.loading = false;
-        this.dialog = false;
-      } else {
-        this.form.resetValidation();
-        this.form.reset();
-        this.loading = false;
-        this.dialog = false;
-      }
+      this.form.resetValidation();
+      this.form.reset();
+      this.loading = false;
+      this.dialog = false;
     }
   }
 

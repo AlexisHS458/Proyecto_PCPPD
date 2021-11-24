@@ -1,0 +1,16 @@
+fragment FilesInTree on Tree {
+  entries {
+    name
+    extension
+    object {
+      ... on Blob {
+        text
+        isBinary
+      }
+      ... on Tree {
+        id
+      }
+    }
+    type
+  }
+}

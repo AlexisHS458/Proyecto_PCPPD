@@ -2,10 +2,18 @@
   <v-hover>
     <v-list-item
       slot-scope="{ hover }"
-      :to="{
-        name: 'messages',
-        params: { idChannel: channel.uid },
-      }"
+      @click="goToTextChannel"
+      :class="[
+        `${hover ? 'select-item' : 'no-select-item'}`,
+        `${
+          '/space/' + workspaceUID + '/' + channel.uid !== $route.path
+            ? ''
+            : 'active'
+        }`,
+      ]"
+      active-class="active"
+      color="white"
+      class="mb-1"
     >
       <v-list-item-icon>
         <v-icon color="white">{{ icon }}</v-icon>
@@ -56,18 +64,19 @@
                   </template>
                   <v-list color="secondaryDark">
                     <v-list-item
-                      v-for="(user, index) in users"
-                      :key="index"
+                      v-for="user in users"
+                      :key="user.uid"
                       class="list-title"
                       color="secondaryDark"
                     >
                       <v-checkbox
+                        v-model="channel.permisos"
                         class="black--text"
                         color="infoDark"
-                        v-model="model"
                         :label="user.nombre"
-                        :value="user"
                         @click.stop="() => {}"
+                        @change="check($event, user.uid, user.nombre)"
+                        :value="user.uid"
                       ></v-checkbox>
                     </v-list-item>
                   </v-list>
@@ -110,10 +119,12 @@
                               outlined
                               dense
                               color="primary"
-                              prepend-inner-icon="mdi-account"
+                              prepend-inner-icon="mdi-message-text "
                               v-model="newNameChannel"
-                              :rules="[rules.required]"
+                              :rules="[rules.required, rules.regexNameChannel]"
                               @keyup.enter="editChannel"
+                              @keydown.esc="closeAddSpace"
+                              autocomplete="off"
                             ></v-text-field>
                           </v-col>
                         </v-row>
@@ -126,9 +137,7 @@
                         @click="editChannel"
                         >Aceptar</v-btn
                       >
-                      <v-btn text @click="dialogRenameChanel = false"
-                        >Cancelar</v-btn
-                      >
+                      <v-btn text @click="closeAddSpace">Cancelar</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -184,6 +193,7 @@
 </template>
 
 <script lang="ts">
+import { PermissionsPath } from "@/models/permissions";
 import { TextChannel } from "@/models/textChannel";
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
@@ -192,6 +202,9 @@ import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
+const Permissions = namespace("PermissionsModule");
+import ChannelService from "@/services/channels.service";
+import { ChannelType } from "@/utils/channels_types";
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -223,6 +236,12 @@ export default class NameChannels extends Vue {
   @WorkspaceOptions.Action
   private deleteTextChannel!: (textChannelID: string) => Promise<void>;
 
+  @WorkspaceOptions.Action
+  private setMessageOnSnackbarWarning!: (message: string) => void;
+
+  @WorkspaceOptions.Action
+  private setVisibleSnackBarWarning!: () => void;
+
   /**
    * Estado obtenido del @module Workspace
    */
@@ -240,6 +259,16 @@ export default class NameChannels extends Vue {
   @User.State("user")
   private currentUser!: User;
 
+  /**
+   * Acciones obtenidas del @module Permissions
+   */
+  @Permissions.Action
+  private AddPermission!: (permissionsPath: PermissionsPath) => Promise<void>;
+  @Permissions.Action
+  private RemovePermission!: (
+    permissionsPath: PermissionsPath
+  ) => Promise<void>;
+
   @Ref("form") readonly form!: VForm;
 
   public menu = false;
@@ -248,12 +277,16 @@ export default class NameChannels extends Vue {
   public dialogDelete = false;
   public loadingDelete = false;
   public loadingRenameChanel = false;
-  public model = [];
+  public userUID = "";
   public valid = true;
   public newNameChannel = "";
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
+    regexNameChannel: (v: string): string | boolean =>
+      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
   };
+  public permissions = {} as PermissionsPath;
+  public statusCheckbox = false;
 
   /**
    * Editar información de un canal de texto
@@ -296,6 +329,54 @@ export default class NameChannels extends Vue {
       /* } */
     }
   }
+
+  async check(e: string[], userUID: string, userName: string) {
+    this.permissions = {
+      uidUser: userUID,
+      uidWorkSpace: this.workspaceUID,
+      uidChannel: this.channel.uid!,
+      nameUser: userName,
+      nameChannel: this.channel.nombre,
+    };
+    if (e.includes(userUID)) {
+      await this.AddPermission(this.permissions);
+    } else {
+      await this.RemovePermission(this.permissions);
+    }
+  }
+
+  closeAddSpace() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialogRenameChanel = false;
+  }
+
+  async goToTextChannel() {
+    const hasAcces = await ChannelService.getUsersInChannel(
+      this.currentUser.uid!,
+      ChannelType.TEXT,
+      this.workspaceUID,
+      this.channel.uid!
+    );
+    if (hasAcces) {
+      if (
+        this.$route.path !=
+        "/space/" + this.workspaceUID + "/" + this.channel.uid!
+      ) {
+        this.$router.push({
+          name: "messages",
+          params: { idChannel: this.channel.uid! },
+        });
+      }
+    } else {
+      this.setVisibleSnackBarWarning();
+      this.setMessageOnSnackbarWarning(
+        "No tienes permiso para entrar a " +
+          this.channel.nombre +
+          ". Comunícate con el administrador."
+      );
+    }
+  }
 }
 </script>
 
@@ -321,15 +402,13 @@ export default class NameChannels extends Vue {
   color: white;
 }
 
-.list-title {
-  color: white;
-}
 .hidden {
   visibility: hidden;
 }
 
 .title {
   color: white;
+  font-size: 1rem !important;
 }
 .v-list .v-list-item--active .v-icon {
   color: white;
@@ -337,5 +416,17 @@ export default class NameChannels extends Vue {
 
 .black--text /deep/ label {
   color: white;
+}
+
+.select-item {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.no-select-item {
+  background-color: #000029;
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 </style>

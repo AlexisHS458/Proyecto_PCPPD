@@ -1,29 +1,42 @@
 <template>
-  <div class="mx-auto card-center">
-    <app-bar-messages :channelApp="channel"></app-bar-messages>
-    <v-list
-      three-line
-      class="list-background scroll flex-grow-1 flex-shrink-1"
-      ref="vList"
-    >
+  <div class="card-center d-flex flex-column">
+    <app-bar-messages
+      :channelApp="channel"
+      class="flex-grow-0 flex-shrink-1"
+    ></app-bar-messages>
+    <div v-if="!isLoadingMessages">
       <template v-if="messages.length > 0">
-        <list-messages
-          v-for="(message, index) in messages"
-          :key="index"
-          :message="message"
-          :currentUser="currentUser"
-        ></list-messages>
+        <messages-list
+          class="background list-background scroll flex-grow-1"
+          ref="vList"
+        >
+          <messages-in-messages
+            v-for="message in messages"
+            :key="message.uid"
+            :message="message"
+            :currentUser="currentUser"
+          >
+            {{ message.contenido }}
+          </messages-in-messages>
+        </messages-list>
       </template>
       <template v-else>
-        <img src="@/assets/Messages.svg" class="img-not-messages" />
+        <div class="div-image-center">
+          <img src="@/assets/Messages.svg" class="img-not-messages" />
+        </div>
       </template>
-    </v-list>
-    <input-message
-      class="flex-grow-0 flex-shrink-0"
-      :workspace="workspace"
-      :currentUser="currentUser"
-    ></input-message>
-
+    </div>
+    <div v-else class="div-progress-circular">
+      <v-progress-circular indeterminate :size="80" :width="4" color="white">
+      </v-progress-circular>
+    </div>
+    <v-footer app color="primary" inset class="display-footer">
+      <input-message
+        class="flex-grow-0 flex-shrink-1"
+        :workspace="workspace"
+        :currentUser="currentUser"
+      ></input-message>
+    </v-footer>
     <!--   Peticiones exitosas del modulo de TextChannel -->
     <snackbar
       :color="'success'"
@@ -52,21 +65,28 @@ import AppBarMessages from "@/components/modules/Workspace/Channels/Text/AppBarM
 import InputMessage from "@/components/modules/Workspace/Channels/Text/InputMessage.vue";
 import ListMessages from "@/components/modules/Workspace/Channels/Text/ListMessages.vue";
 import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
+import MessagesList from "@/components/modules/Workspace/Channels/Text/Messages.vue";
+import MessagesInMessages from "@/components/modules/Workspace/Channels/Text/Message.vue";
 import { User } from "@/models/user";
 import { TextChannel } from "@/models/textChannel";
 import { Workspace } from "@/models/workspace";
 import { Message } from "@/models/message";
 import { Prop, Watch } from "vue-property-decorator";
+import { ChannelType } from "@/utils/channels_types";
+import ServiceChannels from "@/services/channels.service";
 const User = namespace("UserModule");
 const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 const Invitations = namespace("InvitationsModule");
+const Permissions = namespace("PermissionsModule");
 @Component({
   components: {
     Snackbar,
     AppBarMessages,
     InputMessage,
     ListMessages,
+    MessagesList,
+    MessagesInMessages,
   },
 })
 export default class MessagesPage extends Vue {
@@ -149,6 +169,9 @@ export default class MessagesPage extends Vue {
   @Invitations.Action("setNotVisibleSnackBarError")
   setNotVisibleSnackBarErrorInvitations!: () => void;
 
+  @Permissions.Action("setNotVisibleSnackBar")
+  setNotVisibleSnackBarPermissions!: () => void;
+
   /**
    * Cada que se cambie de canal de texto se mandara a llamar la función de obtener mensajes
    */
@@ -157,7 +180,7 @@ export default class MessagesPage extends Vue {
     this.getMessages();
   }
 
-  public channel? = {} as TextChannel;
+  public channel = "";
   public timeout = -1;
 
   /**
@@ -167,7 +190,13 @@ export default class MessagesPage extends Vue {
     /*   await this.fetchTextChannels(this.$route.params.id); */
     this.getMessages();
   }
-
+  async nameText() {
+    this.channel = await ServiceChannels.getChannelName(
+      ChannelType.TEXT,
+      this.$route.params.id,
+      this.$route.params.idChannel
+    );
+  }
   destroyed() {
     this.setNotVisibleSnackBarWorkspace();
     this.setNotVisibleSnackBar();
@@ -175,6 +204,7 @@ export default class MessagesPage extends Vue {
     this.setNotVisibleSnackBarError();
     this.setNotVisibleSnackBarErrorWorkspace();
     this.setNotVisibleSnackBarErrorInvitations();
+    this.setNotVisibleSnackBarPermissions();
   }
 
   /**
@@ -187,12 +217,10 @@ export default class MessagesPage extends Vue {
     this.setNotVisibleSnackBarError();
     this.setNotVisibleSnackBarErrorWorkspace();
     this.setNotVisibleSnackBarErrorInvitations();
+    this.setNotVisibleSnackBarPermissions();
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    this.channel = this.textChannel.find(
-      (channel) => channel.uid === this.$route.params.idChannel
-    );
-
+    this.nameText();
     this.fetchMesages(() => {
       setTimeout(() => {
         //Mostrar scroll inverso
@@ -204,13 +232,27 @@ export default class MessagesPage extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss" >
+.div-progress-circular {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .card-center {
-  height: 100vh;
+  /* display: flex; */
+  flex-direction: column;
+  /* justify-content: space-between; */
+  background-color: #0c2a52;
+}
+.div-image-center {
+  height: 86vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background-color: #0c2a52;
+  justify-content: center;
+  align-items: center;
 }
 .scroll::-webkit-scrollbar {
   width: 5px;
@@ -227,17 +269,25 @@ export default class MessagesPage extends Vue {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  max-height: 40vh;
 }
 .list-background {
   background-color: #0c2a52;
   color: white;
-  max-height: 100vh;
+  max-height: 81vh;
   overflow-x: auto;
 }
 .img-not-messages {
-  width: 40rem;
-  height: 20rem;
-  margin: auto;
+  border-radius: 1rem;
+  width: 18rem !important;
+  height: 18rem !important;
+}
+/* .background {
+  background-color: transparent;
+  border: 0px;
+} */
+.display-footer {
+  display: block;
 }
 </style>
 

@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="!isLoading" class="fill-height" fluid>
+  <v-container v-if="!isLoading" class="fill-height scroll" fluid>
     <v-row align="center" justify="center">
       <v-col cols="10">
         <v-card rounded="lg" height="100%" width="100%">
@@ -9,7 +9,14 @@
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
             </v-col>
-            <v-col cols="7" class="d-flex align-center">
+            <v-col
+              cols="12"
+              lg="7"
+              md="12"
+              sm="12"
+              xl="7"
+              class="d-flex align-center"
+            >
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-img
@@ -18,7 +25,7 @@
                     height="50%"
                     width="25%"
                   />
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Nombre"
                       v-model="currentUser.nombre"
@@ -28,7 +35,7 @@
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Apellidos"
                       v-model="currentUser.apellido"
@@ -39,11 +46,16 @@
                       prepend-inner-icon="mdi-account"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="8">
+                  <v-col cols="12" sm="12" md="12" xl="8" lg="8">
                     <v-text-field
                       label="Boleta o Número de empleado"
                       v-model="currentUser.boleta"
-                      :rules="[rules.required, rules.regexBoleta]"
+                      :rules="[
+                        rules.required,
+                        rules.regexBoleta,
+                        rules.caracteres,
+                        rules.caracteresMayor,
+                      ]"
                       outlined
                       dense
                       color="primary"
@@ -79,7 +91,7 @@
               </v-snackbar>
             </v-col>
 
-            <v-col cols="5">
+            <v-col cols="5" class="hidden-md-and-down">
               <v-img
                 :src="require('@/assets/background.jpg')"
                 height="600"
@@ -117,10 +129,11 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { namespace } from "vuex-class";
 import { User } from "@/models/user";
-import { Ref } from "vue-property-decorator";
+import { Ref, Watch } from "vue-property-decorator";
 import { VForm } from "@/utils/types";
 const Auth = namespace("UserModule");
 const GetUsers = namespace("InvitationsModule");
+const Workspace = namespace("WorkspaceModule");
 @Component
 export default class Register extends Vue {
   /**
@@ -159,6 +172,15 @@ export default class Register extends Vue {
   @GetUsers.State("users")
   private users!: User[];
 
+  /**
+   * Accion obtenida del @module Worksapce
+   */
+  @Workspace.State("allUsers")
+  private allUsers!: User[];
+
+  @Workspace.Action
+  private fetchAllUsers!: () => Promise<void>;
+
   @Ref("form") readonly form!: VForm;
 
   public loading = false;
@@ -179,6 +201,12 @@ export default class Register extends Vue {
       ) || "Apellido inválido",
     regexBoleta: (v: string): string | boolean =>
       /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválida",
+    caracteres: (v: string): string | boolean =>
+      (v || "").length >= 6 ||
+      "Este campo no puede tener menor de 6 caracteres",
+    caracteresMayor: (v: string): string | boolean =>
+      (v || "").length <= 15 ||
+      "Este campo no puede tener más de 15 caracteres",
   };
 
   async created(): Promise<void> {
@@ -200,8 +228,10 @@ export default class Register extends Vue {
       this.form.resetValidation();
       this.loading = true;
       this.snackbar = false;
-
-      if (!this.users.find((user) => user.boleta === this.currentUser.boleta)) {
+      await this.fetchAllUsers();
+      if (
+        !this.allUsers.find((user) => user.boleta === this.currentUser.boleta)
+      ) {
         await this.saveUser(this.currentUser);
         if (this.isLoggedIn) {
           this.loading = false;
@@ -215,6 +245,11 @@ export default class Register extends Vue {
         this.loading = false;
       }
     }
+  }
+
+  @Watch("currentUser.boleta")
+  onChildChanged() {
+    this.textError = "";
   }
 }
 </script>
@@ -236,5 +271,21 @@ export default class Register extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.scroll {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: #000029;
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
 }
 </style>

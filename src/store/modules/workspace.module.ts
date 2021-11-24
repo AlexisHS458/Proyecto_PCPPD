@@ -6,7 +6,7 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { User } from "@/models/user";
 import { VoiceChannel } from "@/models/voiceChannel";
 import { CodeChannel } from "@/models/codeChannel";
-
+import UserService from "@/services/user.service";
 /**
  * Modulo de acceso a información de un solo espacio de trabajo
  */
@@ -16,6 +16,11 @@ class WorkspaceModule extends VuexModule {
    * Datos del espacio de trabajo
    */
   public workspace!: Workspace;
+
+  /**
+   * Usuario actual autenticado
+   */
+  public user?: User = undefined;
 
   /**
    * Usuarios pertenecientes al espacio de trabajo
@@ -35,7 +40,7 @@ class WorkspaceModule extends VuexModule {
   /**
    * Canales de voz en el espacio de trabajo
    */
-   public codeChannels: CodeChannel[] = [];
+  public codeChannels: CodeChannel[] = [];
 
   /**
    * Mensaje a mostrar en snackbar
@@ -48,6 +53,16 @@ class WorkspaceModule extends VuexModule {
   public snackbarMessageError = "";
 
   /**
+   * Mensaje a mostrar warning en snackbar
+   */
+  public snackbarMessageWarning = "";
+
+  /**
+   * Todos los usuarios dentro de la base de datos
+   */
+  public allUsers: User[] = [];
+
+  /**
    * Status de la consulta del espacio de trabajo
    */
   public status = {
@@ -58,8 +73,19 @@ class WorkspaceModule extends VuexModule {
     channelDeleted: false,
     userRemoved: false,
     showSnackbar: false,
-    showSnackbarError: false
+    showSnackbarError: false,
+    showSnackbarWarning: false
   };
+
+  @Mutation
+  public setShowSnackBarMessageWarning(status: boolean): void {
+    this.status.showSnackbarWarning = status;
+  }
+
+  @Mutation
+  public setSnackBarMessageWarning(message: string): void {
+    this.snackbarMessageWarning = message;
+  }
 
   @Mutation
   public setWorkspace(workspace: Workspace): void {
@@ -113,7 +139,14 @@ class WorkspaceModule extends VuexModule {
 
   @Mutation
   public setUsers(users: Array<User>): void {
-    this.users = users;
+    this.users = users.filter(user => {
+      return user.uid !== this.user!.uid;
+    });
+  }
+
+  @Mutation
+  public setUser(user: User): void {
+    this.user = user;
   }
 
   @Mutation
@@ -134,6 +167,11 @@ class WorkspaceModule extends VuexModule {
   @Mutation
   public setShowSnackBarMessage(status: boolean): void {
     this.status.showSnackbar = status;
+  }
+
+  @Mutation
+  public setAllUsers(allUsers: User[]): void {
+    this.allUsers = allUsers;
   }
 
   /**
@@ -178,24 +216,27 @@ class WorkspaceModule extends VuexModule {
    * Obtiene los canales de codigo del espacio de trabajo
    * @param uid ID único del espacio de trabajo a consultar
    */
-   @Action
-   async fetchCodeChannels(uid: string): Promise<void> {
-     this.context.commit("setLoadingStatus", true);
-     ChannelsService.getCodeChannels(uid, codeChannels => {
-       this.context.commit("setCodeChannels", codeChannels);
-       this.context.commit("setLoadingStatus", false);
-     });
-   }
+  @Action
+  async fetchCodeChannels(uid: string): Promise<void> {
+    this.context.commit("setLoadingStatus", true);
+    ChannelsService.getCodeChannels(uid, codeChannels => {
+      this.context.commit("setCodeChannels", codeChannels);
+      this.context.commit("setLoadingStatus", false);
+    });
+  }
 
   /**
    * Obtiene los usuarios dentro del espacio de trabajo.
    */
   @Action
-  fetchUsersInWorkspace(): void {
+  async fetchUsersInWorkspace() {
     this.context.commit("setLoadingUsersStatus", true);
-    WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
-      this.context.commit("setUsers", users);
-      this.context.commit("setLoadingUsersStatus", false);
+    await UserService.getUserAuthInfo(user => {
+      this.context.commit("setUser", user);
+      WorkSpaceService.getUsersInWorkspace(this.workspace.uid, users => {
+        this.context.commit("setUsers", users);
+        this.context.commit("setLoadingUsersStatus", false);
+      });
     });
   }
 
@@ -267,7 +308,6 @@ class WorkspaceModule extends VuexModule {
   @Action
   async createVoiceChannel(voiceChannel: VoiceChannel): Promise<void> {
     this.context.commit("setChannelCreatedStatus", false);
-    console.log(voiceChannel);
     ChannelsService.createVoiceChannel(this.workspace.uid, voiceChannel)
       .then(() => {
         this.context.commit("setChannelCreatedStatus", true);
@@ -325,62 +365,62 @@ class WorkspaceModule extends VuexModule {
    * Crea un canal de codigo en el espacio de trabajo
    * @param codeChannel Canal de voz a agregar al espacio de trabajo
    */
-   @Action
-   async createCodeChannel(codeChannel: CodeChannel): Promise<void> {
-     this.context.commit("setChannelCreatedStatus", false);
-     console.log(codeChannel);
-     ChannelsService.createCodeChannel(this.workspace.uid, codeChannel)
-       .then(() => {
-         this.context.commit("setChannelCreatedStatus", true);
-         this.context.commit("setSnackBarMessage", "Exito al crear canal");
-         this.context.commit("setShowSnackBarMessage", true);
-       })
-       .catch(() => {
-         this.context.commit("setChannelCreatedStatus", false);
-         this.context.commit("setSnackBarMessageError", "Error al crear canal");
-         this.context.commit("setShowSnackBarMessageError", true);
-       });
-   }
- 
-   /**
-    * Editar un canal de codigo
-    * @param codeChannel Información del nuevo canal de codigo
-    */
-   @Action
-   async editCodeChannel(codeChannel: CodeChannel): Promise<void> {
-     this.context.commit("setChannelEditedStatus", false);
-     ChannelsService.editCodeChannel(this.workspace.uid, codeChannel)
-       .then(() => {
-         this.context.commit("setChannelEditedStatus", true);
-         this.context.commit("setSnackBarMessage", "Exito al editar canal");
-         this.context.commit("setShowSnackBarMessage", true);
-       })
-       .catch(() => {
-         this.context.commit("setChannelEditedStatus", false);
-         this.context.commit("setSnackBarMessageError", "Error al editar canal");
-         this.context.commit("setShowSnackBarMessageError", true);
-       });
-   }
- 
-   /**
-    * Elimina un canal de codigo del espacio de trabajo
-    * @param codeChannelID ID del canal de codigo a eliminar
-    */
-   @Action
-   async deleteCodeChannel(codeChannelID: string): Promise<void> {
-     this.context.commit("setChannelDeletedStatus", false);
-     ChannelsService.deleteCodeChannel(this.workspace.uid, codeChannelID)
-       .then(() => {
-         this.context.commit("setChannelDeletedStatus", true);
-         this.context.commit("setSnackBarMessage", "Exito al eliminar canal");
-         this.context.commit("setShowSnackBarMessage", true);
-       })
-       .catch(() => {
-         this.context.commit("setChannelDeletedStatus", false);
-         this.context.commit("setSnackBarMessageError", "Error al eliminar canal");
-         this.context.commit("setShowSnackBarMessageError", true);
-       });
-   }
+  @Action
+  async createCodeChannel(codeChannel: CodeChannel): Promise<void> {
+    this.context.commit("setChannelCreatedStatus", false);
+
+    ChannelsService.createCodeChannel(this.workspace.uid, codeChannel)
+      .then(() => {
+        this.context.commit("setChannelCreatedStatus", true);
+        this.context.commit("setSnackBarMessage", "Exito al crear canal");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("setChannelCreatedStatus", false);
+        this.context.commit("setSnackBarMessageError", "Error al crear canal");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
+  }
+
+  /**
+   * Editar un canal de codigo
+   * @param codeChannel Información del nuevo canal de codigo
+   */
+  @Action
+  async editCodeChannel(codeChannel: CodeChannel): Promise<void> {
+    this.context.commit("setChannelEditedStatus", false);
+    ChannelsService.editCodeChannel(this.workspace.uid, codeChannel)
+      .then(() => {
+        this.context.commit("setChannelEditedStatus", true);
+        this.context.commit("setSnackBarMessage", "Exito al editar canal");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("setChannelEditedStatus", false);
+        this.context.commit("setSnackBarMessageError", "Error al editar canal");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
+  }
+
+  /**
+   * Elimina un canal de codigo del espacio de trabajo
+   * @param codeChannelID ID del canal de codigo a eliminar
+   */
+  @Action
+  async deleteCodeChannel(codeChannelID: string): Promise<void> {
+    this.context.commit("setChannelDeletedStatus", false);
+    ChannelsService.deleteCodeChannel(this.workspace.uid, codeChannelID)
+      .then(() => {
+        this.context.commit("setChannelDeletedStatus", true);
+        this.context.commit("setSnackBarMessage", "Exito al eliminar canal");
+        this.context.commit("setShowSnackBarMessage", true);
+      })
+      .catch(() => {
+        this.context.commit("setChannelDeletedStatus", false);
+        this.context.commit("setSnackBarMessageError", "Error al eliminar canal");
+        this.context.commit("setShowSnackBarMessageError", true);
+      });
+  }
 
   /**
    * Elimina un usuario del espacio de trabajo.
@@ -395,12 +435,33 @@ class WorkspaceModule extends VuexModule {
   }
 
   /**
+   * Hace visible el snackbar de warning
+   */
+  @Action
+  setVisibleSnackBarWarning(): void {
+    this.context.commit("setShowSnackBarMessageWarning", true);
+  }
+
+  /**
+   * Hace no visible el snackbar de warning
+   */
+  @Action
+  setNotVisibleSnackBarWarning(): void {
+    this.context.commit("setShowSnackBarMessageWarning", false);
+  }
+
+  /**
    * Coloca un mensaje en el snackbar
    * @param message mensaje a mostrar en el snackbar
    */
   @Action
   setMessageOnSnackbar(message: string): void {
     this.context.commit("setSnackBarMessage", message);
+  }
+
+  @Action
+  setMessageOnSnackbarWarning(message: string): void {
+    this.context.commit("setSnackBarMessageWarning", message);
   }
 
   /**
@@ -433,6 +494,19 @@ class WorkspaceModule extends VuexModule {
   @Action
   setNotVisibleSnackBarError(): void {
     this.context.commit("setShowSnackBarMessageError", false);
+  }
+
+  /**
+   * Recupera los usuarios de la base de datos para enviar invitación
+   * @param userIDs IDs de los usuarios dentro del workspace
+   */
+  @Action
+  async fetchAllUsers(): Promise<void> {
+    this.context.commit("setAllUsers", await UserService.getUsers());
+  }
+
+  get getUserList(): User[] {
+    return this.users;
   }
 
   get isLoadingWorkspace(): boolean {

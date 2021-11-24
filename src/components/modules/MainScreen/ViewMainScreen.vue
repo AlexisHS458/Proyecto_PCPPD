@@ -1,11 +1,18 @@
 <template>
-  <v-container v-if="!isLoading">
-    <v-row>
-      <app-bar></app-bar>
-    </v-row>
-    <own-card :user="currentUser"></own-card>
-    <invitation-card :user="currentUser"></invitation-card>
-    <floating-button></floating-button>
+  <div v-if="!isLoading">
+    <app-bar></app-bar>
+    <v-container fluid class="scroll">
+      <v-container class="mb-16">
+        <template>
+          <own-card :user="currentUser"></own-card>
+        </template>
+        <div v-show="(currentUser.workspacesCount || 0) < 1">
+          <floating-button></floating-button>
+        </div>
+        <users-manual-bottom></users-manual-bottom>
+      </v-container>
+    </v-container>
+
     <!--   Peticiones exitosas del modulo de MainScreen -->
     <snackbar
       :color="'success'"
@@ -45,7 +52,7 @@
       :timeout="timeout"
       :method="setNotVisibleSnackBarWarningInvitations"
     ></snackbar-warning>
-  </v-container>
+  </div>
   <div v-else class="div-progress-circular">
     <v-progress-circular indeterminate :size="120" :width="4" color="primary">
     </v-progress-circular>
@@ -63,10 +70,12 @@ import CollaborationCard from "@/components/modules/MainScreen/CardCollaboration
 import InvitationCard from "@/components/modules/MainScreen/CardInvitation.vue";
 import Snackbar from "@/components/modules/Workspace/Snackbar.vue";
 import SnackbarWarning from "@/components/modules/Workspace/SnackbarWarning.vue";
+import UsersManualBottom from "@/components/modules/MainScreen/UsersManualBottom.vue";
 import { User } from "@/models/user";
 const User = namespace("UserModule");
 const LeaveWorkspace = namespace("MainScreenModule");
 const Invitations = namespace("InvitationsModule");
+const SocketIO = namespace("SocketIO");
 @Component({
   components: {
     AppBar,
@@ -76,6 +85,7 @@ const Invitations = namespace("InvitationsModule");
     FloatingButton,
     Snackbar,
     SnackbarWarning,
+    UsersManualBottom,
   },
 })
 export default class ViewMainScreen extends Vue {
@@ -145,7 +155,11 @@ export default class ViewMainScreen extends Vue {
   @Invitations.State("snackbarMessageError")
   private snackbarMessageErrorInvitation!: string;
 
+  @SocketIO.Action
+  private connect!: () => void;
+
   public timeout = -1;
+  public userWorkspace = 0;
 
   async created() {
     if (!this.isLoggedIn) {
@@ -164,6 +178,9 @@ export default class ViewMainScreen extends Vue {
 </script>
 
 <style scoped>
+.body {
+  background-color: #edf0f3;
+}
 .div-progress-circular {
   margin: auto;
   width: 100%;
@@ -172,6 +189,26 @@ export default class ViewMainScreen extends Vue {
   justify-content: center;
   align-items: center;
 }
+
+.scroll {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: #000029;
+  border-radius: 10px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #3e527e;
+  border-radius: 10px;
+}
+/* .container {
+  max-width: 100%;
+} */
 </style>
  
 

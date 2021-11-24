@@ -1,0 +1,27 @@
+overwrite: true
+schema:
+  - https://api.github.com/graphql:
+      headers:
+        Authorization: "Bearer ${GITHUB_TOKEN}"
+documents: 'src/**/*.graphql'
+config:
+  scalars:
+    DateTime: Date
+    Date: Date
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-document-nodes"
+  src/generated/graphql.d.ts:
+    plugins:
+      - "typescript-graphql-files-modules"
+  ./graphql.schema.json:
+    plugins:
+      - "introspection"
+  src/generated/introspection_result.ts:
+    plugins:
+      - "fragment-matcher"
+    config:
+      apolloClientVersion: 2

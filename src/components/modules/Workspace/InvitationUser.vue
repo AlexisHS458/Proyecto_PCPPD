@@ -81,6 +81,7 @@ import { User } from "@/models/user";
 import { Invitation } from "@/models/invitation";
 import { Workspace } from "@/models/workspace";
 const Invitations = namespace("InvitationsModule");
+const Workspace = namespace("WorkspaceModule");
 @Component
 export default class ToolbarUsers extends Vue {
   @Prop({
@@ -97,7 +98,7 @@ export default class ToolbarUsers extends Vue {
    * Acciones obtenidas del @module Invitations
    */
   @Invitations.Action
-  private fetchUserNames!: () => void;
+  private fetchUserNames!: (userIds: string[]) => void;
 
   @Invitations.Action
   private sendInvitation!: (invitation: Invitation) => Promise<void>;
@@ -114,6 +115,9 @@ export default class ToolbarUsers extends Vue {
   @Invitations.State("snackbarMessage")
   private snackbarMessage!: string;
 
+  @Workspace.Getter
+  private getUserList!: User[];
+
   @Watch("invitation")
   onChildChanged(val: string) {
     if (val != null) this.tab = 0;
@@ -127,7 +131,8 @@ export default class ToolbarUsers extends Vue {
   onChildChangedSearch() {
     if (this.itemsUsers.length > 0) return;
     this.isLoading = true;
-    this.fetchUserNames();
+    let usersIDs = this.getUserList.map((user) => user.uid!)
+    this.fetchUserNames(usersIDs);
     //Se elimina el usuario actual de la lista
     let index = this.users.findIndex((user) => user.uid === this.user.uid);
     if (index > -1) {
@@ -206,5 +211,6 @@ export default class ToolbarUsers extends Vue {
 }
 .v-toolbar__title {
   color: white;
+  font-size: 1.13rem;
 }
 </style>

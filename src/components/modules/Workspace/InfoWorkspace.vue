@@ -7,16 +7,33 @@
       dense
       class="toolbar"
     >
-      <v-btn depressed text fab small class="mr-4" :to="'/mainscreen'">
+      <v-btn depressed text fab small class="mr-4" @click="changeStatus">
         <v-img
           class="img"
           src="@/assets/logo.png"
           max-height="40"
           max-width="40"
           contain
+          @click="disconnect"
         ></v-img>
       </v-btn>
-      <v-toolbar-title> {{ workspace.nombre }} </v-toolbar-title>
+
+      <v-toolbar-title
+        class="toolbar-title font-weight-bold"
+        :to="{
+          name: 'notChannels',
+        }"
+      >
+        <router-link
+          style="text-decoration: none; color: inherit"
+          :to="{
+            name: 'notChannels',
+          }"
+        >
+          {{ workspace.nombre }}
+        </router-link>
+      </v-toolbar-title>
+
       <v-spacer></v-spacer>
       <v-menu
         v-if="workspace.uid_usuario !== currentUser.uid"
@@ -139,8 +156,17 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const LeaveWorkspace = namespace("MainScreenModule");
 import { LeaveWorkspace } from "@/models/leaveWorkspace";
+const CodeChannel = namespace("CodeChannelModule");
+import VoiceService from "@/services/voice_channel.service";
+import CodeService from "@/services/code_channel.service";
 @Component
 export default class Toolbar extends Vue {
+  @CodeChannel.State("status")
+  private status!: any;
+
+  @CodeChannel.Action
+  private toggleShowTreeView!: () => void;
+
   @Prop({
     required: true,
   })
@@ -164,6 +190,7 @@ export default class Toolbar extends Vue {
   public singleSelect = false;
   public dialogLeave = false;
   public userLeave = {} as LeaveWorkspace;
+  public isConnected = false;
   public headers = [
     {
       sortable: false,
@@ -230,6 +257,29 @@ export default class Toolbar extends Vue {
     this.dialogLeave = false;
     this.$router.replace({ path: "/mainscreen" });
   }
+
+  changeStatus() {
+    this.$router.replace({ path: "/mainscreen" });
+    if (!this.status.showTreeView) {
+      this.toggleShowTreeView();
+    }
+  }
+
+  toNotChannels() {
+    this.$router.replace({ name: "notChannels" });
+  }
+
+  disconnect() {
+    /*  VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
+      this.isConnected = !!isConnected;
+    });*/
+    //  if (this.isConnected) {
+    VoiceService.leaveVoiceChannel(this.currentUser.uid!);
+    CodeService.leaveCodeChannel(this.currentUser.uid!);
+    //   var audio = new Audio(require("@/assets/disconnected.mp3"));
+    //  audio.play();
+    // }
+  }
 }
 </script>
 
@@ -265,5 +315,9 @@ export default class Toolbar extends Vue {
 
 .img {
   border-radius: 90px;
+}
+
+.toolbar-title {
+  font-size: 1.13rem;
 }
 </style>

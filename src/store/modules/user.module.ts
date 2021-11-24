@@ -4,6 +4,8 @@ import UserService from "@/services/user.service";
 import AuthService from "@/services/auth.service";
 import presenceServices from "@/services/presence.service";
 import { Status } from "@/models/status";
+import { auth } from "@/utils/firebase";
+
 
 /**
  * Clase para el manejo de la información de usuario.
@@ -104,9 +106,11 @@ class UserModule extends VuexModule {
   @Action
   async fetchCurrentUser(): Promise<void> {
     this.context.commit("setLoadingStatus", true);
-    const user = await UserService.getUserAuthInfo();
-    this.context.commit("setUser", user);
-    this.context.commit("setLoadingStatus", false);
+    await UserService.getUserAuthInfo(user => {
+      this.context.commit("setUser", user);
+      
+      this.context.commit("setLoadingStatus", false);
+    });
   }
 
   /**
@@ -190,6 +194,10 @@ class UserModule extends VuexModule {
 
   get showSnackbar(): boolean {
     return this.status.showSnackbar;
+  }
+
+  get getUser(): User {
+    return this.user!;
   }
 }
 

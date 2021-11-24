@@ -8,7 +8,6 @@ import SpaceWork from "@/components/modules/Workspace/ViewWorkspace.vue";
 
 export default Vue.extend({
   name: "Space",
-
   components: {
     SpaceWork,
   },

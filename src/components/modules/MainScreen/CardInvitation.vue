@@ -1,6 +1,12 @@
 <template>
   <v-row>
-    <v-col v-for="(invitation, index) in invitations" :key="index" cols="4">
+    <v-col
+      v-for="invitation in invitations"
+      :key="invitation.uid"
+      lg="4"
+      cols="12"
+      md="6"
+    >
       <invitations :invitation="invitation"></invitations>
     </v-col>
   </v-row>

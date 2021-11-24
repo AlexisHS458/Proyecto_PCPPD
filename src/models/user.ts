@@ -22,4 +22,10 @@ export interface User {
    * URL de la imagen de perfil del usuario
    */
   fotoURL: string,
+
+  oAuthToken: string,
+
+  workspacesCount?: number,
+
+  workspacesCollab?: number
 }
