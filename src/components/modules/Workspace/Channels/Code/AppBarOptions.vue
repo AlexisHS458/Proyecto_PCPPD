@@ -50,7 +50,7 @@
               v-on="on"
               size="25px"
               color="info"
-              :disabled="currentUser.uid != driverUID"
+              :disabled="currentUser.uid != driverUID "
             >
               mdi-content-save
             </v-icon>
@@ -117,7 +117,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Ref } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
@@ -126,7 +126,7 @@ import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
 const WorkspaceOptions = namespace("WorkspaceModule");
 import UserService from "@/services/user.service";
-import { Maybe, Repository } from "@/generated/graphql";
+import { Maybe, Repository, Commit } from "@/generated/graphql";
 import { VForm } from "@/utils/types";
 import * as monaco from "monaco-editor";
 @Component
@@ -159,6 +159,9 @@ export default class AppBarOptions extends Vue {
 
   @CodeChannel.State("codeFilePath")
   private codeFilePath!: string;
+
+  @CodeChannel.Action("setBranchOid")
+  private setBranchOid!: (ref: any) => void;
 
   @WorkspaceOptions.Action
   private setMessageOnSnackbar!: (message: string) => void;
@@ -210,7 +213,7 @@ export default class AppBarOptions extends Vue {
   async doCommit() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingExport = true;
-      const url = await GitHubService.makeCommit({
+      const response = await GitHubService.makeCommit({
         branch: {
           repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
           branchName: this.repository?.defaultBranchRef?.name
@@ -228,11 +231,18 @@ export default class AppBarOptions extends Vue {
       });
       this.loadingExport = false;
       this.dialogExport = false;
+      this.form.resetValidation();
+      this.form.reset();
       this.setVisibleSnackBar();
-      const urlShort = url.slice(0,-25) + "..."
+
+      const commit = response.commit as Commit;
+      this.setBranchOid(response.ref);
+      console.log(commit);
+      
+      const urlShort = commit.url.slice(0, -25) + "...";
       this.setMessageOnSnackbar(
         "Puedes consultar tu commit copiando esta URL en tu navegador:\n" +
-        `<a href="${url}"  target="_blank">${urlShort}</a>`
+          `<a href="${commit.url}"  target="_blank">${urlShort}</a>`
       );
     }
   }

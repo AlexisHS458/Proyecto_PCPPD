@@ -3,6 +3,11 @@ mutation makeCommit($input: CreateCommitOnBranchInput!) {
     commit{
       url
     }
+    ref{
+      target{
+        oid
+      }
+    }
   }
 }
 

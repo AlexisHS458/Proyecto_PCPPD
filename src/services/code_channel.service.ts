@@ -60,12 +60,13 @@ class CodeChannelService {
     codeData: {
       channelID: string;
       code: string;
+      extension: string;
     }
   ): Socket {
     return codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
   }
 
-  getDataCode(uid: string, onEvent: (code: string) => void): Socket {
+  getDataCode(uid: string, onEvent: (code: { data: string; extension: string }) => void): Socket {
     return codeChannelSocket(uid).on(ResponseEventName.CODE, payload => {
       onEvent(payload);
     });
@@ -113,6 +114,28 @@ class CodeChannelService {
 
   requestCurrentDriver(uid: string, codeChannelID: string): Socket {
     return codeChannelSocket(uid).emit(EventName.GET_DRIVER, codeChannelID);
+  }
+
+  requestInitialHash(uid: string, codeChannelID: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.GET_HASH, codeChannelID);
+  }
+
+  updateInitialHash(
+    uid: string,
+    codeData: {
+      channelID: string;
+      code: string;
+    }
+  ): Socket {
+    return codeChannelSocket(uid).emit(EventName.UPDATE_HASH, codeData);
+  }
+
+  getInitialHash(uid: string, onEvent: (hash: string) => void): Socket {
+    return codeChannelSocket(uid).on(ResponseEventName.HASH, payload => {
+      console.log('tengo un nuevo hash');
+      
+      onEvent(payload);
+    });
   }
 }
 

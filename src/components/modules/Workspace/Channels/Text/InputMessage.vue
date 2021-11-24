@@ -1,33 +1,53 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
-    <v-textarea
-      no-resize
-      dark
-      rows="1"
-      auto-grow
-      rounded
-      filled
-      dense
-      outlined
-      autocomplete="off"
-      maxlength="500"
-      counter
-      background-color="primaryDark"
-      placeholder="Escribe tu mensaje"
-      v-model.trim="message"
-      append-icon="mdi-send"
-      class="chat-input"
-      @keydown="inputHandler"
-      @click:append="sendMessages"
-    ></v-textarea>
-    <!--    <input
-      ref="uploader"
-      class="d-none"
-      type="file"
-      accept="image/*"
-      @change="onFileChanged"
-    /> -->
-  </v-form>
+  <div>
+    <div v-if="!file">
+      <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+        <v-textarea
+          no-resize
+          dark
+          rows="1"
+          auto-grow
+          rounded
+          filled
+          dense
+          outlined
+          autocomplete="off"
+          maxlength="500"
+          counter
+          background-color="primaryDark"
+          placeholder="Escribe tu mensaje"
+          v-model.trim="message"
+          append-icon="mdi-send"
+          class="chat-input"
+          @keydown="inputHandler"
+          @click:append="sendMessages"
+        >
+          <template v-slot:prepend-inner>
+            <v-file-input
+              accept="image/*"
+              hide-input
+              @change="onFileChanged($event)"
+            ></v-file-input>
+          </template>
+        </v-textarea>
+      </v-form>
+    </div>
+    <div v-else>
+      <v-file-input
+        dark
+        rounded
+        filled
+        dense
+        outlined
+        v-model="file"
+        append-icon="mdi-send"
+        class="chat-input"
+        show-size
+        counter
+        @click:append="uploadFile"
+      ></v-file-input>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -38,7 +58,8 @@ import { Workspace } from "@/models/workspace";
 import { User } from "@/models/user";
 import { VForm } from "@/utils/types";
 const Message = namespace("TextChannelModule");
-
+import { storage } from "@/utils/firebase";
+import { Maybe } from "graphql/jsutils/Maybe";
 @Component
 export default class InputMessage extends Vue {
   @Prop({
@@ -100,7 +121,8 @@ export default class InputMessage extends Vue {
       v.length <= 500 || "Haz alcanzado el límite de caracteres",
   };
   public valid = true;
-
+  public file: Maybe<File> = null;
+  public imageURL = null;
   /**
    * Mandar mensaje al canal de texto seleccionado
    */
@@ -131,6 +153,17 @@ export default class InputMessage extends Vue {
       e.preventDefault();
       this.sendMessages();
     }
+  }
+
+  onFileChanged(e: File) {
+    this.file = e;
+  }
+
+  async uploadFile() {
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(this.file!.name);
+    await fileRef.put(this.file!);
+    this.file = null;
   }
 
   destroyed() {

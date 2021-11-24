@@ -9,6 +9,8 @@ export enum EventName {
   REQUEST_DRIVER = 'request-driver',
   ACCEPT_REQUEST = 'accpet-request',
   GET_DRIVER = 'get-driver',
+  GET_HASH = 'get-hash',
+  UPDATE_HASH = 'UPDATE_HASH',
 
   //VoiceChannel
   JOIN_VOICE_CHANNEL = 'join-voice-channel',
