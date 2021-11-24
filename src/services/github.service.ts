@@ -67,17 +67,21 @@ class GitHubService {
     });
   }
 
-  async makeCommit(commitInput: CreateCommitOnBranchInput): Promise<string> {
+  async makeCommit(commitInput: CreateCommitOnBranchInput): Promise<any> {
     const response: MakeCommitMutation = (
       await apollo_client.mutate({
         mutation: MakeCommit,
         variables: {
           input: commitInput
-        }
+        },
+      }).then((res)=>{
+        console.log(res);
+        return res
+        
       })
     ).data;
-
-    return response.createCommitOnBranch?.commit?.url;
+    
+    return response.createCommitOnBranch as any;
   }
 }
 

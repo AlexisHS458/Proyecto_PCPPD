@@ -1,6 +1,6 @@
 import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
 import CodeChannelService from "@/services/code_channel.service";
-import { Maybe, Repository, TreeEntry } from "@/generated/graphql";
+import { Maybe, Ref, Repository, TreeEntry } from "@/generated/graphql";
 import { CodePath } from "@/models/codePath";
 
 @Module({ namespaced: true })
@@ -21,9 +21,9 @@ class CodeChannelModule extends VuexModule {
 
   public codeFilePath = "";
 
-  public branchOid = ""
+  public branchOid = "";
 
-  public repository: Maybe<Repository> = null
+  public repository: Maybe<Repository> = null;
 
   public codeChannelName = "";
   public driverUID = "";
@@ -110,8 +110,8 @@ class CodeChannelModule extends VuexModule {
     this.codeData = blob;
     console.log(this.codePath);
     let prefix = "";
-    if(this.codePath.length > 0){
-      prefix = this.codePath.map(path => path.nombre).join("/") + "/"
+    if (this.codePath.length > 0) {
+      prefix = this.codePath.map(path => path.nombre).join("/") + "/";
     }
     this.codeFilePath = prefix + blob.name;
   }
@@ -120,6 +120,16 @@ class CodeChannelModule extends VuexModule {
   public setRepoState(repo: Repository): void {
     this.repository = repo;
     this.branchOid = repo.defaultBranchRef?.target?.oid;
+  }
+
+  @Mutation
+  public setBranchOidState(ref: Ref): void {
+    this.branchOid = ref.target?.oid
+  }
+
+  @Action
+  public setBranchOid(ref: Ref): void {
+    this.context.commit("setBranchOidState", ref);
   }
 
   @Action

@@ -1,21 +1,12 @@
 <template>
   <div>
     <v-toolbar color="primaryDark" flat dense>
-      <v-icon
-        color="grey darken-2"
-        @click="goBackAction"
-        v-if="codePath.length > 0"
-        class="mr-4"
-      >
+      <v-icon color="grey darken-2" @click="goBackAction" v-if="codePath.length > 0" class="mr-4">
         mdi-arrow-left
       </v-icon>
 
       <v-toolbar-title class="grey--text text--darken-4 font">
-        {{
-          codePath.length > 0
-            ? codePath[codePath.length - 1].nombre
-            : nameCodeChannel
-        }}
+        {{ codePath.length > 0 ? codePath[codePath.length - 1].nombre : nameCodeChannel }}
       </v-toolbar-title>
     </v-toolbar>
     <v-list dark>
@@ -54,15 +45,18 @@ import { Colors } from "@/utils/colors";
 import { StringUtils } from "@/utils/stringsUtils";
 import { ChannelType } from "@/utils/channels_types";
 import ServiceChannels from "@/services/channels.service";
+import CodeService from "@/services/code_channel.service";
+import * as monaco from "monaco-editor";
+import CryptoJS from "crypto-js";
 @Component
 export default class ViewTreeView extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public treeEntries!: Maybe<TreeEntry[]>;
 
   @Prop({
-    required: false,
+    required: false
   })
   public codeChanel!: string;
 
@@ -91,6 +85,8 @@ export default class ViewTreeView extends Vue {
 
   public nameCodeChannel = "";
 
+  public serverHash: string | undefined;
+
   getColor(extensionFile: string): string {
     return Colors.toColor(StringUtils.getHashCode(extensionFile));
   }
@@ -107,17 +103,58 @@ export default class ViewTreeView extends Vue {
     this.nameCode();
   }
 
-  goToPath(treeEntry: TreeEntry) {
+  async getServerHash(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      CodeService.getInitialHash(this.currentUser.uid!, hash => {
+        console.log("tengo el hash del server");
+        resolve(hash);
+      });
+    });
+  }
+
+  compareHash(): boolean {
+    console.log("entro");
+
+    if (!this.serverHash) {
+      console.log("se salio");
+      return true;
+    }
+
+    const currentCode = monaco.editor.getModels()[0].getValue();
+    // const secret = process.env.VUE_APP_SOCKET_SECRET
+    //   ? process.env.VUE_APP_SOCKET_SECRET
+    //   : "secreto";
+    const secret = "Plataforma colaborativa para el pair programming distribuido";
+    const encryp = CryptoJS.AES.encrypt(currentCode, secret).toString();
+    console.log(
+      CryptoJS.AES.decrypt(this.serverHash, secret)
+        .toString(CryptoJS.enc.Utf8)
+        .substring(0, 200)
+    );
+    console.log(this.serverHash == encryp);
+
+    return this.serverHash == encryp;
+  }
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async goToPath(treeEntry: TreeEntry) {
     switch ((treeEntry.object as any)?.__typename) {
       case "Tree":
         const tree = treeEntry.object as Tree;
         this.addPathState({ id: tree.id, nombre: treeEntry.name });
         break;
       case "Blob":
+        //this.serverHash = await this.getServerHash();
         if (this.driverUID === this.currentUser.uid!) {
           const blob = treeEntry.object as Blob;
           if (blob.isBinary == false) {
-            this.setCodeData(treeEntry);
+            if (this.compareHash() == true) {
+              this.setCodeData(treeEntry);
+            } else {
+              console.log("decirle que guarde");
+            }
           }
         }
         break;
