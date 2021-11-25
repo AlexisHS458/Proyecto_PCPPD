@@ -1,12 +1,21 @@
 <template>
   <div>
     <v-toolbar color="primaryDark" flat dense>
-      <v-icon color="grey darken-2" @click="goBackAction" v-if="codePath.length > 0" class="mr-4">
+      <v-icon
+        color="grey darken-2"
+        @click="goBackAction"
+        v-if="codePath.length > 0"
+        class="mr-4"
+      >
         mdi-arrow-left
       </v-icon>
 
       <v-toolbar-title class="grey--text text--darken-4 font">
-        {{ codePath.length > 0 ? codePath[codePath.length - 1].nombre : nameCodeChannel }}
+        {{
+          codePath.length > 0
+            ? codePath[codePath.length - 1].nombre
+            : nameCodeChannel
+        }}
       </v-toolbar-title>
     </v-toolbar>
     <v-list dark>
@@ -51,12 +60,12 @@ import CryptoJS from "crypto-js";
 @Component
 export default class ViewTreeView extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public treeEntries!: Maybe<TreeEntry[]>;
 
   @Prop({
-    required: false
+    required: false,
   })
   public codeChanel!: string;
 
@@ -64,6 +73,9 @@ export default class ViewTreeView extends Vue {
   onChildChangedView() {
     this.nameCode();
   }
+
+  @CodeChannelModule.Action
+  private setShowDialog!: (state: boolean) => void;
 
   @CodeChannelModule.Action
   private addPathState!: (path: CodePath) => void;
@@ -76,6 +88,9 @@ export default class ViewTreeView extends Vue {
 
   @CodeChannelModule.State("driverUID")
   private driverUID!: string;
+
+  @CodeChannelModule.State("codeChanged")
+  private codeChanged!: boolean;
 
   @User.State("user")
   private currentUser!: User;
@@ -103,8 +118,6 @@ export default class ViewTreeView extends Vue {
     this.nameCode();
   }
 
-  
-
   async goToPath(treeEntry: TreeEntry) {
     switch ((treeEntry.object as any)?.__typename) {
       case "Tree":
@@ -113,10 +126,13 @@ export default class ViewTreeView extends Vue {
         break;
       case "Blob":
         if (this.driverUID === this.currentUser.uid!) {
-          const blob = treeEntry.object as Blob;
-          if (blob.isBinary == false) {
-            this.setCodeData(treeEntry);
+          if (!this.codeChanged) {
+            const blob = treeEntry.object as Blob;
+            if (blob.isBinary == false) {
+              this.setCodeData(treeEntry);
+            }
           }
+          this.setShowDialog(this.codeChanged);
         }
         break;
       default:

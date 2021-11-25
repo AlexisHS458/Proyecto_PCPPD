@@ -113,6 +113,15 @@ const router = new VueRouter({
   mode: "history",
   routes
 });
+router.beforeEach((to, from, next) => {
+  const codeChanged: boolean = store.getters["CodeChannelModule/getCodeChanged"];
+
+  if (!codeChanged) {
+    next();
+  }
+
+  store.commit("CodeChannelModule/setShowDialogState", codeChanged);
+});
 
 router.beforeEach(
   /* async */ (to, from, next) => {

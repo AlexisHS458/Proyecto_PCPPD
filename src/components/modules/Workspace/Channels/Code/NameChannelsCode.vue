@@ -318,6 +318,9 @@ export default class NameChannels extends Vue {
   @CodeChannel.Action
   private setShowRequestDriverStatus!: (status: boolean) => void;
 
+  @CodeChannel.Action
+  private setCodeChanged!: (state: boolean) => void;
+
   @Ref("form") readonly form!: VForm;
 
   public menu = false;
@@ -403,11 +406,6 @@ export default class NameChannels extends Vue {
         );
       }
     );
-    /*    CodeService.currentDriver(this.currentUser.uid!, async uid => {
-      this.currentDriver = uid;
-      this.setDriverUIDStatus(uid);
-      console.log(this.driverUID); 
-    }); */
   }
 
   imgError(e: any) {

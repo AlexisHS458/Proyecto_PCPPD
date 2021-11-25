@@ -27,6 +27,8 @@ class CodeChannelModule extends VuexModule {
 
   public codeChannelName = "";
   public driverUID = "";
+  public codeChanged = false;
+
   public status = {
     isLoading: true,
     showTreeView: false,
@@ -35,11 +37,13 @@ class CodeChannelModule extends VuexModule {
     showRequestDriver: false,
     showSnackbar: false,
     showSnackbarError: false,
-    showCloseDialog: false
+    showCloseDialog: false,
+    showDialogSave: false
   };
 
   @Mutation
   public clearPath(): void {
+    this.status.showCloseDialog = false;
     this.codePath = [];
   }
 
@@ -125,7 +129,7 @@ class CodeChannelModule extends VuexModule {
 
   @Mutation
   public setBranchOidState(ref: Ref): void {
-    this.branchOid = ref.target?.oid
+    this.branchOid = ref.target?.oid;
   }
 
   @Mutation
@@ -133,12 +137,30 @@ class CodeChannelModule extends VuexModule {
     this.status.showCloseDialog = state;
   }
 
+  @Mutation
+  public setShowSaveDialogState(state: boolean): void {
+    this.status.showDialogSave = state;
+  }
+
+  @Mutation
+  public setCodeChangedState(state: boolean): void {
+    this.codeChanged = state;
+  }
+
+  @Action
+  public setCodeChanged(state: boolean): void {
+    this.context.commit("setCodeChangedState", state);
+  }
+
+  @Action
+  public setShowDialogSave(state: boolean): void {
+    this.context.commit("setShowSaveDialogState", state);
+  }
+
   @Action
   public setShowDialog(state: boolean): void {
     this.context.commit("setShowDialogState", state);
   }
-
-
 
   @Action
   public setBranchOid(ref: Ref): void {
@@ -146,7 +168,7 @@ class CodeChannelModule extends VuexModule {
   }
 
   @Action
-  setRepository(repo: Repository): void{
+  setRepository(repo: Repository): void {
     this.context.commit("setRepoState", repo);
   }
 
@@ -258,6 +280,14 @@ class CodeChannelModule extends VuexModule {
 
   get pathSize(): number {
     return this.codePath.length;
+  }
+
+  get showCloseDialog(): boolean {
+    return this.status.showCloseDialog;
+  }
+
+  get getCodeChanged(): boolean {
+    return this.codeChanged;
   }
 }
 
