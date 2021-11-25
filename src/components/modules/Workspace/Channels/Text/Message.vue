@@ -115,7 +115,7 @@
               </span>
             </div>
             <div class="editable-text wrapper">
-              <img class="icon" src="@/assets/docFile.svg" />
+              <img v-img class="icon" :src="message.contenido" />
               <span class="discord-message-body"
                 >{{ message.nombreArchivo }}
               </span>
@@ -530,6 +530,7 @@ export default class Messages extends Vue {
 }
 
 .icon {
+  margin-right: 12px;
   height: 40px;
   width: 40px;
 }

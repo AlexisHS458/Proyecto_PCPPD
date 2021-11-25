@@ -1,9 +1,15 @@
 <template>
   <div class="card-center d-flex flex-column">
-    <app-bar-messages :channelApp="channel" class="flex-grow-0 flex-shrink-1"></app-bar-messages>
+    <app-bar-messages
+      :channelApp="channel"
+      class="flex-grow-0 flex-shrink-1"
+    ></app-bar-messages>
     <div v-if="!isLoadingMessages">
       <template v-if="messages.length > 0">
-        <messages-list class="background list-background scroll flex-grow-1" ref="vList">
+        <messages-list
+          class="background list-background scroll flex-grow-1"
+          ref="vList"
+        >
           <messages-in-messages
             v-for="message in messages"
             :key="message.uid"
@@ -17,7 +23,6 @@
               {{ message.contenido }}
             </template> -->
           </messages-in-messages>
-          <a href="messages[1].contenido" target="_blank"> {{ messages[1].contenido }} </a>
         </messages-list>
       </template>
       <template v-else>
@@ -27,7 +32,8 @@
       </template>
     </div>
     <div v-else class="div-progress-circular">
-      <v-progress-circular indeterminate :size="80" :width="4" color="white"> </v-progress-circular>
+      <v-progress-circular indeterminate :size="80" :width="4" color="white">
+      </v-progress-circular>
     </div>
     <v-footer app color="primary" inset class="display-footer">
       <input-message
@@ -85,12 +91,12 @@ const Permissions = namespace("PermissionsModule");
     InputMessage,
     ListMessages,
     MessagesList,
-    MessagesInMessages
-  }
+    MessagesInMessages,
+  },
 })
 export default class MessagesPage extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public idChannel!: string;
 
