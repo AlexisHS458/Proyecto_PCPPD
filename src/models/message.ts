@@ -31,4 +31,6 @@ export interface Message {
    * URL de la imagen de perfil del usuario
    */
   fotoURL: string;
+
+  isFile: boolean;
 }

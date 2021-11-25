@@ -2,11 +2,7 @@
   <v-hover>
     <div class="discord-message" slot-scope="{ hover }">
       <div class="discord-author-avatar">
-        <img
-          :src="message.fotoURL"
-          :alt="message.usuarioNombre"
-          @error="imgError"
-        />
+        <img :src="message.fotoURL" :alt="message.usuarioNombre" @error="imgError" />
       </div>
       <div class="discord-message-content">
         <div class="div">
@@ -21,11 +17,7 @@
             class="flex-shrink-1 flex-grow-0"
             :class="{ hidden: !hover }"
           >
-            <v-dialog
-              transition="dialog-top-transition"
-              max-width="600"
-              v-model="dialogEdit"
-            >
+            <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogEdit">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon color="infoLight" v-bind="attrs" v-on="on">
                   <v-icon small> mdi-pencil </v-icon>
@@ -34,12 +26,7 @@
               <v-card>
                 <v-toolbar color="secondary" dark> Editar mensaje </v-toolbar>
                 <v-card-text>
-                  <v-form
-                    ref="form"
-                    v-model="valid"
-                    lazy-validation
-                    @submit.prevent
-                  >
+                  <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
                     <v-row align="center" justify="center" class="mt-6">
                       <v-col cols="9">
                         <v-textarea
@@ -63,22 +50,14 @@
                   </v-form>
                 </v-card-text>
                 <v-card-actions class="justify-end">
-                  <v-btn
-                    color="success"
-                    @click="editMessages"
-                    :loading="loadingEdit"
-                  >
+                  <v-btn color="success" @click="editMessages" :loading="loadingEdit">
                     Guardar cambios
                   </v-btn>
                   <v-btn text @click="closeDialogEdit">Cancelar</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
-            <v-dialog
-              transition="dialog-top-transition"
-              max-width="600"
-              v-model="dialog"
-            >
+            <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialog">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon color="errorLight" v-bind="attrs" v-on="on">
                   <v-icon color="error" small> mdi-delete </v-icon>
@@ -94,11 +73,7 @@
                     <p>ESTA ACCION NO SE PUEDE DESAHACER</p>
                   </div>
                   <v-row align="center" justify="center">
-                    <v-btn
-                      color="error"
-                      @click="deleteMessages"
-                      :loading="loadingDelete"
-                    >
+                    <v-btn color="error" @click="deleteMessages" :loading="loadingDelete">
                       SI, QUIERO ELIMINARLO
                     </v-btn>
                   </v-row>
@@ -111,8 +86,13 @@
           </span>
         </div>
         <div class="discord-message-body editable-text">
-          <slot></slot>
-          <!-- <span v-if="edited" class="discord-message-edited">(edited)</span> -->
+          <template v-if="message.isFile">
+            {{ message.contenido }}
+            <a href="message.contenido" target="_blank">Hola</a>
+          </template>
+          <template v-else>
+            {{ message.contenido }}
+          </template>
         </div>
       </div>
     </div>
@@ -144,23 +124,23 @@ const now = new Date();
 
 @Component({
   components: {
-    AuthorInfo,
-  },
+    AuthorInfo
+  }
 })
 export default class Messages extends Vue {
   @Prop({
     required: false,
-    default: "User",
+    default: "User"
   })
   public author!: string;
 
   @Prop({
-    required: false,
+    required: false
   })
   public avatar!: string;
 
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -168,17 +148,17 @@ export default class Messages extends Vue {
     type: [Date, String],
     required: false,
     default: () => now,
-    validator: validators.dates.validator,
+    validator: validators.dates.validator
   })
   public timestamp!: string;
 
   @Prop({
-    required: false,
+    required: false
   })
   public profile!: string;
 
   @Prop({
-    required: true,
+    required: true
   })
   public message!: Message;
 
@@ -206,7 +186,7 @@ export default class Messages extends Vue {
   public loadingDelete = false;
   public valid = false;
   public rules = {
-    required: (v: string): string | boolean => !!v || "Campo requerido",
+    required: (v: string): string | boolean => !!v || "Campo requerido"
   };
 
   /**
@@ -354,15 +334,11 @@ export default class Messages extends Vue {
 
 .discord-light-theme .discord-message .discord-message-timestamp,
 .discord-compact-mode .discord-message:hover .discord-message-timestamp,
-.discord-compact-mode.discord-light-theme
-  .discord-message:hover
-  .discord-message-timestamp {
+.discord-compact-mode.discord-light-theme .discord-message:hover .discord-message-timestamp {
   color: #99aab5;
 }
 
-.discord-compact-mode.discord-light-theme
-  .discord-message
-  .discord-message-timestamp {
+.discord-compact-mode.discord-light-theme .discord-message .discord-message-timestamp {
   color: #d1d9de;
 }
 
