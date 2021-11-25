@@ -90,7 +90,7 @@
                 </v-toolbar>
                 <v-card-text>
                   <div class="text-h6 pa-5 text-center">
-                    <p>¿SEGURO QUE DESEAS ELIMINAR ESTE Mnesaje?</p>
+                    <p>¿SEGURO QUE DESEAS ELIMINAR ESTE MENSAJE?</p>
                     <p>ESTA ACCION NO SE PUEDE DESAHACER</p>
                   </div>
                   <v-row align="center" justify="center">

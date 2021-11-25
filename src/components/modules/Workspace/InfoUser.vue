@@ -67,6 +67,7 @@ import { Workspace } from "@/models/workspace";
 const User = namespace("UserModule");
 const StatusVoice = namespace("VoiceChannelModule");
 const MyWorkSpace = namespace("WorkspaceModule");
+const CodeChannel = namespace("CodeChannelModule");
 @Component
 export default class UserInfo extends Vue {
   @Prop({
@@ -82,6 +83,15 @@ export default class UserInfo extends Vue {
 
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
+
+  @CodeChannel.Action
+  private setCodeChanged!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setShowDialog!: (state: boolean) => void;
+
+  @CodeChannel.State("codeChanged")
+  private codeChanged!: boolean;
 
   public loading = false;
   public isTalk = true;
@@ -110,14 +120,18 @@ export default class UserInfo extends Vue {
   }
 
   disconnectCode() {
-    CodeService.leaveCodeChannel(this.currentUser.uid!);
-    var audio = new Audio(require("@/assets/disconnected.mp3"));
-    audio.play();
-    if (
-      (this.$route.path != "/space/" + this.$route.params.id,
-      +"/code/" + this.$route.params.idChannelCode)
-    ) {
-      this.$router.replace({ name: "notChannels" });
+    if (!this.codeChanged) {
+      CodeService.leaveCodeChannel(this.currentUser.uid!);
+      var audio = new Audio(require("@/assets/disconnected.mp3"));
+      audio.play();
+      if (
+        (this.$route.path != "/space/" + this.$route.params.id,
+        +"/code/" + this.$route.params.idChannelCode)
+      ) {
+        this.$router.replace({ name: "notChannels" });
+      }
+    } else {
+      this.setShowDialog(true);
     }
   }
 

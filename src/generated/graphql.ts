@@ -22484,7 +22484,7 @@ export type MakeCommitMutationVariables = Exact<{
 }>;
 
 
-export type MakeCommitMutation = { __typename?: 'Mutation', createCommitOnBranch?: { __typename?: 'CreateCommitOnBranchPayload', commit?: { __typename?: 'Commit', url: any } | null | undefined } | null | undefined };
+export type MakeCommitMutation = { __typename?: 'Mutation', createCommitOnBranch?: { __typename?: 'CreateCommitOnBranchPayload', commit?: { __typename?: 'Commit', url: any } | null | undefined, ref?: { __typename?: 'Ref', target?: { __typename?: 'Blob', oid: any } | { __typename?: 'Commit', oid: any } | { __typename?: 'Tag', oid: any } | { __typename?: 'Tree', oid: any } | null | undefined } | null | undefined } | null | undefined };
 
 export const FilesInTree = gql`
     fragment FilesInTree on Tree {
@@ -22555,6 +22555,11 @@ export const MakeCommit = gql`
   createCommitOnBranch(input: $input) {
     commit {
       url
+    }
+    ref {
+      target {
+        oid
+      }
     }
   }
 }

@@ -185,6 +185,8 @@ import ChannelService from "@/services/channels.service";
 import image from "@/assets/userProfile.png";
 import { VoiceState } from "@/utils/voiceState";
 import { ChannelType } from "@/utils/channels_types";
+import { voiceChannelSocket } from "@/socketio";
+import { Socket } from "socket.io-client";
 /* eslint-enable */
 @Component
 export default class NameChannels extends Vue {
@@ -240,6 +242,8 @@ export default class NameChannels extends Vue {
   @User.State("user")
   private currentUser!: User;
 
+  
+
   /**
    * Acciones obtenidas del @module Permissions
    */
@@ -270,6 +274,7 @@ export default class NameChannels extends Vue {
   public model = [];
   public valid = true;
   public newNameChannel = "";
+  public socket?: Socket 
   public permissions = {} as PermissionsPath;
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
@@ -341,7 +346,7 @@ export default class NameChannels extends Vue {
     if (hasAcces) {
       this.setIsConnectedStatus(VoiceState.CONNECTING);
       await this.initStream();
-      VoiceService.joinToVoiceChannel(this.currentUser.uid!, this.channel.uid!);
+      VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
       VoiceService.userStatus(this.currentUser.uid!, isConnected => {
         this.isConnected = !!isConnected;
       });
@@ -360,6 +365,7 @@ export default class NameChannels extends Vue {
   }
 
   mounted() {
+    this.socket  = voiceChannelSocket(this.currentUser.uid!,true);
     VoiceService.allUsers(this.currentUser.uid!, this.channel.uid!, async users => {
       if (!users.find(user => user.uid === this.currentUser.uid)) {
         this.stream?.getTracks().forEach(track => {
@@ -375,6 +381,7 @@ export default class NameChannels extends Vue {
       );
     });
     this.initSignaling();
+    
   }
 
   imgError(e: any) {
@@ -497,7 +504,7 @@ export default class NameChannels extends Vue {
   }
 
   initSignaling(): void {
-    VoiceService.joinedUsers(this.currentUser.uid!, users => {
+    VoiceService.joinedUsers(this.socket!,this.channel.uid!, users => {
       console.log('entro a joined');
       
       users
@@ -508,7 +515,7 @@ export default class NameChannels extends Vue {
         });
     });
 
-    VoiceService.listenUserJoined(this.currentUser.uid!, payloadSignal => {
+    VoiceService.listenUserJoined(this.socket!,this.channel.uid!, payloadSignal => {
       const peer = this.addPeer(payloadSignal.signal, payloadSignal.callerID, this.stream!);
       this.peers[payloadSignal.callerID] = peer;
     });

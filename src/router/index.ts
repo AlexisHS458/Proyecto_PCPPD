@@ -8,7 +8,7 @@ import Workspace from "../views/Workspace.vue";
 import MessagesPage from "../components/modules/Workspace/ViewMessages.vue";
 import NotFound from "../views/PageNotFound.vue";
 import NotChannels from "../components/modules/Workspace/NotChannels.vue";
-import CodeChannel from "../components/modules/Workspace/Channels/Code/EditCode.vue";
+import CodeChannel from "../components/modules/Workspace/Channels/Code/ViewCode.vue";
 import NavigationDrawer from "../components/modules/Workspace/ViewNavigationDrawer.vue";
 import ViewTreeView from "../components/modules/Workspace/Channels/Code/Files/RepoFilesView.vue";
 import { auth } from "@/utils/firebase";
@@ -112,6 +112,15 @@ const routes: Array<RouteConfig> = [
 const router = new VueRouter({
   mode: "history",
   routes
+});
+router.beforeEach((to, from, next) => {
+  const codeChanged: boolean = store.getters["CodeChannelModule/getCodeChanged"];
+
+  if (!codeChanged) {
+    next();
+  }
+
+  store.commit("CodeChannelModule/setShowDialogState", codeChanged);
 });
 
 router.beforeEach(

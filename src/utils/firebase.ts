@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/database";
+import "firebase/storage";
 const firebaseConfig = {
   apiKey: "AIzaSyC6gxhINyjRetBOkPsTwuF1Jcm7veQJ02Y",
   authDomain: "pair-programming-7ea55.firebaseapp.com",
@@ -22,5 +23,6 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const realTime = firebase.database();
 const FieldValue = firebase.firestore.FieldValue;
+const storage = firebase.storage();
 
-export { auth, firebase, db, realTime, FieldValue  };
+export { auth, firebase, db, realTime, FieldValue, storage };

@@ -1,6 +1,6 @@
 import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
 import CodeChannelService from "@/services/code_channel.service";
-import { Maybe, Repository, TreeEntry } from "@/generated/graphql";
+import { Maybe, Ref, Repository, TreeEntry } from "@/generated/graphql";
 import { CodePath } from "@/models/codePath";
 
 @Module({ namespaced: true })
@@ -21,12 +21,14 @@ class CodeChannelModule extends VuexModule {
 
   public codeFilePath = "";
 
-  public branchOid = ""
+  public branchOid = "";
 
-  public repository: Maybe<Repository> = null
+  public repository: Maybe<Repository> = null;
 
   public codeChannelName = "";
   public driverUID = "";
+  public codeChanged = false;
+
   public status = {
     isLoading: true,
     showTreeView: false,
@@ -34,11 +36,14 @@ class CodeChannelModule extends VuexModule {
     showNavigationDrawerChannels: true,
     showRequestDriver: false,
     showSnackbar: false,
-    showSnackbarError: false
+    showSnackbarError: false,
+    showCloseDialog: false,
+    showDialogSave: false
   };
 
   @Mutation
   public clearPath(): void {
+    this.status.showCloseDialog = false;
     this.codePath = [];
   }
 
@@ -108,10 +113,10 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public setInitialCodeData(blob: TreeEntry): void {
     this.codeData = blob;
-    console.log(this.codePath);
+
     let prefix = "";
-    if(this.codePath.length > 0){
-      prefix = this.codePath.map(path => path.nombre).join("/") + "/"
+    if (this.codePath.length > 0) {
+      prefix = this.codePath.map(path => path.nombre).join("/") + "/";
     }
     this.codeFilePath = prefix + blob.name;
   }
@@ -122,8 +127,68 @@ class CodeChannelModule extends VuexModule {
     this.branchOid = repo.defaultBranchRef?.target?.oid;
   }
 
+  @Mutation
+  public setBranchOidState(ref: Ref): void {
+    this.branchOid = ref.target?.oid;
+  }
+
+  @Mutation
+  public setShowDialogState(state: boolean): void {
+    this.status.showCloseDialog = state;
+  }
+
+  @Mutation
+  public setShowSaveDialogState(state: boolean): void {
+    this.status.showDialogSave = state;
+  }
+
+  @Mutation
+  public setCodeChangedState(state: boolean): void {
+    this.codeChanged = state;
+  }
+
+  @Mutation
+  public clearCodePath(): void {
+    this.codeFilePath = "";
+  }
+
   @Action
-  setRepository(repo: Repository): void{
+  public setCodePath(): void {
+    this.context.commit("clearCodePath");
+  }
+
+  @Mutation
+  public changeFilePathState(path: string): void {
+    this.codeFilePath = path;
+  }
+
+  @Action
+  changeFilePath(path: string): void {
+    this.context.commit("changeFilePathState", path);
+  }
+
+  @Action
+  public setCodeChanged(state: boolean): void {
+    this.context.commit("setCodeChangedState", state);
+  }
+
+  @Action
+  public setShowDialogSave(state: boolean): void {
+    this.context.commit("setShowSaveDialogState", state);
+  }
+
+  @Action
+  public setShowDialog(state: boolean): void {
+    this.context.commit("setShowDialogState", state);
+  }
+
+  @Action
+  public setBranchOid(ref: Ref): void {
+    this.context.commit("setBranchOidState", ref);
+  }
+
+  @Action
+  setRepository(repo: Repository): void {
     this.context.commit("setRepoState", repo);
   }
 
@@ -235,6 +300,14 @@ class CodeChannelModule extends VuexModule {
 
   get pathSize(): number {
     return this.codePath.length;
+  }
+
+  get showCloseDialog(): boolean {
+    return this.status.showCloseDialog;
+  }
+
+  get getCodeChanged(): boolean {
+    return this.codeChanged;
   }
 }
 

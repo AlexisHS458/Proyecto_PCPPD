@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app clipped-right flat height="48px" color="primary">
+  <v-app-bar app clipped-right flat height="48px" :color="color">
     <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
     <v-toolbar-title class="font-weight-medium">
       {{ nameChannel }}
@@ -42,8 +42,12 @@
             </template>
           </v-card>
         </v-menu>
-
-        <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogExport">
+        <!-- dialogExport-->
+        <v-dialog
+          transition="dialog-top-transition"
+          max-width="600"
+          v-model="status.showDialogSave"
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-icon
               v-bind="attrs"
@@ -88,7 +92,9 @@
               </v-form>
             </v-card-text>
             <v-card-actions class="justify-end">
-              <v-btn color="success" :loading="loadingExport" @click="doCommit"> Commit </v-btn>
+              <v-btn color="success" :loading="loadingExport" @click="doCommit">
+                Commit
+              </v-btn>
               <v-btn text @click="closeDialogExport">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
@@ -117,15 +123,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Ref } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
 import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
+const WorkspaceOptions = namespace("WorkspaceModule");
 import UserService from "@/services/user.service";
-import { Maybe, Repository } from "@/generated/graphql";
+import { Maybe, Repository, Commit } from "@/generated/graphql";
 import { VForm } from "@/utils/types";
 import * as monaco from "monaco-editor";
 @Component
@@ -134,6 +141,11 @@ export default class AppBarOptions extends Vue {
     required: true
   })
   public nameChannel!: string;
+
+  @Prop({
+    required: true
+  })
+  public color!: string;
 
   @CodeChannel.Action
   private toggleShowTreeView!: () => void;
@@ -158,6 +170,24 @@ export default class AppBarOptions extends Vue {
 
   @CodeChannel.State("codeFilePath")
   private codeFilePath!: string;
+
+  @CodeChannel.Action("setBranchOid")
+  private setBranchOid!: (ref: any) => void;
+
+  @CodeChannel.Action
+  private setCodeChanged!: (state: boolean) => void;
+
+  @CodeChannel.Action("setShowDialogSave")
+  private setShowDialogSave!: (status: boolean) => void;
+
+  @WorkspaceOptions.Action
+  private setMessageOnSnackbar!: (message: string) => void;
+
+  @WorkspaceOptions.Action
+  private setVisibleSnackBar!: () => void;
+
+  @CodeChannel.Action
+  private setShowDialog!: (state: boolean) => void;
 
   @Ref("form") readonly form!: VForm;
 
@@ -186,7 +216,7 @@ export default class AppBarOptions extends Vue {
   closeDialogExport() {
     this.form.resetValidation();
     this.form.reset();
-    this.dialogExport = false;
+    this.setShowDialogSave(false);
   }
 
   acceptRequest() {
@@ -203,7 +233,7 @@ export default class AppBarOptions extends Vue {
   async doCommit() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingExport = true;
-      await GitHubService.makeCommit({
+      const response = await GitHubService.makeCommit({
         branch: {
           repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
           branchName: this.repository?.defaultBranchRef?.name
@@ -219,8 +249,23 @@ export default class AppBarOptions extends Vue {
         message: { headline: this.summary, body: this.description },
         expectedHeadOid: this.branchOid
       });
-      this.loadingExport = false;
-      this.dialogExport = false;
+
+      this.setShowDialogSave(false);
+      this.setCodeChanged(false);
+      this.setShowDialog(false);
+      this.form.resetValidation();
+      this.form.reset();
+      this.setVisibleSnackBar();
+
+      const commit = response.commit as Commit;
+      this.setBranchOid(response.ref);
+     
+
+      const urlShort = commit.url.slice(0, -25) + "...";
+      this.setMessageOnSnackbar(
+        "Puedes consultar tu commit copiando esta URL en tu navegador:\n" +
+          `<a href="${commit.url}"  target="_blank">${urlShort}</a>`
+      );
     }
   }
 

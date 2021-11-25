@@ -204,7 +204,7 @@ export default class ListChannels extends Vue {
    */
   async addChannelCode() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
-      console.log(this.repo);
+     
 
       this.loading = true;
       this.codeChannel.nombre = this.nameChannel;

@@ -165,6 +165,9 @@ export default class Toolbar extends Vue {
   private status!: any;
 
   @CodeChannel.Action
+  private setShowDialog!: (state: boolean) => void;
+
+  @CodeChannel.Action
   private toggleShowTreeView!: () => void;
 
   @Prop({

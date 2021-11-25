@@ -1,3 +1,4 @@
+import { Code } from "@/models/code";
 import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { SocketUser } from "@/models/socketUser";
 import { codeChannelSocket } from "@/socketio";
@@ -60,12 +61,14 @@ class CodeChannelService {
     codeData: {
       channelID: string;
       code: string;
+      extension: string;
+      path: string;
     }
   ): Socket {
     return codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
   }
 
-  getDataCode(uid: string, onEvent: (code: string) => void): Socket {
+  getDataCode(uid: string, onEvent: (code: Code) => void): Socket {
     return codeChannelSocket(uid).on(ResponseEventName.CODE, payload => {
       onEvent(payload);
     });
@@ -113,6 +116,10 @@ class CodeChannelService {
 
   requestCurrentDriver(uid: string, codeChannelID: string): Socket {
     return codeChannelSocket(uid).emit(EventName.GET_DRIVER, codeChannelID);
+  }
+
+  requestCurrentCode(uid: string, codeChannelID: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.REQUEST_CODE, codeChannelID);
   }
 }
 

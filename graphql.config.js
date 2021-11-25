@@ -14,5 +14,3 @@ module.exports = {
     }
   }
 }
-
-console.log(process.env.GITHUB_TOKEN);
