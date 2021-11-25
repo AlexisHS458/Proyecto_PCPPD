@@ -113,7 +113,7 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public setInitialCodeData(blob: TreeEntry): void {
     this.codeData = blob;
-    console.log(this.codePath);
+
     let prefix = "";
     if (this.codePath.length > 0) {
       prefix = this.codePath.map(path => path.nombre).join("/") + "/";
@@ -145,6 +145,26 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public setCodeChangedState(state: boolean): void {
     this.codeChanged = state;
+  }
+
+  @Mutation
+  public clearCodePath(): void {
+    this.codeFilePath = "";
+  }
+
+  @Action
+  public setCodePath(): void {
+    this.context.commit("clearCodePath");
+  }
+
+  @Mutation
+  public changeFilePathState(path: string): void {
+    this.codeFilePath = path;
+  }
+
+  @Action
+  changeFilePath(path: string): void {
+    this.context.commit("changeFilePathState", path);
   }
 
   @Action

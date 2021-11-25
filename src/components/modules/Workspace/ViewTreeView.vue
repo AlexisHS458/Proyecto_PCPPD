@@ -1,21 +1,12 @@
 <template>
   <div>
     <v-toolbar color="primaryDark" flat dense>
-      <v-icon
-        color="grey darken-2"
-        @click="goBackAction"
-        v-if="codePath.length > 0"
-        class="mr-4"
-      >
+      <v-icon color="grey darken-2" @click="goBackAction" v-if="codePath.length > 0" class="mr-4">
         mdi-arrow-left
       </v-icon>
 
       <v-toolbar-title class="grey--text text--darken-4 font">
-        {{
-          codePath.length > 0
-            ? codePath[codePath.length - 1].nombre
-            : nameCodeChannel
-        }}
+        {{ codePath.length > 0 ? codePath[codePath.length - 1].nombre : nameCodeChannel }}
       </v-toolbar-title>
     </v-toolbar>
     <v-list dark>
@@ -60,12 +51,12 @@ import CryptoJS from "crypto-js";
 @Component
 export default class ViewTreeView extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public treeEntries!: Maybe<TreeEntry[]>;
 
   @Prop({
-    required: false,
+    required: false
   })
   public codeChanel!: string;
 
@@ -98,6 +89,9 @@ export default class ViewTreeView extends Vue {
   @CodeChannelModule.State("codePath")
   private codePath!: CodePath[];
 
+  @CodeChannelModule.State("codeFilePath")
+  private codeFilePath!:string;
+
   public nameCodeChannel = "";
 
   public serverHash: string | undefined;
@@ -129,10 +123,20 @@ export default class ViewTreeView extends Vue {
           if (!this.codeChanged) {
             const blob = treeEntry.object as Blob;
             if (blob.isBinary == false) {
+              const language = monaco.languages.getLanguages().find(language => {
+                return language.extensions?.includes(treeEntry.extension ?? "plaintext");
+              })?.id;
               this.setCodeData(treeEntry);
+              CodeService.sendCode(this.currentUser.uid!, {
+                channelID: this.$route.params.idChannelCode,
+                code: blob.text ?? "",
+                extension: language ?? "plaintext",
+                path: this.codeFilePath
+              });
             }
+          } else {
+            this.setShowDialog(this.codeChanged);
           }
-          this.setShowDialog(this.codeChanged);
         }
         break;
       default:

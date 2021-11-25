@@ -118,7 +118,9 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.GET_DRIVER, codeChannelID);
   }
 
-  
+  requestCurrentCode(uid: string, codeChannelID: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.REQUEST_CODE, codeChannelID);
+  }
 }
 
 export default new CodeChannelService();

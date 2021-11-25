@@ -27,7 +27,7 @@ export default class SubTreeFile extends Vue {
     this.treeEntries = await GitHubService.getNodeFiles(
       this.codePath[this.codePath.length - 1].id
     );
-    console.log(this.treeEntries);
+
   }
 
   public treeEntries: Maybe<TreeEntry[]> | undefined = null;

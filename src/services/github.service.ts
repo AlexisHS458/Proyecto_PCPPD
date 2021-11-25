@@ -53,7 +53,7 @@ class GitHubService {
           fetchPolicy: "network-only"
         })
         .then(res => {
-          console.log(res);
+       
 
           return res;
         })
@@ -75,7 +75,7 @@ class GitHubService {
           input: commitInput
         },
       }).then((res)=>{
-        console.log(res);
+       
         return res
         
       })
