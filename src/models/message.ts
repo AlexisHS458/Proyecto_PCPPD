@@ -32,5 +32,19 @@ export interface Message {
    */
   fotoURL: string;
 
+  /**
+   * Saber si es archivo
+   */
   isFile: boolean;
+
+  /**
+   * Nombre del archivo
+   */
+  nombreArchivo?: string;
+
+  /**
+   * Tipo de archivo
+   */
+
+  contentType?: string;
 }

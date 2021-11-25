@@ -63,30 +63,14 @@ import { Maybe } from "graphql/jsutils/Maybe";
 @Component
 export default class InputMessage extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public workspace!: Workspace;
 
   @Prop({
-    required: true
+    required: true,
   })
   public currentUser!: User;
-
-  /*   onButtonClick() {
-    this.isSelecting = true;
-    window.addEventListener(
-      "focus",
-      () => {
-        this.isSelecting = false;
-      },
-      { once: true }
-    );
-    (this.$refs.uploader as HTMLElement).click();
-  }
-
-  onFileChanged(e: any) {
-    this.selectedFile = e.target.files[0];
-  } */
 
   /**
    * Acciones obtenidas del @module Messages
@@ -118,7 +102,7 @@ export default class InputMessage extends Vue {
   public selectedFile = "";
   public rules = {
     size: (v: string): string | boolean =>
-      v.length <= 500 || "Haz alcanzado el límite de caracteres"
+      v.length <= 500 || "Haz alcanzado el límite de caracteres",
   };
   public valid = true;
   public file: Maybe<File> = null;
@@ -128,15 +112,19 @@ export default class InputMessage extends Vue {
    * Mandar mensaje al canal de texto seleccionado
    */
   async sendMessages() {
-    if (this.message && this.message.length > 0 /* &&
-      !/^\s*$/.test(this.message) */) {
+    if (
+      this.message &&
+      this.message.length > 0 /* &&
+      !/^\s*$/.test(this.message) */
+    ) {
       this.messageModel = {
         fotoURL: this.currentUser.fotoURL,
         uid_usuario: this.currentUser.uid!,
-        usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
+        usuarioNombre:
+          this.currentUser.nombre + " " + this.currentUser.apellido,
         contenido: this.message,
         fecha: Date.now(),
-        isFile: false
+        isFile: false,
       };
       this.setTextChannelIDtoModule(this.$route.params.id);
       this.setWorkspaceIDtoModule(this.$route.params.idChannel);
@@ -161,7 +149,7 @@ export default class InputMessage extends Vue {
     const storageRef = storage.ref();
     const fileRef = storageRef.child(this.file!.name);
     await fileRef.put(this.file!);
-    const   meta = await fileRef.getMetadata();
+    const metaData = await fileRef.getMetadata();
     this.fileURL = await fileRef.getDownloadURL();
     this.messageModel = {
       fotoURL: this.currentUser.fotoURL,
@@ -169,11 +157,14 @@ export default class InputMessage extends Vue {
       usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
       contenido: this.fileURL,
       fecha: Date.now(),
-      isFile: true
+      isFile: true,
+      nombreArchivo: metaData.name,
+      contentType: metaData.contentType,
     };
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
     await this.sendMessage(this.messageModel);
+
     this.file = null;
   }
 
