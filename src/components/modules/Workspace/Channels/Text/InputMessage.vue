@@ -40,7 +40,7 @@
         class="chat-input"
         show-size
         counter
-        @click:append="uploadFile"
+        @click:append="uploadFileInput"
       ></v-file-input>
     </div>
   </div>
@@ -53,9 +53,10 @@ import { namespace } from "vuex-class";
 import { Workspace } from "@/models/workspace";
 import { User } from "@/models/user";
 import { VForm } from "@/utils/types";
-const Message = namespace("TextChannelModule");
 import { storage } from "@/utils/firebase";
 import { Maybe } from "graphql/jsutils/Maybe";
+const Message = namespace("TextChannelModule");
+import MessageService from "@/services/message.service";
 @Component
 export default class InputMessage extends Vue {
   @Prop({
@@ -79,6 +80,14 @@ export default class InputMessage extends Vue {
 
   @Message.Action
   setWorkspaceIDtoModule!: (id: string) => void;
+
+  @Message.Action
+  private uploadFile!: (data: {
+    workspaceID: string;
+    textChannelID: string;
+    message: Message;
+    file: File;
+  }) => Promise<void>;
 
   /**
    * Getter obtenido del @module Messages
@@ -137,25 +146,24 @@ export default class InputMessage extends Vue {
     this.file = e;
   }
 
-  async uploadFile() {
-    const storageRef = storage.ref();
-    const fileRef = storageRef.child(this.file!.name);
-    await fileRef.put(this.file!);
-    const metaData = await fileRef.getMetadata();
-    this.fileURL = await fileRef.getDownloadURL();
+  async uploadFileInput() {
     this.messageModel = {
       fotoURL: this.currentUser.fotoURL,
       uid_usuario: this.currentUser.uid!,
       usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
-      contenido: this.fileURL,
+      contenido: "",
       fecha: Date.now(),
       isFile: true,
-      nombreArchivo: metaData.name,
-      contentType: metaData.contentType
+      nombreArchivo: "",
+      contentType: ""
     };
-    this.setTextChannelIDtoModule(this.$route.params.id);
-    this.setWorkspaceIDtoModule(this.$route.params.idChannel);
-    await this.sendMessage(this.messageModel);
+
+    await this.uploadFile({
+      workspaceID: this.$route.params.id,
+      textChannelID: this.$route.params.idChannel,
+      message: this.messageModel,
+      file: this.file!
+    });
 
     this.file = null;
   }

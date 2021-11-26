@@ -42,7 +42,8 @@ class TextChannelModule extends VuexModule {
     messageEdited: false,
     messageDeleted: false,
     showSnackbar: false,
-    showSnackbarError: false
+    showSnackbarError: false,
+    isLoadingFile: false
   };
 
   @Mutation
@@ -113,6 +114,28 @@ class TextChannelModule extends VuexModule {
   @Mutation
   public setShowSnackBarMessageError(status: boolean): void {
     this.status.showSnackbarError = status;
+  }
+
+  @Mutation
+  public setLoadingFileStatus(state: boolean): void {
+    this.status.isLoadingFile = state;
+  }
+
+  @Action
+  public async uploadFile(data: {
+    workspaceID: string;
+    textChannelID: string;
+    message: Message;
+    file: File;
+  }): Promise<void> {
+    this.context.commit("setLoadingFileStatus", true);
+    await MessageService.sendMessageFile(
+      data.workspaceID,
+      data.textChannelID,
+      data.message,
+      data.file
+    );
+    this.context.commit("setLoadingFileStatus", false);
   }
 
   /**
@@ -266,6 +289,10 @@ class TextChannelModule extends VuexModule {
 
   get showSnackbar(): boolean {
     return this.status.showSnackbar;
+  }
+
+  get isLoadingFile(): boolean {
+    return this.status.isLoadingFile;
   }
 }
 

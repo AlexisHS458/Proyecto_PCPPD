@@ -84,6 +84,7 @@ const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 const Invitations = namespace("InvitationsModule");
 const Permissions = namespace("PermissionsModule");
+import MessageService from "@/services/message.service";
 @Component({
   components: {
     Snackbar,
@@ -231,7 +232,7 @@ export default class MessagesPage extends Vue {
         //Mostrar scroll inverso
         const vList = this.$refs.vList as any;
         vList.$el.scrollTop = vList.$el.scrollHeight;
-      }, 200);
+      }, 1000);
     });
   }
 }
@@ -294,4 +295,5 @@ export default class MessagesPage extends Vue {
 .display-footer {
   display: block;
 }
+
 </style>

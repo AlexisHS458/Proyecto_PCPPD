@@ -4,11 +4,7 @@
       <v-hover>
         <div class="discord-message" slot-scope="{ hover }">
           <div class="discord-author-avatar">
-            <img
-              :src="message.fotoURL"
-              :alt="message.usuarioNombre"
-              @error="imgError"
-            />
+            <img :src="message.fotoURL" :alt="message.usuarioNombre" @error="imgError" />
           </div>
           <div class="discord-message-content">
             <div class="div">
@@ -18,23 +14,87 @@
               <span class="discord-message-timestamp flex-shrink-0 flex-grow-1">
                 {{ formatDate(new Date(message.fecha)) }}
               </span>
-              <span
-                class="flex-shrink-1 flex-grow-0"
-                :class="{ hidden: !hover }"
-              >
+              <span class="flex-shrink-1 flex-grow-0" :class="{ hidden: !hover }">
                 <v-btn
                   icon
                   color="infoLight"
-                  @click.prevent="
-                    downloadFile(message.contenido, message.nombreArchivo)
-                  "
+                  @click.prevent="downloadFile(message.contenido, message.nombreArchivo)"
                 >
                   <v-icon small> mdi-cloud-download </v-icon>
                 </v-btn>
-                <!--   <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogEdit">
+            
+                <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialog">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      icon
+                      color="errorLight"
+                      v-bind="attrs"
+                      v-on="on"
+                      v-if="message.uid_usuario == currentUser.uid"
+                    >
+                      <v-icon color="error" small> mdi-delete </v-icon>
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <v-toolbar color="error" dark>
+                      Solicitud de confirmación
+                    </v-toolbar>
+                    <v-card-text>
+                      <div class="text-h6 pa-5 text-center">
+                        <p>¿SEGURO QUE DESEAS ELIMINAR ESTE MENSAJE?</p>
+                        <p>ESTA ACCION NO SE PUEDE DESAHACER</p>
+                      </div>
+                      <v-row align="center" justify="center">
+                        <v-btn color="error" @click="deleteMessages" :loading="loadingDelete">
+                          SI, QUIERO ELIMINARLO
+                        </v-btn>
+                      </v-row>
+                    </v-card-text>
+                    <v-card-actions class="justify-end">
+                      <v-btn text @click="dialog = false">Cerrar</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </span>
+            </div>
+            <div class="editable-text wrapper">
+              <template v-if="message.contentType.includes('image')">
+                <img class="iconImage" v-img :src="message.contenido" />
+              </template>
+              <template v-else>
+                <img class="icon" :src="previewType(message.contentType)" />
+                  <span class="discord-message-body" v-if="!status.isLoadingFile"
+                  >{{ message.nombreArchivo }}
+                </span> 
+                <v-skeleton-loader class="mx-auto" max-width="300" type="text"></v-skeleton-loader>
+              </template>
+            </div>
+          </div>
+        </div>
+      </v-hover>
+    </div>
+    <div v-else>
+      <v-hover>
+        <div class="discord-message" slot-scope="{ hover }">
+          <div class="discord-author-avatar">
+            <img :src="message.fotoURL" :alt="message.usuarioNombre" @error="imgError" />
+          </div>
+          <div class="discord-message-content">
+            <div class="div">
+              <author-info class="flex-shrink-1 flex-grow-0">
+                {{ message.usuarioNombre }}
+              </author-info>
+              <span class="discord-message-timestamp flex-shrink-0 flex-grow-1">
+                {{ formatDate(new Date(message.fecha)) }}
+             <span
+                v-if="message.uid_usuario == currentUser.uid"
+                class="flex-shrink-1 flex-grow-0"
+                :class="{ hidden: !hover }"
+              >
+                <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogEdit">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn icon color="infoLight" v-bind="attrs" v-on="on">
-                      <v-icon small> mdi-cloud-download </v-icon>
+                      <v-icon small> mdi-pencil </v-icon>
                     </v-btn>
                   </template>
                   <v-card>
@@ -72,147 +132,8 @@
                       <v-btn text @click="closeDialogEdit">Cancelar</v-btn>
                     </v-card-actions>
                   </v-card>
-                </v-dialog>-->
-                <v-dialog
-                  transition="dialog-top-transition"
-                  max-width="600"
-                  v-model="dialog"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      icon
-                      color="errorLight"
-                      v-bind="attrs"
-                      v-on="on"
-                      v-if="message.uid_usuario == currentUser.uid"
-                    >
-                      <v-icon color="error" small> mdi-delete </v-icon>
-                    </v-btn>
-                  </template>
-                  <v-card>
-                    <v-toolbar color="error" dark>
-                      Solicitud de confirmación
-                    </v-toolbar>
-                    <v-card-text>
-                      <div class="text-h6 pa-5 text-center">
-                        <p>¿SEGURO QUE DESEAS ELIMINAR ESTE MENSAJE?</p>
-                        <p>ESTA ACCION NO SE PUEDE DESAHACER</p>
-                      </div>
-                      <v-row align="center" justify="center">
-                        <v-btn
-                          color="error"
-                          @click="deleteMessages"
-                          :loading="loadingDelete"
-                        >
-                          SI, QUIERO ELIMINARLO
-                        </v-btn>
-                      </v-row>
-                    </v-card-text>
-                    <v-card-actions class="justify-end">
-                      <v-btn text @click="dialog = false">Cerrar</v-btn>
-                    </v-card-actions>
-                  </v-card>
                 </v-dialog>
-              </span>
-            </div>
-            <div class="editable-text wrapper">
-              <template v-if="message.contentType.includes('image')">
-                <img class="iconImage" v-img :src="message.contenido" />
-              </template>
-              <template v-else>
-                <img class="icon" :src="previewType(message.contentType)" />
-                <span class="discord-message-body"
-                  >{{ message.nombreArchivo }}
-                </span>
-              </template>
-            </div>
-          </div>
-        </div>
-      </v-hover>
-    </div>
-    <div v-else>
-      <v-hover>
-        <div class="discord-message" slot-scope="{ hover }">
-          <div class="discord-author-avatar">
-            <img
-              :src="message.fotoURL"
-              :alt="message.usuarioNombre"
-              @error="imgError"
-            />
-          </div>
-          <div class="discord-message-content">
-            <div class="div">
-              <author-info class="flex-shrink-1 flex-grow-0">
-                {{ message.usuarioNombre }}
-              </author-info>
-              <span class="discord-message-timestamp flex-shrink-0 flex-grow-1">
-                {{ formatDate(new Date(message.fecha)) }}
-              </span>
-              <span
-                v-if="message.uid_usuario == currentUser.uid"
-                class="flex-shrink-1 flex-grow-0"
-                :class="{ hidden: !hover }"
-              >
-                <v-dialog
-                  transition="dialog-top-transition"
-                  max-width="600"
-                  v-model="dialogEdit"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon color="infoLight" v-bind="attrs" v-on="on">
-                      <v-icon small> mdi-pencil </v-icon>
-                    </v-btn>
-                  </template>
-                  <v-card>
-                    <v-toolbar color="secondary" dark>
-                      Editar mensaje
-                    </v-toolbar>
-                    <v-card-text>
-                      <v-form
-                        ref="form"
-                        v-model="valid"
-                        lazy-validation
-                        @submit.prevent
-                      >
-                        <v-row align="center" justify="center" class="mt-6">
-                          <v-col cols="9">
-                            <v-textarea
-                              v-model.trim="text"
-                              label="Mensaje"
-                              :placeholder="message.contenido"
-                              class="chat-input"
-                              outlined
-                              dense
-                              counter
-                              color="primary"
-                              prepend-inner-icon="mdi-message"
-                              :rules="[rules.required]"
-                              @keydown="inputHandler"
-                              autocomplete="off"
-                              maxlength="500"
-                              no-resize
-                            ></v-textarea>
-                          </v-col>
-                        </v-row>
-                      </v-form>
-                    </v-card-text>
-                    <v-card-actions class="justify-end">
-                      <v-btn
-                        color="success"
-                        @click="editMessages"
-                        :loading="loadingEdit"
-                      >
-                        Guardar cambios
-                      </v-btn>
-                      <v-btn text @click="closeDialogEdit">Cancelar</v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
-                <v-dialog
-                  transition="dialog-top-transition"
-                  max-width="600"
-                  v-model="dialog"
-                >
+                <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialog">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn icon color="errorLight" v-bind="attrs" v-on="on">
                       <v-icon color="error" small> mdi-delete </v-icon>
@@ -228,11 +149,7 @@
                         <p>ESTA ACCION NO SE PUEDE DESAHACER</p>
                       </div>
                       <v-row align="center" justify="center">
-                        <v-btn
-                          color="error"
-                          @click="deleteMessages"
-                          :loading="loadingDelete"
-                        >
+                        <v-btn color="error" @click="deleteMessages" :loading="loadingDelete">
                           SI, QUIERO ELIMINARLO
                         </v-btn>
                       </v-row>
@@ -280,23 +197,23 @@ const now = new Date();
 
 @Component({
   components: {
-    AuthorInfo,
-  },
+    AuthorInfo
+  }
 })
 export default class Messages extends Vue {
   @Prop({
     required: false,
-    default: "User",
+    default: "User"
   })
   public author!: string;
 
   @Prop({
-    required: false,
+    required: false
   })
   public avatar!: string;
 
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -304,17 +221,17 @@ export default class Messages extends Vue {
     type: [Date, String],
     required: false,
     default: () => now,
-    validator: validators.dates.validator,
+    validator: validators.dates.validator
   })
   public timestamp!: string;
 
   @Prop({
-    required: false,
+    required: false
   })
   public profile!: string;
 
   @Prop({
-    required: true,
+    required: true
   })
   public message!: Message;
 
@@ -342,7 +259,7 @@ export default class Messages extends Vue {
   public loadingDelete = false;
   public valid = false;
   public rules = {
-    required: (v: string): string | boolean => !!v || "Campo requerido",
+    required: (v: string): string | boolean => !!v || "Campo requerido"
   };
 
   /**
@@ -383,22 +300,48 @@ export default class Messages extends Vue {
   }
 
   async downloadFile(url: string, name: string) {
-    console.log(url);
+    const resumeRef = storage.refFromURL(url);
+    resumeRef
+      .getDownloadURL()
+      .then(url => {
+        // `url` is the download URL
+        console.log(url);
+        // This can be downloaded directly:
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = "blob";
+        xhr.onload = function() {
+          const blob = xhr.response;
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = name;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        };
+        xhr.open("GET", url);
+        xhr.send();
+      })
+      .catch(error => {
+        // Handle any errors
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
 
-    const storageRef = storage.ref();
-    const fileRef = await storageRef.child(name).getDownloadURL();
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
 
-    URL.createObjectURL;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
 
-    const a = Object.assign(document.createElement("a"), {
-      href: "",
-      download: fileRef,
-      name: name,
-      url: fileRef,
-    });
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+          default:
+            break;
+        }
+      });
   }
 
   /**
@@ -536,15 +479,11 @@ export default class Messages extends Vue {
 
 .discord-light-theme .discord-message .discord-message-timestamp,
 .discord-compact-mode .discord-message:hover .discord-message-timestamp,
-.discord-compact-mode.discord-light-theme
-  .discord-message:hover
-  .discord-message-timestamp {
+.discord-compact-mode.discord-light-theme .discord-message:hover .discord-message-timestamp {
   color: #99aab5;
 }
 
-.discord-compact-mode.discord-light-theme
-  .discord-message
-  .discord-message-timestamp {
+.discord-compact-mode.discord-light-theme .discord-message .discord-message-timestamp {
   color: #d1d9de;
 }
 
