@@ -43,7 +43,6 @@ class TextChannelModule extends VuexModule {
     messageDeleted: false,
     showSnackbar: false,
     showSnackbarError: false,
-    isLoadingFile: false
   };
 
   @Mutation
@@ -116,27 +115,6 @@ class TextChannelModule extends VuexModule {
     this.status.showSnackbarError = status;
   }
 
-  @Mutation
-  public setLoadingFileStatus(state: boolean): void {
-    this.status.isLoadingFile = state;
-  }
-
-  @Action
-  public async uploadFile(data: {
-    workspaceID: string;
-    textChannelID: string;
-    message: Message;
-    file: File;
-  }): Promise<void> {
-    this.context.commit("setLoadingFileStatus", true);
-    await MessageService.sendMessageFile(
-      data.workspaceID,
-      data.textChannelID,
-      data.message,
-      data.file
-    );
-    this.context.commit("setLoadingFileStatus", false);
-  }
 
   /**
    * Coloca el ID del espacio de trabajo
@@ -197,8 +175,8 @@ class TextChannelModule extends VuexModule {
    * @param id  del documento a eliminar
    */
   @Action
-  async deleteMessage(id: string | undefined): Promise<void> {
-    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, id)
+  async deleteMessage(message: Message): Promise<void> {
+    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, message)
       .then(() => {
         this.context.commit("messageDeletedSuccess");
         this.context.commit("setSnackBarMessage", "Mensaje eliminado correctamente");
@@ -291,9 +269,7 @@ class TextChannelModule extends VuexModule {
     return this.status.showSnackbar;
   }
 
-  get isLoadingFile(): boolean {
-    return this.status.isLoadingFile;
-  }
+
 }
 
 export default TextChannelModule;

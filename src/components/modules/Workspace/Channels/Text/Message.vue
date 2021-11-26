@@ -22,7 +22,7 @@
                 >
                   <v-icon small> mdi-cloud-download </v-icon>
                 </v-btn>
-            
+
                 <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialog">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
@@ -41,7 +41,7 @@
                     </v-toolbar>
                     <v-card-text>
                       <div class="text-h6 pa-5 text-center">
-                        <p>¿SEGURO QUE DESEAS ELIMINAR ESTE MENSAJE?</p>
+                        <p>¿SEGURO QUE DESEAS ELIMINAR ESTE ARCHIVO?</p>
                         <p>ESTA ACCION NO SE PUEDE DESAHACER</p>
                       </div>
                       <v-row align="center" justify="center">
@@ -63,10 +63,13 @@
               </template>
               <template v-else>
                 <img class="icon" :src="previewType(message.contentType)" />
-                  <span class="discord-message-body" v-if="!status.isLoadingFile"
-                  >{{ message.nombreArchivo }}
-                </span> 
-                <v-skeleton-loader class="mx-auto" max-width="300" type="text"></v-skeleton-loader>
+                <span class="discord-message-body">{{ message.nombreArchivo }} </span>
+                <!--  <v-skeleton-loader
+                  v-else
+                  type="text"
+                  min-height="70"
+                  min-width="250"
+                ></v-skeleton-loader>-->
               </template>
             </div>
           </div>
@@ -86,7 +89,8 @@
               </author-info>
               <span class="discord-message-timestamp flex-shrink-0 flex-grow-1">
                 {{ formatDate(new Date(message.fecha)) }}
-             <span
+              </span>
+              <span
                 v-if="message.uid_usuario == currentUser.uid"
                 class="flex-shrink-1 flex-grow-0"
                 :class="{ hidden: !hover }"
@@ -242,7 +246,7 @@ export default class Messages extends Vue {
   private editMessage!: (message: Message) => Promise<void>;
 
   @optionsMessage.Action
-  private deleteMessage!: (id: string | undefined) => Promise<void>;
+  private deleteMessage!: (message: Message) => Promise<void>;
 
   /**
    * Estado obtenido del @module Messages
@@ -289,7 +293,7 @@ export default class Messages extends Vue {
    */
   async deleteMessages() {
     this.loadingDelete = true;
-    await this.deleteMessage(this.message.uid);
+    await this.deleteMessage(this.message);
     if (this.status.showSnackbar && !this.status.showSnackbarError) {
       this.loadingDelete = false;
       this.dialog = false;
@@ -305,7 +309,7 @@ export default class Messages extends Vue {
       .getDownloadURL()
       .then(url => {
         // `url` is the download URL
-        console.log(url);
+
         // This can be downloaded directly:
         const xhr = new XMLHttpRequest();
         xhr.responseType = "blob";

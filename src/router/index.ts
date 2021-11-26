@@ -50,11 +50,6 @@ const routes: Array<RouteConfig> = [
     path: "/space/:id",
     name: "Space",
     component: Workspace /* { default: Workspace, Navigation: NavigationDrawer } */,
-    beforeEnter: async (to, from, next) => {
-      await store.dispatch("UserModule/fetchCurrentUser");
-      const currentUser = store.getters["UserModule/getUser"];
-      next();
-    },
     meta: {
       requiresAuth: true
     },
@@ -123,28 +118,22 @@ router.beforeEach((to, from, next) => {
   store.commit("CodeChannelModule/setShowDialogState", codeChanged);
 });
 
-router.beforeEach(
-  /* async */ (to, from, next) => {
-    const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
-    /*   await store.dispatch("UserModule/fetchCurrentUser");
-  const currentUser = store.getters["UserModule/getUser"]; */
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
+  // await store.dispatch("UserModule/fetchCurrentUser");
+  // const currentUser = store.getters["UserModule/getUser"];
 
-    /*  if (!currentUser && requiresAuth) {
-    next({ name: "Home" });
-  } else if (!requiresAuth && currentUser) {
-    next("/Mainscreen");
-  } else if (!requiresAuth && !currentUser) next();
-  else next(); */
-
-    auth.onAuthStateChanged(user => {
-      if (!user && requiresAuth) {
-        next({ name: "Home" });
-      } else if (!requiresAuth && user) {
-        next("/Mainscreen");
-      } else if (!requiresAuth && !user) next();
-      else next();
-    });
-  }
-);
+  auth.onAuthStateChanged(user => {
+    if (!user && requiresAuth) {
+      next({ name: "Home" });
+    } else if (!requiresAuth && user) {
+      next("/Mainscreen");
+    } else if (!requiresAuth && !user) {
+      next();
+    }
+    // else if()
+    else next();
+  });
+});
 
 export default router;

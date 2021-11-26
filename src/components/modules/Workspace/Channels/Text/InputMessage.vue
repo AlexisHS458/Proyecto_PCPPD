@@ -81,14 +81,6 @@ export default class InputMessage extends Vue {
   @Message.Action
   setWorkspaceIDtoModule!: (id: string) => void;
 
-  @Message.Action
-  private uploadFile!: (data: {
-    workspaceID: string;
-    textChannelID: string;
-    message: Message;
-    file: File;
-  }) => Promise<void>;
-
   /**
    * Getter obtenido del @module Messages
    */
@@ -158,12 +150,12 @@ export default class InputMessage extends Vue {
       contentType: ""
     };
 
-    await this.uploadFile({
-      workspaceID: this.$route.params.id,
-      textChannelID: this.$route.params.idChannel,
-      message: this.messageModel,
-      file: this.file!
-    });
+    MessageService.sendMessageFile(
+      this.$route.params.id,
+      this.$route.params.idChannel,
+      this.messageModel,
+      this.file!
+    );
 
     this.file = null;
   }

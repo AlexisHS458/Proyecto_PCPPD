@@ -70,12 +70,12 @@ class MessageService {
         const metaData = await fileRef.getMetadata();
         const fileURL = await fileRef.getDownloadURL();
 
-        message.nombreArchivo = metaData.name;
+        message.nombreArchivo = file.name;
         message.contentType = metaData.contentType;
         message.contenido = fileURL;
         message.uid = data.id
 
-        console.log(message);
+       
         
 
         await this.editMessage(workspaceID, textChannelID, message);
@@ -93,7 +93,7 @@ class MessageService {
    * @param message Mensaje a enviar al canal de texto
    */
   async editMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
-    console.log("entre");
+
 
     await db
       .collection(Collection.WORK_SPACE)
@@ -114,7 +114,7 @@ class MessageService {
   async deleteMessage(
     workspaceID: string,
     textChannelID: string,
-    messageID: string | undefined
+    message: Message
   ): Promise<void> {
     await db
       .collection(Collection.WORK_SPACE)
@@ -122,8 +122,14 @@ class MessageService {
       .collection(Collection.TEXT_CHANNEL)
       .doc(textChannelID)
       .collection(Collection.MESSAGES)
-      .doc(messageID)
+      .doc(message.uid)
       .delete();
+
+    if(message.isFile){
+      const storageRef = storage.ref();
+      const fileRef = storageRef.child(message.uid!)
+      await fileRef.delete()
+    }
   }
 
   /**
