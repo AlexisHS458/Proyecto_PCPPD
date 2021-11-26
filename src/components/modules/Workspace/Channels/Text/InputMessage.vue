@@ -23,11 +23,7 @@
           @click:append="sendMessages"
         >
           <template v-slot:prepend-inner>
-            <v-file-input
-              accept="image/*"
-              hide-input
-              @change="onFileChanged($event)"
-            ></v-file-input>
+            <v-file-input hide-input @change="onFileChanged($event)"></v-file-input>
           </template>
         </v-textarea>
       </v-form>
@@ -63,12 +59,12 @@ import { Maybe } from "graphql/jsutils/Maybe";
 @Component
 export default class InputMessage extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public workspace!: Workspace;
 
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -102,7 +98,7 @@ export default class InputMessage extends Vue {
   public selectedFile = "";
   public rules = {
     size: (v: string): string | boolean =>
-      v.length <= 500 || "Haz alcanzado el límite de caracteres",
+      v.length <= 500 || "Haz alcanzado el límite de caracteres"
   };
   public valid = true;
   public file: Maybe<File> = null;
@@ -112,19 +108,15 @@ export default class InputMessage extends Vue {
    * Mandar mensaje al canal de texto seleccionado
    */
   async sendMessages() {
-    if (
-      this.message &&
-      this.message.length > 0 /* &&
-      !/^\s*$/.test(this.message) */
-    ) {
+    if (this.message && this.message.length > 0 /* &&
+      !/^\s*$/.test(this.message) */) {
       this.messageModel = {
         fotoURL: this.currentUser.fotoURL,
         uid_usuario: this.currentUser.uid!,
-        usuarioNombre:
-          this.currentUser.nombre + " " + this.currentUser.apellido,
+        usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
         contenido: this.message,
         fecha: Date.now(),
-        isFile: false,
+        isFile: false
       };
       this.setTextChannelIDtoModule(this.$route.params.id);
       this.setWorkspaceIDtoModule(this.$route.params.idChannel);
@@ -159,7 +151,7 @@ export default class InputMessage extends Vue {
       fecha: Date.now(),
       isFile: true,
       nombreArchivo: metaData.name,
-      contentType: metaData.contentType,
+      contentType: metaData.contentType
     };
     this.setTextChannelIDtoModule(this.$route.params.id);
     this.setWorkspaceIDtoModule(this.$route.params.idChannel);
