@@ -1,6 +1,7 @@
 import { db } from "@/utils/firebase";
 import { Message } from "@/models/message";
 import { Collection } from "@/utils/collections";
+import { storage } from "@/utils/firebase";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
@@ -26,7 +27,61 @@ class MessageService {
         .doc(textChannelID)
         .collection(Collection.MESSAGES)
         .add(message)
-    ).get();
+    )
+      .get()
+      .then(data => {
+        data.id;
+
+        return data;
+      });
+
+    return <Message>(await messageRef).data();
+  }
+
+  /**
+   * Agrega un nuevo mensaje de archivo
+   * @param workspaceID ID del espacio de trabajo correspondiente
+   * @param textChannelID ID del canal de texto
+   * @param message Mensaje a enviar al canal de texto
+   * @param file Archivo a enviar
+   * @returns Message. Referencia del mensaje creado.
+   */
+  async sendMessageFile(
+    workspaceID: string,
+    textChannelID: string,
+    message: Message,
+    file: File
+  ): Promise<Message> {
+    const messageRef = (
+      await db
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceID)
+        .collection(Collection.TEXT_CHANNEL)
+        .doc(textChannelID)
+        .collection(Collection.MESSAGES)
+        .add(message)
+    )
+      .get()
+      .then(async data => {
+        const message = <Message>(data).data();
+        const storageRef = storage.ref();
+        const fileRef = storageRef.child(data.id);
+        await fileRef.put(file);
+        const metaData = await fileRef.getMetadata();
+        const fileURL = await fileRef.getDownloadURL();
+
+        message.nombreArchivo = file.name;
+        message.contentType = metaData.contentType;
+        message.contenido = fileURL;
+        message.uid = data.id
+
+       
+        
+
+        await this.editMessage(workspaceID, textChannelID, message);
+
+        return data;
+      });
 
     return <Message>(await messageRef).data();
   }
@@ -38,6 +93,8 @@ class MessageService {
    * @param message Mensaje a enviar al canal de texto
    */
   async editMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
+
+
     await db
       .collection(Collection.WORK_SPACE)
       .doc(workspaceID)
@@ -57,7 +114,7 @@ class MessageService {
   async deleteMessage(
     workspaceID: string,
     textChannelID: string,
-    messageID: string | undefined
+    message: Message
   ): Promise<void> {
     await db
       .collection(Collection.WORK_SPACE)
@@ -65,8 +122,14 @@ class MessageService {
       .collection(Collection.TEXT_CHANNEL)
       .doc(textChannelID)
       .collection(Collection.MESSAGES)
-      .doc(messageID)
+      .doc(message.uid)
       .delete();
+
+    if(message.isFile){
+      const storageRef = storage.ref();
+      const fileRef = storageRef.child(message.uid!)
+      await fileRef.delete()
+    }
   }
 
   /**

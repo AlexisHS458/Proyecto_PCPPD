@@ -42,7 +42,7 @@ class TextChannelModule extends VuexModule {
     messageEdited: false,
     messageDeleted: false,
     showSnackbar: false,
-    showSnackbarError: false
+    showSnackbarError: false,
   };
 
   @Mutation
@@ -115,6 +115,7 @@ class TextChannelModule extends VuexModule {
     this.status.showSnackbarError = status;
   }
 
+
   /**
    * Coloca el ID del espacio de trabajo
    * @param id ID del workspase
@@ -174,8 +175,8 @@ class TextChannelModule extends VuexModule {
    * @param id  del documento a eliminar
    */
   @Action
-  async deleteMessage(id: string | undefined): Promise<void> {
-    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, id)
+  async deleteMessage(message: Message): Promise<void> {
+    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, message)
       .then(() => {
         this.context.commit("messageDeletedSuccess");
         this.context.commit("setSnackBarMessage", "Mensaje eliminado correctamente");
@@ -267,6 +268,8 @@ class TextChannelModule extends VuexModule {
   get showSnackbar(): boolean {
     return this.status.showSnackbar;
   }
+
+
 }
 
 export default TextChannelModule;

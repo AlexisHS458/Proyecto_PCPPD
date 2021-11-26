@@ -9,14 +9,7 @@
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
             </v-col>
-            <v-col
-              cols="12"
-              lg="7"
-              md="12"
-              sm="12"
-              xl="7"
-              class="d-flex align-center"
-            >
+            <v-col cols="12" lg="7" md="12" sm="12" xl="7" class="d-flex align-center">
               <v-card-text align="center">
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-img
@@ -54,7 +47,7 @@
                         rules.required,
                         rules.regexBoleta,
                         rules.caracteres,
-                        rules.caracteresMayor,
+                        rules.caracteresMayor
                       ]"
                       outlined
                       dense
@@ -79,12 +72,7 @@
               <v-snackbar v-model="snackbar" :timeout="timeout" color="error">
                 {{ text }}
                 <template v-slot:action="{ attrs }">
-                  <v-btn
-                    color="white"
-                    text
-                    v-bind="attrs"
-                    @click="snackbar = false"
-                  >
+                  <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
                     Cerrar
                   </v-btn>
                 </template>
@@ -92,23 +80,11 @@
             </v-col>
 
             <v-col cols="5" class="hidden-md-and-down">
-              <v-img
-                :src="require('@/assets/background.jpg')"
-                height="600"
-                width="100%"
-              >
-                <p
-                  class="text-h4 white--text text-center margin-p"
-                  align="center"
-                  justify="center"
-                >
+              <v-img :src="require('@/assets/background.jpg')" height="600" width="100%">
+                <p class="text-h4 white--text text-center margin-p" align="center" justify="center">
                   Regístrate a <strong>Kun</strong>
                 </p>
-                <p
-                  class="text-h5 white--text text-center"
-                  align="center"
-                  justify="center"
-                >
+                <p class="text-h5 white--text text-center" align="center" justify="center">
                   Completa tus datos para terminar tu registro
                 </p>
               </v-img>
@@ -192,21 +168,16 @@ export default class Register extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regex: (v: string): string | boolean =>
-      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
-        v
-      ) || "Nombre inválido",
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(v) ||
+      "Nombre inválido",
     regexLastName: (v: string): string | boolean =>
-      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(
-        v
-      ) || "Apellido inválido",
-    regexBoleta: (v: string): string | boolean =>
-      /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválida",
+      /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s[a-zA-ZÀ-ÿ\u00f1\u00d1])*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/.test(v) ||
+      "Apellido inválido",
+    regexBoleta: (v: string): string | boolean => /^[a-zA-Z0-9]+$/.test(v) || "Boleta inválida",
     caracteres: (v: string): string | boolean =>
-      (v || "").length >= 6 ||
-      "Este campo no puede tener menor de 6 caracteres",
+      (v || "").length >= 6 || "Este campo no puede tener menor de 6 caracteres",
     caracteresMayor: (v: string): string | boolean =>
-      (v || "").length <= 15 ||
-      "Este campo no puede tener más de 15 caracteres",
+      (v || "").length <= 15 || "Este campo no puede tener más de 15 caracteres"
   };
 
   async created(): Promise<void> {
@@ -214,9 +185,9 @@ export default class Register extends Vue {
     //Se obtiene información del usuario.
     await this.fetchCurrentUser();
     //Si el usuario ya esta regsitrado será redireccionado a la pantalla principal
-    if (this.isLoggedIn) {
+    /*   if (this.isLoggedIn) {
       this.$router.push("/Mainscreen");
-    }
+    } */
   }
 
   /**
@@ -229,9 +200,7 @@ export default class Register extends Vue {
       this.loading = true;
       this.snackbar = false;
       await this.fetchAllUsers();
-      if (
-        !this.allUsers.find((user) => user.boleta === this.currentUser.boleta)
-      ) {
+      if (!this.allUsers.find(user => user.boleta === this.currentUser.boleta)) {
         await this.saveUser(this.currentUser);
         if (this.isLoggedIn) {
           this.loading = false;
@@ -254,7 +223,7 @@ export default class Register extends Vue {
 }
 </script>
 
-<style scoped >
+<style scoped>
 .img {
   border-radius: 25px;
 }

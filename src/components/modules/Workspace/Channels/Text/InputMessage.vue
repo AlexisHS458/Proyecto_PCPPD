@@ -23,11 +23,7 @@
           @click:append="sendMessages"
         >
           <template v-slot:prepend-inner>
-            <v-file-input
-              accept="image/*"
-              hide-input
-              @change="onFileChanged($event)"
-            ></v-file-input>
+            <v-file-input hide-input @change="onFileChanged($event)"></v-file-input>
           </template>
         </v-textarea>
       </v-form>
@@ -44,7 +40,7 @@
         class="chat-input"
         show-size
         counter
-        @click:append="uploadFile"
+        @click:append="uploadFileInput"
       ></v-file-input>
     </div>
   </div>
@@ -57,36 +53,21 @@ import { namespace } from "vuex-class";
 import { Workspace } from "@/models/workspace";
 import { User } from "@/models/user";
 import { VForm } from "@/utils/types";
-const Message = namespace("TextChannelModule");
 import { storage } from "@/utils/firebase";
 import { Maybe } from "graphql/jsutils/Maybe";
+const Message = namespace("TextChannelModule");
+import MessageService from "@/services/message.service";
 @Component
 export default class InputMessage extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public workspace!: Workspace;
 
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
-
-  /*   onButtonClick() {
-    this.isSelecting = true;
-    window.addEventListener(
-      "focus",
-      () => {
-        this.isSelecting = false;
-      },
-      { once: true }
-    );
-    (this.$refs.uploader as HTMLElement).click();
-  }
-
-  onFileChanged(e: any) {
-    this.selectedFile = e.target.files[0];
-  } */
 
   /**
    * Acciones obtenidas del @module Messages
@@ -118,27 +99,25 @@ export default class InputMessage extends Vue {
   public selectedFile = "";
   public rules = {
     size: (v: string): string | boolean =>
-      v.length <= 500 || "Haz alcanzado el límite de caracteres",
+      v.length <= 500 || "Haz alcanzado el límite de caracteres"
   };
   public valid = true;
   public file: Maybe<File> = null;
   public imageURL = null;
+  public fileURL = "";
   /**
    * Mandar mensaje al canal de texto seleccionado
    */
   async sendMessages() {
-    if (
-      this.message &&
-      this.message.length > 0 /* &&
-      !/^\s*$/.test(this.message) */
-    ) {
+    if (this.message && this.message.length > 0 /* &&
+      !/^\s*$/.test(this.message) */) {
       this.messageModel = {
         fotoURL: this.currentUser.fotoURL,
         uid_usuario: this.currentUser.uid!,
-        usuarioNombre:
-          this.currentUser.nombre + " " + this.currentUser.apellido,
+        usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
         contenido: this.message,
         fecha: Date.now(),
+        isFile: false
       };
       this.setTextChannelIDtoModule(this.$route.params.id);
       this.setWorkspaceIDtoModule(this.$route.params.idChannel);
@@ -159,23 +138,31 @@ export default class InputMessage extends Vue {
     this.file = e;
   }
 
-  async uploadFile() {
-    const storageRef = storage.ref();
-    const fileRef = storageRef.child(this.file!.name);
-    await fileRef.put(this.file!);
+  async uploadFileInput() {
+    this.messageModel = {
+      fotoURL: this.currentUser.fotoURL,
+      uid_usuario: this.currentUser.uid!,
+      usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
+      contenido: "",
+      fecha: Date.now(),
+      isFile: true,
+      nombreArchivo: "",
+      contentType: ""
+    };
+
+    MessageService.sendMessageFile(
+      this.$route.params.id,
+      this.$route.params.idChannel,
+      this.messageModel,
+      this.file!
+    );
+
     this.file = null;
   }
 
   destroyed() {
     this.message = "";
   }
-
-  /*   preventEnter(event: KeyboardEvent) {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      return false;
-    }
-  } */
 }
 </script>
 
