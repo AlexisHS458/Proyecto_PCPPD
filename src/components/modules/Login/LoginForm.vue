@@ -71,6 +71,7 @@ export default class LoginForm extends Vue {
         provider: firebase.auth.GithubAuthProvider.PROVIDER_ID,
         scopes:["repo"]
       }],
+      //signInFlow: "popup",
       callbacks: {
         signInSuccessWithAuthResult: function (result,redirect){          
            localStorage.setItem('github-token',result.credential.accessToken);
