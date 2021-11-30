@@ -8,7 +8,7 @@ import WorkspaceService from "./work_space.service";
  * Conexión a servicios de información de los espacios de trabajo.
  */
 class MessageService {
-  public MAX_SIZE = 1000000; // 150000000
+  public MAX_SIZE = 150000000;
   /**
    * Agrega un nuevo mensaje
    * @param workspaceID ID del espacio de trabajo correspondiente
@@ -130,7 +130,9 @@ class MessageService {
     if (message.isFile) {
       const storageRef = storage.ref();
       const fileRef = storageRef.child(message.uid!);
+      const fileMeta = await fileRef.getMetadata();
       await fileRef.delete();
+      WorkspaceService.updateWorkspaceStorage(workspaceID, true, -fileMeta.size);
     }
   }
 
