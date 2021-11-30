@@ -88,7 +88,9 @@ class MessageService {
         });
       return <Message>(await messageRef).data();
     } else {
-      throw new Error("No hay mas almacenamiento");
+      throw new Error(
+        "Lo sentimos. El espacio de trabajo ha llegado al máximo de almacenamiento permitido (150 MB). Borra algunos archivos para poder continuar."
+      );
     }
   }
 

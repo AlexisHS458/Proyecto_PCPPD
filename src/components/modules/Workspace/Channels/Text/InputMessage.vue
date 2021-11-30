@@ -73,6 +73,26 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
+      v-model="dialogNoSize"
+      persistent
+    >
+      <v-card>
+        <v-toolbar color="error" dark class="d-flex justify-center">
+          <v-toolbar-title class="flex text-center">¡AVISO!</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+          <div class="text-h6 pa-5 text-center">
+            <p>{{ messageAlert }}</p>
+          </div>
+        </v-card-text>
+        <v-card-actions class="justify-end">
+          <v-btn text @click="dialogNoSize = false"> Cerrar </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -136,6 +156,8 @@ export default class InputMessage extends Vue {
   public imageURL = null;
   public fileURL = "";
   public dialog = false;
+  public dialogNoSize = false;
+  public messageAlert = "";
 
   /**
    * Mandar mensaje al canal de texto seleccionado
@@ -196,7 +218,10 @@ export default class InputMessage extends Vue {
         this.$route.params.idChannel,
         this.messageModel,
         this.file!
-      );
+      ).catch((e: Error) => {
+        this.dialogNoSize = true;
+        this.messageAlert = e.message;
+      });
       this.isSelecting = false;
       this.file = null;
     } else {
