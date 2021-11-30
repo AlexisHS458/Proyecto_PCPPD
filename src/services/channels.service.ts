@@ -73,15 +73,33 @@ class ChannelsService {
               ...doc.data(),
               uid: doc.id
             } as TextChannel;
-            if(textChannel.permisos.length === 0){
-              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
-                PermissionsService.AddPermission(workSpaceID,textChannel.uid!, value.usuarios[0])
+            if (textChannel.permisos.length === 0) {
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then(value => {
+                PermissionsService.AddPermission(workSpaceID, textChannel.uid!, value.usuarios[0]);
               });
             }
             return textChannel;
           })
         );
       });
+  }
+
+  async getFirstTextChannelID(workspaceID: string): Promise<string> {
+    console.log("entro");
+
+    const snapshot = await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceID)
+      .collection(Collection.TEXT_CHANNEL)
+      .get();
+
+    let channelId = ""
+    snapshot.forEach(doc => {
+      channelId = doc.id  
+    });
+
+    return channelId;
+    
   }
 
   /**
@@ -144,9 +162,13 @@ class ChannelsService {
               ...doc.data(),
               uid: doc.id
             } as VoiceChannel;
-            if(voiceChannel.permisos.length === 0){
-              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
-                PermissionsService.AddVoicePermission(workSpaceID,voiceChannel.uid!, value.usuarios[0])
+            if (voiceChannel.permisos.length === 0) {
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then(value => {
+                PermissionsService.AddVoicePermission(
+                  workSpaceID,
+                  voiceChannel.uid!,
+                  value.usuarios[0]
+                );
               });
             }
             return voiceChannel;
@@ -215,9 +237,13 @@ class ChannelsService {
               ...doc.data(),
               uid: doc.id
             } as CodeChannel;
-            if(codeChannel.permisos.length === 0){
-              WorkspaceService.getWorkspaceInfo(workSpaceID).then( value => {                
-                PermissionsService.AddCodePermission(workSpaceID,codeChannel.uid!, value.usuarios[0])
+            if (codeChannel.permisos.length === 0) {
+              WorkspaceService.getWorkspaceInfo(workSpaceID).then(value => {
+                PermissionsService.AddCodePermission(
+                  workSpaceID,
+                  codeChannel.uid!,
+                  value.usuarios[0]
+                );
               });
             }
             return <CodeChannel>codeChannel;
