@@ -19,6 +19,8 @@ class CodeChannelModule extends VuexModule {
 
   public codeData: Maybe<TreeEntry> = null;
 
+  public treeEntry: Maybe<TreeEntry[] | undefined> = null;
+
   public codeFilePath = "";
 
   public branchOid = "";
@@ -150,6 +152,15 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public clearCodePath(): void {
     this.codeFilePath = "";
+  }
+
+  @Mutation
+  public setTreeEntryState(tree: TreeEntry[]): void {
+    this.treeEntry = tree;
+  }
+
+  setTreeEntry(tree: TreeEntry[]): void {
+    this.context.commit("setTreeEntryState", tree);
   }
 
   @Action

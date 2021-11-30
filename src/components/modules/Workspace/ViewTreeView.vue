@@ -8,6 +8,42 @@
       <v-toolbar-title class="grey--text text--darken-4 font">
         {{ codePath.length > 0 ? codePath[codePath.length - 1].nombre : nameCodeChannel }}
       </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogNewFile">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on">
+            <v-icon>mdi-file-plus</v-icon>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-toolbar color="secondary" dark>
+            Nuevo archivo
+          </v-toolbar>
+          <v-card-text>
+            <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+              <v-row align="center" justify="center" class="mt-6">
+                <v-col cols="9">
+                  <v-text-field
+                    label="Ingresa el nombre del archivo con extensiòn"
+                    outlined
+                    dense
+                    color="primary"
+                    prepend-inner-icon="mdi-file"
+                    @keydown.esc="closeDialogNewFile"
+                    v-model="nameFile"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn color="success" @click="addFile" :loading="loadingNewFile">
+              Crear
+            </v-btn>
+            <v-btn text @click="closeDialogNewFile">Cancelar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-toolbar>
     <v-list dark>
       <v-list-item
@@ -34,9 +70,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { CodePath } from "@/models/codePath";
-import { Maybe, Tree, TreeEntry, Blob } from "@/generated/graphql";
+import { Maybe, Tree, TreeEntry, Blob, Repository, Commit } from "@/generated/graphql";
 import { namespace } from "vuex-class";
 const CodeChannelModule = namespace("CodeChannelModule");
 const User = namespace("UserModule");
@@ -47,7 +83,11 @@ import { ChannelType } from "@/utils/channels_types";
 import ServiceChannels from "@/services/channels.service";
 import CodeService from "@/services/code_channel.service";
 import * as monaco from "monaco-editor";
+import GitHubService from "@/services/github.service";
 import CryptoJS from "crypto-js";
+const WorkspaceModule = namespace("WorkspaceModule");
+import { VForm } from "@/utils/types";
+import { CodeChannel } from "@/models/codeChannel";
 @Component
 export default class ViewTreeView extends Vue {
   @Prop({
@@ -90,11 +130,34 @@ export default class ViewTreeView extends Vue {
   private codePath!: CodePath[];
 
   @CodeChannelModule.State("codeFilePath")
-  private codeFilePath!:string;
+  private codeFilePath!: string;
+
+  @CodeChannelModule.State("repository")
+  private repository!: Maybe<Repository>;
+
+  @CodeChannelModule.State("branchOid")
+  private branchOid!: string;
+
+  @CodeChannelModule.Action("setBranchOid")
+  private setBranchOid!: (ref: any) => void;
+
+  @CodeChannelModule.Action("setRepository")
+  private setRepository!: (repo: Repository) => void;
+
+  @WorkspaceModule.State("codeChannels")
+  public codeChannels!: CodeChannel[];
 
   public nameCodeChannel = "";
 
   public serverHash: string | undefined;
+  public dialogNewFile = false;
+  public valid = false;
+  public loadingNewFile = false;
+  public nameFile = "";
+
+  public treeEntriess: Maybe<TreeEntry[]> | undefined = null;
+
+  @Ref("form") readonly form!: VForm;
 
   getColor(extensionFile: string): string {
     return Colors.toColor(StringUtils.getHashCode(extensionFile));
@@ -110,6 +173,39 @@ export default class ViewTreeView extends Vue {
 
   mounted() {
     this.nameCode();
+  }
+
+  async addFile() {
+    this.loadingNewFile = true;
+    let prefix = "";
+    if (this.codePath.length > 0) {
+      prefix = this.codePath.map(path => path.nombre).join("/") + "/";
+    }
+    const response = await GitHubService.makeCommit({
+      branch: {
+        repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+        branchName: this.repository?.defaultBranchRef?.name
+      },
+      fileChanges: {
+        additions: [
+          {
+            path: prefix + this.nameFile,
+            contents: ""
+          }
+        ]
+      },
+      message: { headline: "Creaciòn de archivo " + this.nameFile, body: "" },
+      expectedHeadOid: this.branchOid
+    });
+
+    this.setBranchOid(response.ref);
+
+    //  monaco.editor.getModels().forEach(model => model.dispose());
+    this.loadingNewFile = false;
+
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialogNewFile = false;
   }
 
   async goToPath(treeEntry: TreeEntry) {
@@ -142,6 +238,12 @@ export default class ViewTreeView extends Vue {
       default:
         break;
     }
+  }
+
+  closeDialogNewFile() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.dialogNewFile = false;
   }
 }
 </script>
