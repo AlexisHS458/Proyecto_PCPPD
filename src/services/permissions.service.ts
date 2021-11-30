@@ -8,7 +8,7 @@ class PermissionsService {
     /**
      * Añadir permiso de un canal de texto a un usuario de un espacio de trabajo.
      * @param IDWorkSpace espacio de trabajo
-     * @param IChannel canal
+     * @param IDChannel canal
      * @param IDUser usuario a añadir permiso
      */
     async AddPermission(IDWorkSpace: string, IDChannel: string, IDUser: string, ): Promise<void> {

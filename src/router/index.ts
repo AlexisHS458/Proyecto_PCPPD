@@ -118,21 +118,37 @@ router.beforeEach((to, from, next) => {
   store.commit("CodeChannelModule/setShowDialogState", codeChanged);
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
-  // await store.dispatch("UserModule/fetchCurrentUser");
-  // const currentUser = store.getters["UserModule/getUser"];
 
-  auth.onAuthStateChanged(user => {
+  auth.onAuthStateChanged(async user => {
     if (!user && requiresAuth) {
       next({ name: "Home" });
     } else if (!requiresAuth && user) {
       next("/Mainscreen");
+    } else if (to.fullPath == "/register" && requiresAuth && user) {
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next();
+      } else {
+        next({ name: "MainScreen" });
+      }
+    } else if (to.fullPath !== "/register" && requiresAuth && user) {
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next({ name: "Register" });
+      } else {
+        next();
+      }
+    } else if (requiresAuth && user) {
+      next();
     } else if (!requiresAuth && !user) {
       next();
+    } else {
+      next();
     }
-    // else if()
-    else next();
   });
 });
 

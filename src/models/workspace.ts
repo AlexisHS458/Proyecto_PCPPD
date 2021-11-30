@@ -19,4 +19,6 @@ export interface Workspace {
    * IDs de usuarios pertenencientes al espacio de trabajo
    */
   usuarios: string[];
+
+  almacenamiento: number
 }

@@ -121,6 +121,25 @@ class WorkSpaceService {
         usuarios: FieldValue.arrayRemove(IDUser)
       });
   }
+
+  async updateWorkspaceStorage(workspaceId: string, isIncrement: boolean, value: number): Promise<void>{
+    if(isIncrement){
+      await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceId)
+      .update({
+        almacenamiento: FieldValue.increment(value)
+      });
+    }
+    else{
+      await db
+      .collection(Collection.WORK_SPACE)
+      .doc(workspaceId)
+      .update({
+        almacenamiento: FieldValue.increment(-value)
+      });
+    }
+  }
 }
 
 export default new WorkSpaceService();

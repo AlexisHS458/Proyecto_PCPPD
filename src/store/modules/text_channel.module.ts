@@ -34,6 +34,11 @@ class TextChannelModule extends VuexModule {
   public snackbarMessageError = "";
 
   /**
+   * Estado de consulta de archivos
+   */
+  public isLoadingFile: string[] = [];
+
+  /**
    * Estatos de consulta del canal de texto
    */
   public status = {
@@ -42,7 +47,7 @@ class TextChannelModule extends VuexModule {
     messageEdited: false,
     messageDeleted: false,
     showSnackbar: false,
-    showSnackbarError: false,
+    showSnackbarError: false
   };
 
   @Mutation
@@ -114,7 +119,6 @@ class TextChannelModule extends VuexModule {
   public setShowSnackBarMessageError(status: boolean): void {
     this.status.showSnackbarError = status;
   }
-
 
   /**
    * Coloca el ID del espacio de trabajo
@@ -188,6 +192,23 @@ class TextChannelModule extends VuexModule {
         this.context.commit("setShowSnackBarMessageError", true);
       });
   }
+
+  /*@Action
+  async uploadFile(data: {
+    workspaceID: string;
+    textChannelID: string;
+    message: Message;
+    file: File;
+  }): Promise<void> {
+
+    const message=
+    await MessageService.sendMessageFile(
+      data.workspaceID,
+      data.textChannelID,
+      data.message,
+      data.file
+    );
+  }*/
 
   /**
    * Recupera los mensajes dentro del canal de texto
@@ -268,8 +289,6 @@ class TextChannelModule extends VuexModule {
   get showSnackbar(): boolean {
     return this.status.showSnackbar;
   }
-
-
 }
 
 export default TextChannelModule;

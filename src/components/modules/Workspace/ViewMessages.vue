@@ -15,6 +15,7 @@
             :key="message.uid"
             :message="message"
             :currentUser="currentUser"
+            :messages="messages"
           >
             <!--<template v-if="message.isFile">
               {{ message.contenido }}
@@ -295,5 +296,4 @@ export default class MessagesPage extends Vue {
 .display-footer {
   display: block;
 }
-
 </style>
