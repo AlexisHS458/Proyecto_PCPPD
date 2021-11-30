@@ -2,11 +2,13 @@ import { db } from "@/utils/firebase";
 import { Message } from "@/models/message";
 import { Collection } from "@/utils/collections";
 import { storage } from "@/utils/firebase";
+import WorkspaceService from "./work_space.service";
 
 /**
  * Conexión a servicios de información de los espacios de trabajo.
  */
 class MessageService {
+  public MAX_SIZE = 1000000; // 150000000
   /**
    * Agrega un nuevo mensaje
    * @param workspaceID ID del espacio de trabajo correspondiente
@@ -52,38 +54,42 @@ class MessageService {
     message: Message,
     file: File
   ): Promise<Message> {
-    const messageRef = (
-      await db
-        .collection(Collection.WORK_SPACE)
-        .doc(workspaceID)
-        .collection(Collection.TEXT_CHANNEL)
-        .doc(textChannelID)
-        .collection(Collection.MESSAGES)
-        .add(message)
-    )
-      .get()
-      .then(async data => {
-        const message = <Message>(data).data();
-        const storageRef = storage.ref();
-        const fileRef = storageRef.child(data.id);
-        await fileRef.put(file);
-        const metaData = await fileRef.getMetadata();
-        const fileURL = await fileRef.getDownloadURL();
+    const workspace = await WorkspaceService.getWorkspaceInfo(workspaceID);
 
-        message.nombreArchivo = file.name;
-        message.contentType = metaData.contentType;
-        message.contenido = fileURL;
-        message.uid = data.id
+    if (workspace.almacenamiento + file.size < this.MAX_SIZE) {
+      const messageRef = (
+        await db
+          .collection(Collection.WORK_SPACE)
+          .doc(workspaceID)
+          .collection(Collection.TEXT_CHANNEL)
+          .doc(textChannelID)
+          .collection(Collection.MESSAGES)
+          .add(message)
+      )
+        .get()
+        .then(async data => {
+          const message = <Message>data.data();
 
-       
-        
+          const storageRef = storage.ref();
+          const fileRef = storageRef.child(data.id);
+          await fileRef.put(file);
+          const metaData = await fileRef.getMetadata();
+          const fileURL = await fileRef.getDownloadURL();
 
-        await this.editMessage(workspaceID, textChannelID, message);
+          message.nombreArchivo = file.name;
+          message.contentType = metaData.contentType;
+          message.contenido = fileURL;
+          message.uid = data.id;
 
-        return data;
-      });
+          await this.editMessage(workspaceID, textChannelID, message);
+          await WorkspaceService.updateWorkspaceStorage(workspaceID, true, file.size);
 
-    return <Message>(await messageRef).data();
+          return data;
+        });
+      return <Message>(await messageRef).data();
+    } else {
+      throw new Error("No hay mas almacenamiento");
+    }
   }
 
   /**
@@ -93,8 +99,6 @@ class MessageService {
    * @param message Mensaje a enviar al canal de texto
    */
   async editMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
-
-
     await db
       .collection(Collection.WORK_SPACE)
       .doc(workspaceID)
@@ -111,11 +115,7 @@ class MessageService {
    * @param textChannelID ID del canal de texto
    * @param messageID ID del documento a eliminar
    */
-  async deleteMessage(
-    workspaceID: string,
-    textChannelID: string,
-    message: Message
-  ): Promise<void> {
+  async deleteMessage(workspaceID: string, textChannelID: string, message: Message): Promise<void> {
     await db
       .collection(Collection.WORK_SPACE)
       .doc(workspaceID)
@@ -125,10 +125,10 @@ class MessageService {
       .doc(message.uid)
       .delete();
 
-    if(message.isFile){
+    if (message.isFile) {
       const storageRef = storage.ref();
-      const fileRef = storageRef.child(message.uid!)
-      await fileRef.delete()
+      const fileRef = storageRef.child(message.uid!);
+      await fileRef.delete();
     }
   }
 
