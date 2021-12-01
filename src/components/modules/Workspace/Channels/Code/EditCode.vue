@@ -113,8 +113,6 @@ export default class EditCode extends Vue {
     const language = monaco.languages.getLanguages().find(language => {
       return language.extensions?.includes(this.codeData?.extension ?? "plaintext");
     })?.id;
-    console.log(`watch ${language}`);
-
     monaco.editor.setModelLanguage(this.options.getModel()!, language ?? "cpp");
     const blob = this.codeData?.object as Blob;
     this.options.setValue(blob.text ?? "");
@@ -230,7 +228,6 @@ export default class EditCode extends Vue {
       if (this.driverUID !== this.currentUser.uid) {
         this.setCodeChanged(false);
         this.options.setValue(code.data);
-        console.log(`EditCode ${code.extension}`);
 
         monaco.editor.setModelLanguage(this.options.getModel()!, code.extension ?? "cpp");
       } else if (code.hash !== code.currentHash) {

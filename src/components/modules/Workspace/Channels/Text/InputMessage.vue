@@ -53,12 +53,7 @@
         :loading="isSelecting"
       ></v-file-input>
     </div>
-    <v-dialog
-      transition="dialog-top-transition"
-      max-width="600"
-      v-model="dialog"
-      persistent
-    >
+    <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialog" persistent>
       <v-card>
         <v-toolbar color="error" dark class="d-flex justify-center">
           <v-toolbar-title class="flex text-center">!AVISO!</v-toolbar-title>
@@ -73,12 +68,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog
-      transition="dialog-top-transition"
-      max-width="600"
-      v-model="dialogNoSize"
-      persistent
-    >
+    <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogNoSize" persistent>
       <v-card>
         <v-toolbar color="error" dark class="d-flex justify-center">
           <v-toolbar-title class="flex text-center">¡AVISO!</v-toolbar-title>
@@ -110,12 +100,12 @@ import MessageService from "@/services/message.service";
 @Component
 export default class InputMessage extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public workspace!: Workspace;
 
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -149,7 +139,7 @@ export default class InputMessage extends Vue {
   public selectedFile = "";
   public rules = {
     size: (v: string): string | boolean =>
-      v.length <= 500 || "Haz alcanzado el límite de caracteres",
+      v.length <= 500 || "Haz alcanzado el límite de caracteres"
   };
   public valid = true;
   public file: Maybe<File> = null;
@@ -163,19 +153,15 @@ export default class InputMessage extends Vue {
    * Mandar mensaje al canal de texto seleccionado
    */
   async sendMessages() {
-    if (
-      this.message &&
-      this.message.length > 0 /* &&
-      !/^\s*$/.test(this.message) */
-    ) {
+    if (this.message && this.message.length > 0 /* &&
+      !/^\s*$/.test(this.message) */) {
       this.messageModel = {
         fotoURL: this.currentUser.fotoURL,
         uid_usuario: this.currentUser.uid!,
-        usuarioNombre:
-          this.currentUser.nombre + " " + this.currentUser.apellido,
+        usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
         contenido: this.message,
         fecha: Date.now(),
-        isFile: false,
+        isFile: false
       };
       this.setTextChannelIDtoModule(this.$route.params.id);
       this.setWorkspaceIDtoModule(this.$route.params.idChannel);
@@ -197,20 +183,17 @@ export default class InputMessage extends Vue {
   }
 
   async uploadFileInput() {
-    console.log(this.file);
-
     this.isSelecting = true;
     if (this.file!.size < 5000000) {
       this.messageModel = {
         fotoURL: this.currentUser.fotoURL,
         uid_usuario: this.currentUser.uid!,
-        usuarioNombre:
-          this.currentUser.nombre + " " + this.currentUser.apellido,
+        usuarioNombre: this.currentUser.nombre + " " + this.currentUser.apellido,
         contenido: "",
         fecha: Date.now(),
         isFile: true,
         nombreArchivo: "",
-        contentType: "",
+        contentType: ""
       };
 
       MessageService.sendMessageFile(

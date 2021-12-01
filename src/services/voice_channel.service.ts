@@ -54,7 +54,7 @@ class VoiceChannelService {
    * @param channelID: ID del canal a conectar
    * @param onEvent suscripción al eventro
    */
-  joinedUsers(socket: Socket,channelID: string, onEvent: (users: SocketUser[]) => void): Socket {
+  joinedUsers(socket: Socket, channelID: string, onEvent: (users: SocketUser[]) => void): Socket {
     return socket.on(`${ResponseEventName.JOINED_USERS}-${channelID}`, payload => {
       onEvent(Object.values(payload));
     });
@@ -62,12 +62,19 @@ class VoiceChannelService {
 
   userStatus(uid: string, onEvent: (channelID: string | undefined) => void): Socket {
     return voiceChannelSocket(uid).on(ResponseEventName.USER_STATUS, payload => {
+     
+
       onEvent(payload.channelID);
     });
   }
 
-  listenUserJoined(socket: Socket,channelID:string, onEvent: (signalPayload: SignalPayload) => void): Socket {
-    return socket.on(ResponseEventName.USER_JOINED, payload => {
+  listenUserJoined(
+    socket: Socket,
+    channelID: string,
+    onEvent: (signalPayload: SignalPayload) => void
+  ): Socket {
+    return socket.on(`${ResponseEventName.USER_JOINED}-${channelID}`, payload => {
+      console.log(payload.callerID);
       onEvent(payload);
     });
   }
@@ -80,9 +87,13 @@ class VoiceChannelService {
     return voiceChannelSocket(uid).emit(EventName.RETURNING_SIGNAL, payload);
   }
 
-  listenReturningSignal(uid: string, onEvent: (signalPayload: SignalPayload) => void): Socket {
-    return this.joinRoom(uid, uid, false).on(
-      ResponseEventName.RECEIVING_RETURNED_SIGNAL,
+  listenReturningSignal(
+    uid: string,
+    voiceChannelID: string,
+    onEvent: (signalPayload: SignalPayload) => void
+  ): Socket {
+    return this.joinRoom(uid, uid).on(
+      `${ResponseEventName.RECEIVING_RETURNED_SIGNAL}-${voiceChannelID}`,
       payload => {
         onEvent(payload);
       }

@@ -85,21 +85,18 @@ class ChannelsService {
   }
 
   async getFirstTextChannelID(workspaceID: string): Promise<string> {
-    console.log("entro");
-
     const snapshot = await db
       .collection(Collection.WORK_SPACE)
       .doc(workspaceID)
       .collection(Collection.TEXT_CHANNEL)
       .get();
 
-    let channelId = ""
+    let channelId = "";
     snapshot.forEach(doc => {
-      channelId = doc.id  
+      channelId = doc.id;
     });
 
     return channelId;
-    
   }
 
   /**
