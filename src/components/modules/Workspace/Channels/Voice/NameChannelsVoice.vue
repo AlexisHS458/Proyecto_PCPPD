@@ -425,12 +425,12 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("close", () => {
-      this.disconnect(userSocketIDToSignal);
+      //this.disconnect(userSocketIDToSignal);
     });
 
     peer.on("error", err => {
       console.log(err);
-      this.disconnect(userSocketIDToSignal);
+      //this.disconnect(userSocketIDToSignal);
     });
 
     //console.log('createPeer');
@@ -479,13 +479,13 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("close", () => {
-      this.disconnect(callerID);
+      //this.disconnect(callerID);
     });
 
     peer.on("error", err => {
       console.log(err);
 
-      this.disconnect(callerID);
+      //this.disconnect(callerID);
     });
 
     //console.log('me llama: ', callerID);
