@@ -263,6 +263,8 @@ export default class NameChannels extends Vue {
     this.mutePeers();
   }
 
+  
+
   public menu = false;
   public dialog = false;
   public dialogRenameChanel = false;
@@ -431,7 +433,10 @@ export default class NameChannels extends Vue {
       this.disconnect(userSocketIDToSignal);
     });
 
-    console.log("Soy nuevo y estoy llamando");
+    //console.log('createPeer');
+    
+
+    //console.log('estoy llamando a: ', userSocketIDToSignal);
     console.log(this.peers);
 
     return peer;
@@ -483,7 +488,10 @@ export default class NameChannels extends Vue {
       this.disconnect(callerID);
     });
 
-    console.log("Alguien me llama");
+    //console.log('me llama: ', callerID);
+   // console.log('addPeer');
+   console.log(this.peers);
+   
     
 
     return peer;
@@ -508,7 +516,7 @@ export default class NameChannels extends Vue {
       users
         .filter(user => user.uid != this.currentUser.uid)
         .forEach(user => {
-          this.disconnect(user.uid);
+          //this.disconnect(user.uid);
           this.peers[user.uid] = this.createPeer(user.uid, this.currentUser.uid!, this.stream!);
         });
     });
