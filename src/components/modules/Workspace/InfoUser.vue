@@ -157,6 +157,8 @@ export default class UserInfo extends Vue {
       this.iSConnectedCode = !!isConnected;
     });
     VoiceService.listenToMute(this.currentUser.uid!, () => {
+      console.log('estoy en el listener');
+      
       this.toggleIsMuteStatus();
     });
   }
