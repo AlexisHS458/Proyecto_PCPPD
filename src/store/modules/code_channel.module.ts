@@ -159,6 +159,7 @@ class CodeChannelModule extends VuexModule {
     this.treeEntry = tree;
   }
 
+  @Action
   setTreeEntry(tree: TreeEntry[]): void {
     this.context.commit("setTreeEntryState", tree);
   }
