@@ -15,13 +15,15 @@ class CodeChannelService {
     return codeChannelSocket(uid, createNewSocket).emit(EventName.CODE_JOIN_ROOM, roomID);
   }
 
-  leaveCodeChannel(uid: string) {
-    codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
+  leaveCodeChannel(uid: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
   }
 
   allUsers(uid: string, codeChannelID: string, onEvent: (users: SocketUser[]) => void): Socket {
     return this.joinRoom(uid, codeChannelID)
       .on(ResponseEventName.CODE_ALL_USERS, payload => {
+        console.log('all users', payload);
+        
         onEvent(Object.values(payload));
       })
       .emit(EventName.CODE_EMIT_USERS, codeChannelID);

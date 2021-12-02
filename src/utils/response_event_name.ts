@@ -1,4 +1,5 @@
-export enum ResponseEventName{
+export enum ResponseEventName {
+
    //CodeChannel
    CODE_JOINED_USERS = 'code-joined-users',
    CODE_ALL_USERS = 'code-all-users',
@@ -7,7 +8,6 @@ export enum ResponseEventName{
    CODE = 'code',
    DRIVER = 'driver',
    REQUEST_FROM_NAV = 'request-from-nav',
-   HASH = 'HASH',
  
    //VoiceChannel
    JOINED_USERS = 'joined-users',
@@ -15,4 +15,5 @@ export enum ResponseEventName{
    USER_STATUS = 'user-status',
    RECEIVING_RETURNED_SIGNAL = 'receiving returned signal',
    USER_JOINED = 'user-joined',
-}
+   TOGGLE_MUTE = "toggle-mute"
+ }

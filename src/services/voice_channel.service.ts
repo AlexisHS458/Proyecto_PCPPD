@@ -99,6 +99,25 @@ class VoiceChannelService {
       }
     );
   }
+
+  /**
+   * Mutea el microfono de un usuario
+   * @param uid uid del usuario actual
+   * @param payload  contine uid del usuario a mutear y si se desea mutear
+   */
+  muteUser(uid:string, payload: {
+    uidUserToMute: string;
+    mute: boolean;
+  }): Socket{
+    return voiceChannelSocket(uid).emit(EventName.MUTE_USER, payload);
+  }
+
+  
+  listenToMute(uid:string, onEvent: (isMute: boolean) => void): Socket{
+    return voiceChannelSocket(uid).emit(EventName.MUTE_USER, (payload: boolean) =>{
+      onEvent(payload)
+    });
+  }
 }
 
 export default new VoiceChannelService();
