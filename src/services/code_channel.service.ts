@@ -7,8 +7,8 @@ import { ResponseEventName } from "@/utils/response_event_name";
 import { Socket } from "socket.io-client";
 
 class CodeChannelService {
-  joinToCodeChannel(uid: string, codeChannelID: string): Socket {
-    return codeChannelSocket(uid).emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
+  joinToCodeChannel(socket: Socket, codeChannelID: string): Socket {
+    return socket.emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
   }
 
   joinRoom(uid: string, roomID: string, createNewSocket = true): Socket {
@@ -22,21 +22,21 @@ class CodeChannelService {
   allUsers(uid: string, codeChannelID: string, onEvent: (users: SocketUser[]) => void): Socket {
     return this.joinRoom(uid, codeChannelID)
       .on(ResponseEventName.CODE_ALL_USERS, payload => {
-        console.log('all users', payload);
-        
+        //console.log("all users", payload);
         onEvent(Object.values(payload));
       })
       .emit(EventName.CODE_EMIT_USERS, codeChannelID);
   }
 
-  joinedUsers(uid: string, onEvent: (users: SocketUser[]) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.CODE_JOINED_USERS, payload => {
+  joinedUsers(socket: Socket, onEvent: (users: SocketUser[]) => void): Socket {
+    return socket.on(ResponseEventName.CODE_JOINED_USERS, payload => {
       onEvent(Object.values(payload));
     });
   }
 
   userStatus(uid: string, onEvent: (channelID: string | undefined) => void): Socket {
     return codeChannelSocket(uid).on(ResponseEventName.CODE_USER_STATUS, payload => {
+      console.log('escucha el evento');
       onEvent(payload.channelID);
     });
   }

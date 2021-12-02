@@ -398,6 +398,8 @@ export default class NameChannels extends Vue {
       await this.initStream();
       VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
       VoiceService.userStatus(this.currentUser.uid!, isConnected => {
+        console.log('listener de NameChannelVoice');
+        
         this.isConnected = !!isConnected;
       });
       if (!this.isConnected) {

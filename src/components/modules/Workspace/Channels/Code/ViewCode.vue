@@ -18,6 +18,8 @@ const CodeChannel = namespace("CodeChannelModule");
 import CodeService from "@/services/code_channel.service";
 const User = namespace("UserModule");
 import { User } from "@/models/user";
+import { Socket } from "socket.io-client";
+import { codeChannelSocket } from "@/socketio";
 @Component({
   components: {
     EditCode,
@@ -61,6 +63,7 @@ export default class ViewCode extends Vue {
   private currentUser!: User;
 
   public nameCodeChannel = "";
+  public socket?: Socket;
 
   async nameCode() {
     this.nameCodeChannel = await ServiceChannels.getChannelName(
@@ -72,7 +75,6 @@ export default class ViewCode extends Vue {
 
   changeView() {
     this.setCodePath();
-    CodeService.joinToCodeChannel(this.currentUser.uid!, this.$route.params.idChannelCode);
     this.nameCode();
   }
 
@@ -86,5 +88,6 @@ export default class ViewCode extends Vue {
     this.setDriverUIDStatus(this.currentUser.uid!);
     this.changeView();
   }
+
 }
 </script>

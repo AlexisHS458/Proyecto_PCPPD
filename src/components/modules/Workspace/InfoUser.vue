@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-app-bar v-if="iSConnectedCode" color="primaryDark" dense class="toolbar">
-      <v-toolbar-title class="text-color">
-        Conectado: {{ nameCodeChannel }}</v-toolbar-title
-      >
+      <v-toolbar-title class="text-color"> Conectado: {{ nameCodeChannel }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="disconnectCode" v-if="iSConnectedCode">
         <v-icon color="errorLight">mdi-xml</v-icon>
@@ -11,16 +9,10 @@
     </v-app-bar>
 
     <v-app-bar v-if="isConnected" color="primaryDark" dense class="toolbar">
-      <v-toolbar-title
-        v-if="isConnectedStatus == 'Conectando'"
-        class="text-color-connecting"
-      >
+      <v-toolbar-title v-if="isConnectedStatus == 'Conectando'" class="text-color-connecting">
         {{ isConnectedStatus + " a: " + nameVoiceChannel }}
       </v-toolbar-title>
-      <v-toolbar-title
-        v-else-if="isConnectedStatus == 'Conectado'"
-        class="text-color"
-      >
+      <v-toolbar-title v-else-if="isConnectedStatus == 'Conectado'" class="text-color">
         {{ isConnectedStatus + ": " + nameVoiceChannel }}
       </v-toolbar-title>
 
@@ -71,7 +63,7 @@ const CodeChannel = namespace("CodeChannelModule");
 @Component
 export default class UserInfo extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -136,8 +128,10 @@ export default class UserInfo extends Vue {
   }
 
   mounted() {
-    VoiceService.userStatus(this.currentUser.uid!, async (isConnected) => {
+    VoiceService.userStatus(this.currentUser.uid!, async isConnected => {
       if (isConnected) {
+        console.log("listener de InfoUser de voice");
+
         this.nameVoiceChannel = await ServiceChannels.getChannelName(
           ChannelType.VOICE,
           this.$route.params.id,
@@ -145,20 +139,26 @@ export default class UserInfo extends Vue {
         );
       }
       this.isConnected = !!isConnected;
+      console.log(this.isConnected);
     });
-    CodeService.userStatus(this.currentUser.uid!, async (isConnected) => {
+    CodeService.userStatus(this.currentUser.uid!, async isConnected => {
+      console.log("listener de InfoUser de code");
       if (isConnected) {
+        console.log(isConnected);
+
         this.nameCodeChannel = await ServiceChannels.getChannelName(
           ChannelType.CODE,
           this.$route.params.id,
           isConnected
         );
       }
+
       this.iSConnectedCode = !!isConnected;
+      console.log(this.iSConnectedCode);
     });
     VoiceService.listenToMute(this.currentUser.uid!, () => {
-      console.log('estoy en el listener');
-      
+      console.log("estoy en el listener");
+
       this.toggleIsMuteStatus();
     });
   }
