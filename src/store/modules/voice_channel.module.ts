@@ -5,10 +5,18 @@ import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 class VoiceChannelModule extends VuexModule {
   public isConnectedStatus: VoiceState = VoiceState.CONNECTING;
   public isMute = false;
+  public isDeafen = false;
 
   @Mutation
   public toggleMute(): void {
     this.isMute = !this.isMute;
+    if (!this.isMute && this.isDeafen) this.isDeafen = false;
+  }
+
+  @Mutation
+  public toggleDeafen(): void {
+    this.isDeafen = !this.isDeafen;
+    this.isMute = this.isDeafen;
   }
 
   @Mutation
@@ -32,7 +40,12 @@ class VoiceChannelModule extends VuexModule {
   }
 
   @Action
-  setMute(mute : boolean): void {
+  toggleIsDeafenStatus(): void {
+    this.context.commit("toggleDeafen");
+  }
+
+  @Action
+  setMute(mute: boolean): void {
     this.context.commit("setMuteState", mute);
   }
 

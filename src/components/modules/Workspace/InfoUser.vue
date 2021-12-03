@@ -32,12 +32,12 @@
         <span>{{ currentUser.nombre + " " + currentUser.apellido }}</span>
       </v-tooltip>
       <v-spacer></v-spacer>
-      <v-btn icon @click="toggleMicrophone">
+      <v-btn icon @click="toggleMicrophone" v-if="isConnected">
         <v-icon v-if="!isMute" color="success">mdi-microphone</v-icon>
         <v-icon v-else color="error">mdi-microphone-off</v-icon>
       </v-btn>
-      <v-btn icon @click="toggleHeadphones">
-        <v-icon v-if="isListening" color="success">mdi-headphones</v-icon>
+      <v-btn icon @click="toggleHeadphones" v-if="isConnected">
+        <v-icon v-if="!isDeafen" color="success">mdi-headphones</v-icon>
         <v-icon v-else color="error">mdi-headphones-off</v-icon>
       </v-btn>
     </v-app-bar>
@@ -76,6 +76,12 @@ export default class UserInfo extends Vue {
   @StatusVoice.Action
   private toggleIsMuteStatus!: () => void;
 
+  @StatusVoice.State("isDeafen")
+  private isDeafen!: boolean;
+
+  @StatusVoice.Action
+  private toggleIsDeafenStatus!: () => void;
+
   @StatusVoice.Action
   private setMute!: (mute: boolean) => void;
 
@@ -92,7 +98,7 @@ export default class UserInfo extends Vue {
   private codeChanged!: boolean;
 
   public loading = false;
-  public isListening = true;
+
   public isConnected = false;
   public iSConnectedCode = false;
   public nameCodeChannel = "";
@@ -102,8 +108,7 @@ export default class UserInfo extends Vue {
   }
 
   toggleHeadphones() {
-    this.isListening = !this.isListening;
-  
+    this.toggleIsDeafenStatus();
   }
 
   disconnect() {
@@ -153,10 +158,13 @@ export default class UserInfo extends Vue {
 
       this.iSConnectedCode = !!isConnected;
     });
-    VoiceService.listenToMute(this.currentUser.uid!, isMute => {
-      console.log("me quieren mutear", isMute);
-
-      this.setMute(isMute);
+    VoiceService.listenToActions(this.currentUser.uid!, actions => {
+      if (actions.mute) {
+        this.setMute(actions.mute);
+      }
+      if (actions.disconnect) {
+        VoiceService.leaveVoiceChannel(this.currentUser.uid!);
+      }
     });
   }
 }

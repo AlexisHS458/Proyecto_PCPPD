@@ -86,10 +86,6 @@ export default class ViewCode extends Vue {
       this.$router.push({
         name: "notChannels"
       });
-    } else {
-      this.$router.push({
-        name: "Mainscreen"
-      });
     }
   }
   /*destroyed() {
