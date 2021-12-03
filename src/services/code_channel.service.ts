@@ -22,7 +22,6 @@ class CodeChannelService {
   allUsers(uid: string, codeChannelID: string, onEvent: (users: SocketUser[]) => void): Socket {
     return this.joinRoom(uid, codeChannelID)
       .on(ResponseEventName.CODE_ALL_USERS, payload => {
-        //console.log("all users", payload);
         onEvent(Object.values(payload));
       })
       .emit(EventName.CODE_EMIT_USERS, codeChannelID);
@@ -36,7 +35,6 @@ class CodeChannelService {
 
   userStatus(uid: string, onEvent: (channelID: string | undefined) => void): Socket {
     return codeChannelSocket(uid).on(ResponseEventName.CODE_USER_STATUS, payload => {
-      console.log('escucha el evento');
       onEvent(payload.channelID);
     });
   }
@@ -81,8 +79,8 @@ class CodeChannelService {
    * @param uid uid de usuario
    * @param onEvent evento cuando cambia el driver
    */
-  currentDriver(uid: string, onEvent: (driverID: string) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.DRIVER, payload => {
+  currentDriver(socket: Socket,onEvent: (driverID: string) => void): Socket {
+    return  socket.on(ResponseEventName.DRIVER, payload => {
       onEvent(payload);
     });
   }

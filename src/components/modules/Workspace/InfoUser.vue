@@ -130,8 +130,6 @@ export default class UserInfo extends Vue {
   mounted() {
     VoiceService.userStatus(this.currentUser.uid!, async isConnected => {
       if (isConnected) {
-        console.log("listener de InfoUser de voice");
-
         this.nameVoiceChannel = await ServiceChannels.getChannelName(
           ChannelType.VOICE,
           this.$route.params.id,
@@ -139,13 +137,9 @@ export default class UserInfo extends Vue {
         );
       }
       this.isConnected = !!isConnected;
-      console.log(this.isConnected);
     });
     CodeService.userStatus(this.currentUser.uid!, async isConnected => {
-      console.log("listener de InfoUser de code");
       if (isConnected) {
-        console.log(isConnected);
-
         this.nameCodeChannel = await ServiceChannels.getChannelName(
           ChannelType.CODE,
           this.$route.params.id,
@@ -154,12 +148,12 @@ export default class UserInfo extends Vue {
       }
 
       this.iSConnectedCode = !!isConnected;
-      console.log(this.iSConnectedCode);
     });
-    VoiceService.listenToMute(this.currentUser.uid!, () => {
-      console.log("estoy en el listener");
+    VoiceService.listenToMute(this.currentUser.uid!, isMute => {
+      console.log("me quieren mutear", isMute);
 
       this.toggleIsMuteStatus();
+      this.isTalk = !this.isTalk;
     });
   }
 }

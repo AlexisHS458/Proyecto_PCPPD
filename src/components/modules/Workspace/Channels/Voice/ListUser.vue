@@ -142,15 +142,12 @@ export default class NameChannels extends Vue {
   }
 
   muteUser(userUId: string) {
-    console.log("Hola");
-
-    console.log("User uid: " + userUId);
-    console.log(userUId);
-
-    VoiceService.muteUser(this.currentUser.uid!, {
-      uidUserToMute: userUId,
-      mute: true
-    });
+    if (userUId) {
+      VoiceService.muteUser(this.currentUser.uid!, {
+        uidUserToMute: userUId,
+        mute: true
+      });
+    }
   }
 }
 </script>

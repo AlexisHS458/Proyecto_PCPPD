@@ -292,6 +292,9 @@ export default class NameChannels extends Vue {
   @StatusVoice.Action
   private setIsConnectedStatus!: (status: VoiceState) => void;
 
+  @StatusVoice.Action
+  private toggleIsMuteStatus!: () => void;
+
   @StatusVoice.State("isMute")
   private isMute!: boolean;
 
@@ -344,10 +347,6 @@ export default class NameChannels extends Vue {
   }
 
   muteUser(userUId: string) {
-    console.log("Hola");
-
-    console.log("User uid: " + userUId);
-
     VoiceService.muteUser(this.currentUser.uid!, {
       uidUserToMute: userUId,
       mute: true
@@ -398,9 +397,7 @@ export default class NameChannels extends Vue {
       await this.initStream();
       VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
       VoiceService.userStatus(this.currentUser.uid!, isConnected => {
-        console.log('listener de NameChannelVoice');
-        
-        this.isConnected = !!isConnected;
+            this.isConnected = !!isConnected;
       });
       if (!this.isConnected) {
         const audio = new Audio(require("@/assets/connected.mp3"));
@@ -432,6 +429,7 @@ export default class NameChannels extends Vue {
         users.map(user => UserService.getUserInfoByID(user.uid))
       );
     });
+
     this.initSignaling();
   }
 
@@ -488,7 +486,7 @@ export default class NameChannels extends Vue {
     //console.log('createPeer');
 
     //console.log('estoy llamando a: ', userSocketIDToSignal);
-    console.log(this.peers);
+    //console.log(this.peers);
 
     return peer;
   }
@@ -498,7 +496,7 @@ export default class NameChannels extends Vue {
     this.peers[peerID]?.destroy();
     delete this.peers[peerID];
 
-    console.log("alguien se fue");
+ 
   }
 
   addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream): Peer.Instance {
@@ -540,7 +538,7 @@ export default class NameChannels extends Vue {
 
     //console.log('me llama: ', callerID);
     // console.log('addPeer');
-    console.log(this.peers);
+    //console.log(this.peers);
 
     return peer;
   }

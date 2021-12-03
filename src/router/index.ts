@@ -178,10 +178,10 @@ router.beforeEach((to, from, next) => {
     if (requiresAuth && !user) {
       next({ name: "Home" });
     } else if (!requiresAuth && user) {
-      console.log("Entro no regitser");
+      
       next({ name: "MainScreen" });
     } else if (to.fullPath == "/register" && requiresAuth && user) {
-      console.log("Entro register");
+      
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
       if (currentUser.boleta == "") {
