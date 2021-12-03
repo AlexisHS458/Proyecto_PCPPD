@@ -295,6 +295,9 @@ export default class NameChannels extends Vue {
   @StatusVoice.Action
   private toggleIsMuteStatus!: () => void;
 
+  @StatusVoice.State("isDeafen")
+  private isDeafen!: boolean;
+
   @StatusVoice.State("isMute")
   private isMute!: boolean;
 
@@ -302,7 +305,7 @@ export default class NameChannels extends Vue {
 
   @Watch("isMute")
   onChildChanged() {
-    this.mutePeers();
+    this.muteMe();
   }
 
   public hover = true;
@@ -344,13 +347,6 @@ export default class NameChannels extends Vue {
         this.dialogRenameChanel = false;
       }
     }
-  }
-
-  muteUser(userUId: string) {
-    VoiceService.muteUser(this.currentUser.uid!, {
-      uidUserToMute: userUId,
-      mute: true
-    });
   }
 
   /**
@@ -397,7 +393,7 @@ export default class NameChannels extends Vue {
       await this.initStream();
       VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
       VoiceService.userStatus(this.currentUser.uid!, isConnected => {
-            this.isConnected = !!isConnected;
+        this.isConnected = !!isConnected;
       });
       if (!this.isConnected) {
         const audio = new Audio(require("@/assets/connected.mp3"));
@@ -495,8 +491,6 @@ export default class NameChannels extends Vue {
     document.getElementById(peerID)?.remove();
     this.peers[peerID]?.destroy();
     delete this.peers[peerID];
-
- 
   }
 
   addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream): Peer.Instance {
@@ -543,11 +537,22 @@ export default class NameChannels extends Vue {
     return peer;
   }
 
-  mutePeers(): void {
+  muteMe(): void {
     this.stream?.getAudioTracks().forEach(track => {
       track.enabled = !this.isMute;
     });
   }
+
+  deafenMe(): void {
+    Object.keys(this.peers).forEach(k => {
+      const audioTag = document.getElementById(k) as HTMLAudioElement;
+      const stream = audioTag.srcObject as MediaStream;
+      stream.getTracks().forEach(track => {
+        track.enabled = !this.isMute;
+      });
+    });
+  }
+
   async initStream(): Promise<void> {
     if (!this.stream) {
       this.stream = await navigator.mediaDevices.getUserMedia({

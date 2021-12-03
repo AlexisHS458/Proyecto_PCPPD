@@ -15,6 +15,7 @@
               icon
               v-on="on"
               v-on:click.prevent
+              v-if="user.uid !== currentUser.uid"
               :class="{ hidden: !hover && !menuOptions }"
             >
               <v-icon color="white">mdi-cog</v-icon>
@@ -29,9 +30,10 @@
                   </v-icon>
                   Silenciar usuario
                 </v-btn>
-                <v-btn depressed text block class="btn">
+
+                <v-btn depressed text block class="btn" @click="disconnectUser(user.uid)">
                   <v-icon color="error" class="mr-6">
-                    mdi-headphones-off
+                    mdi-phone-remove
                   </v-icon>
                   Desconectar usuario
                 </v-btn>
@@ -143,9 +145,18 @@ export default class NameChannels extends Vue {
 
   muteUser(userUId: string) {
     if (userUId) {
-      VoiceService.muteUser(this.currentUser.uid!, {
+      VoiceService.sendActionToUser(this.currentUser.uid!, {
         uidUserToMute: userUId,
-        mute: true
+        actions: { mute: true }
+      });
+    }
+  }
+
+  disconnectUser(userUId: string) {
+    if (userUId) {
+      VoiceService.sendActionToUser(this.currentUser.uid!, {
+        uidUserToMute: userUId,
+        actions: { disconnect: true }
       });
     }
   }
