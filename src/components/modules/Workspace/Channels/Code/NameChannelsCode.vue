@@ -399,9 +399,11 @@ export default class NameChannels extends Vue {
       await this.RemoveCodePermission(this.permissions);
     }
   }
-
+  destroyed() {
+    delete this.socket;
+  }
   mounted() {
-    // this.socket = codeChannelSocket(this.currentUser.uid!, true);
+    this.socket = codeChannelSocket(this.currentUser.uid!, true);
     CodeService.allUsers(
       this.currentUser.uid!,
       this.channel.uid!,
@@ -443,7 +445,7 @@ export default class NameChannels extends Vue {
         this.$route.path !=
         "/space/" + this.workspaceUID + "/code/" + this.channel.uid!
       ) {
-        //   CodeService.joinToCodeChannel(this.socket!, this.channel.uid!);
+        CodeService.joinToCodeChannel(this.socket!, this.channel.uid!);
         this.$router.push({
           name: "codeChannel",
           params: { idChannelCode: this.channel.uid! },

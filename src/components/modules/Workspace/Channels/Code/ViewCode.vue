@@ -81,18 +81,22 @@ export default class ViewCode extends Vue {
 
   changeView() {
     this.setCodePath();
-    CodeService.joinToCodeChannel(
+    /* CodeService.joinToCodeChannel(
       this.socket!,
       this.$route.params.idChannelCode
-    );
+    ); */
     this.nameCode();
   }
-
   destroyed() {
-    delete this.socket;
+    this.$router.push({
+      name: "notChannels",
+    });
   }
+  /*destroyed() {
+    delete this.socket;
+  } */
   mounted() {
-    this.socket = codeChannelSocket(this.currentUser.uid!, true);
+    //  this.socket = codeChannelSocket(this.currentUser.uid!, true);
     CodeService.getDataCode(this.currentUser.uid!, (code) => {
       if (code.path !== "") {
         this.changeFilePath(code.path);
