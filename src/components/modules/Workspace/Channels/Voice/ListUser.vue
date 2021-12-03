@@ -8,7 +8,11 @@
         <v-list-item-title v-text="user.nombre"></v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
-        <v-menu v-model="menuOptions" offset-y v-if="workspace.uid_usuario === currentUser.uid">
+        <v-menu
+          v-model="menuOptions"
+          offset-y
+          v-if="workspace.uid_usuario === currentUser.uid"
+        >
           <template #activator="{ on }">
             <v-btn
               text
@@ -24,17 +28,37 @@
           <v-list color="secondary">
             <v-list-item-content class="justify-center card-list">
               <div class="mx-auto text-right">
-                <v-btn depressed text block class="btn" @click="muteUser(user.uid)">
+                <v-btn
+                  depressed
+                  text
+                  block
+                  class="btn"
+                  @click="muteUser(user.uid)"
+                >
                   <v-icon color="error" class="mr-6">
                     mdi-microphone-off
                   </v-icon>
                   Silenciar usuario
                 </v-btn>
+                <v-btn
+                  depressed
+                  text
+                  block
+                  class="btn"
+                  @click="unmuteUser(user.uid)"
+                >
+                  <v-icon color="success" class="mr-6"> mdi-microphone </v-icon>
+                  Desilenciar usuario
+                </v-btn>
 
-                <v-btn depressed text block class="btn" @click="disconnectUser(user.uid)">
-                  <v-icon color="error" class="mr-6">
-                    mdi-phone-remove
-                  </v-icon>
+                <v-btn
+                  depressed
+                  text
+                  block
+                  class="btn"
+                  @click="disconnectUser(user.uid)"
+                >
+                  <v-icon color="error" class="mr-6"> mdi-phone-remove </v-icon>
                   Desconectar usuario
                 </v-btn>
               </div>
@@ -74,27 +98,27 @@ import { Socket } from "socket.io-client";
 @Component({ components: { ListUser } })
 export default class NameChannels extends Vue {
   @Prop({
-    required: false
+    required: false,
   })
   public channel!: VoiceChannel;
 
   @Prop({
-    required: false
+    required: false,
   })
   public icon!: string;
 
   @Prop({
-    required: false
+    required: false,
   })
   public users!: User[];
 
   @Prop({
-    required: false
+    required: false,
   })
   public workspaceUID!: string;
 
   @Prop({
-    required: true
+    required: true,
   })
   public user!: User;
 
@@ -131,7 +155,8 @@ export default class NameChannels extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
-      /^[_A-z\u00C0-\u00FF0-9]*((\s)*[_A-z\u00C0-\u00FF0-9])*$/.test(v) || "Nombre inválido"
+      /^[_A-z\u00C0-\u00FF0-9]*((\s)*[_A-z\u00C0-\u00FF0-9])*$/.test(v) ||
+      "Nombre inválido",
   };
   public usersDisplay: User[] = [];
   public isConnected = false;
@@ -147,7 +172,16 @@ export default class NameChannels extends Vue {
     if (userUId) {
       VoiceService.sendActionToUser(this.currentUser.uid!, {
         uidUserToMute: userUId,
-        actions: { mute: true }
+        actions: { mute: true },
+      });
+    }
+  }
+
+  unmuteUser(userUId: string) {
+    if (userUId) {
+      VoiceService.sendActionToUser(this.currentUser.uid!, {
+        uidUserToMute: userUId,
+        actions: { mute: false },
       });
     }
   }
@@ -156,7 +190,7 @@ export default class NameChannels extends Vue {
     if (userUId) {
       VoiceService.sendActionToUser(this.currentUser.uid!, {
         uidUserToMute: userUId,
-        actions: { disconnect: true }
+        actions: { disconnect: true },
       });
     }
   }
