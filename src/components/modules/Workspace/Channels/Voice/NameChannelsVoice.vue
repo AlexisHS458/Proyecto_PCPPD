@@ -307,6 +307,10 @@ export default class NameChannels extends Vue {
   onChildChanged() {
     this.muteMe();
   }
+  @Watch("isDeafen")
+  onChildChangedIsDeafen() {
+    this.deafenMe();
+  }
 
   public hover = true;
   public menuOptions = false;
@@ -444,6 +448,8 @@ export default class NameChannels extends Vue {
   }
 
   createPeer(userSocketIDToSignal: string, callerID: string, stream: MediaStream): Peer.Instance {
+   
+    
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -451,7 +457,7 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("signal", signal => {
-      VoiceService.sendingSignal(callerID, {
+      VoiceService.sendingSignal(this.socket!, {
         signal: signal,
         callerID: callerID,
         userIDToSignal: userSocketIDToSignal
@@ -471,18 +477,13 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("close", () => {
-      //this.disconnect(userSocketIDToSignal);
+      this.disconnect(userSocketIDToSignal);
     });
 
     peer.on("error", err => {
       console.log(err);
-      //this.disconnect(userSocketIDToSignal);
+      this.disconnect(userSocketIDToSignal);
     });
-
-    //console.log('createPeer');
-
-    //console.log('estoy llamando a: ', userSocketIDToSignal);
-    //console.log(this.peers);
 
     return peer;
   }
@@ -521,18 +522,14 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("close", () => {
-      //this.disconnect(callerID);
+    
+      this.disconnect(callerID);
     });
 
     peer.on("error", err => {
       console.log(err);
-
-      //this.disconnect(callerID);
+      this.disconnect(callerID);
     });
-
-    //console.log('me llama: ', callerID);
-    // console.log('addPeer');
-    //console.log(this.peers);
 
     return peer;
   }
@@ -547,8 +544,10 @@ export default class NameChannels extends Vue {
     Object.keys(this.peers).forEach(k => {
       const audioTag = document.getElementById(k) as HTMLAudioElement;
       const stream = audioTag.srcObject as MediaStream;
+    
+      
       stream.getTracks().forEach(track => {
-        track.enabled = !this.isMute;
+        track.enabled = !this.isDeafen;
       });
     });
   }
@@ -567,14 +566,17 @@ export default class NameChannels extends Vue {
       users
         .filter(user => user.uid != this.currentUser.uid)
         .forEach(user => {
-          //this.disconnect(user.uid);
           this.peers[user.uid] = this.createPeer(user.uid, this.currentUser.uid!, this.stream!);
         });
     });
 
     VoiceService.listenUserJoined(this.socket!, this.channel.uid!, payloadSignal => {
-      const peer = this.addPeer(payloadSignal.signal, payloadSignal.callerID, this.stream!);
-      this.peers[payloadSignal.callerID] = peer;
+     
+      
+      if (!this.peers[payloadSignal.callerID]) {
+        const peer = this.addPeer(payloadSignal.signal, payloadSignal.callerID, this.stream!);
+        this.peers[payloadSignal.callerID] = peer;
+      }
     });
 
     VoiceService.listenReturningSignal(this.currentUser.uid!, this.channel.uid!, payloadSignal => {
