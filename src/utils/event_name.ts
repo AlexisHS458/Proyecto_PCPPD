@@ -1,4 +1,5 @@
 export enum EventName {
+
   //CodeChannel
   JOIN_CODE_CHANNEL = 'join-code-channel',
   LEAVE_CODE_CHANNEL = 'leave-code-channel',
@@ -9,9 +10,8 @@ export enum EventName {
   REQUEST_DRIVER = 'request-driver',
   ACCEPT_REQUEST = 'accpet-request',
   GET_DRIVER = 'get-driver',
-  GET_HASH = 'get-hash',
-  UPDATE_HASH = 'UPDATE_HASH',
-  REQUEST_CODE = 'REQUEST_CODE',
+  REQUEST_CODE = 'request-code',
+
 
   //VoiceChannel
   JOIN_VOICE_CHANNEL = 'join-voice-channel',
@@ -20,4 +20,5 @@ export enum EventName {
   RETURNING_SIGNAL = 'returning-signal',
   EMIT_USERS = 'emit-users',
   JOIN_ROOM = 'join-room',
+  MUTE_USER = "mute-user",
 }

@@ -7,16 +7,16 @@ import { ResponseEventName } from "@/utils/response_event_name";
 import { Socket } from "socket.io-client";
 
 class CodeChannelService {
-  joinToCodeChannel(uid: string, codeChannelID: string): Socket {
-    return codeChannelSocket(uid).emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
+  joinToCodeChannel(socket: Socket, codeChannelID: string): Socket {
+    return socket.emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
   }
 
   joinRoom(uid: string, roomID: string, createNewSocket = true): Socket {
     return codeChannelSocket(uid, createNewSocket).emit(EventName.CODE_JOIN_ROOM, roomID);
   }
 
-  leaveCodeChannel(uid: string) {
-    codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
+  leaveCodeChannel(uid: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
   }
 
   allUsers(uid: string, codeChannelID: string, onEvent: (users: SocketUser[]) => void): Socket {
@@ -27,8 +27,8 @@ class CodeChannelService {
       .emit(EventName.CODE_EMIT_USERS, codeChannelID);
   }
 
-  joinedUsers(uid: string, onEvent: (users: SocketUser[]) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.CODE_JOINED_USERS, payload => {
+  joinedUsers(socket: Socket, onEvent: (users: SocketUser[]) => void): Socket {
+    return socket.on(ResponseEventName.CODE_JOINED_USERS, payload => {
       onEvent(Object.values(payload));
     });
   }
@@ -79,8 +79,8 @@ class CodeChannelService {
    * @param uid uid de usuario
    * @param onEvent evento cuando cambia el driver
    */
-  currentDriver(uid: string, onEvent: (driverID: string) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.DRIVER, payload => {
+  currentDriver(socket: Socket,onEvent: (driverID: string) => void): Socket {
+    return  socket.on(ResponseEventName.DRIVER, payload => {
       onEvent(payload);
     });
   }

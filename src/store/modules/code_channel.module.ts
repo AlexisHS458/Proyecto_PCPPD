@@ -2,6 +2,7 @@ import { Module, Action, Mutation, VuexModule } from "vuex-module-decorators";
 import CodeChannelService from "@/services/code_channel.service";
 import { Maybe, Ref, Repository, TreeEntry } from "@/generated/graphql";
 import { CodePath } from "@/models/codePath";
+import { Socket } from "socket.io-client";
 
 @Module({ namespaced: true })
 class CodeChannelModule extends VuexModule {
@@ -159,6 +160,7 @@ class CodeChannelModule extends VuexModule {
     this.treeEntry = tree;
   }
 
+  @Action
   setTreeEntry(tree: TreeEntry[]): void {
     this.context.commit("setTreeEntryState", tree);
   }
@@ -236,9 +238,9 @@ class CodeChannelModule extends VuexModule {
   }
 
   @Action
-  setDriverUIDStatus(uid: string): void {
+  setDriverUIDStatus(socket: Socket): void {
     this.context.commit("setLoading", true);
-    CodeChannelService.currentDriver(uid, driverID => {
+    CodeChannelService.currentDriver(socket, driverID => {
       this.context.commit("setDriverUID", driverID);
       this.context.commit("setLoading", false);
     });

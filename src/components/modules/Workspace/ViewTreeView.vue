@@ -1,24 +1,35 @@
 <template>
   <div>
     <v-toolbar color="primaryDark" flat dense>
-      <v-icon color="grey darken-2" @click="goBackAction" v-if="codePath.length > 0" class="mr-4">
+      <v-icon
+        color="grey darken-2"
+        @click="goBackAction"
+        v-if="codePath.length > 0"
+        class="mr-4"
+      >
         mdi-arrow-left
       </v-icon>
 
       <v-toolbar-title class="grey--text text--darken-4 font">
-        {{ codePath.length > 0 ? codePath[codePath.length - 1].nombre : nameCodeChannel }}
+        {{
+          codePath.length > 0
+            ? codePath[codePath.length - 1].nombre
+            : nameCodeChannel
+        }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogNewFile">
+      <v-dialog
+        transition="dialog-top-transition"
+        max-width="600"
+        v-model="dialogNewFile"
+      >
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
             <v-icon>mdi-file-plus</v-icon>
           </v-btn>
         </template>
         <v-card>
-          <v-toolbar color="secondary" dark>
-            Nuevo archivo
-          </v-toolbar>
+          <v-toolbar color="secondary" dark> Nuevo archivo </v-toolbar>
           <v-card-text>
             <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
               <v-row align="center" justify="center" class="mt-6">
@@ -72,7 +83,15 @@
 <script lang="ts">
 import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { CodePath } from "@/models/codePath";
-import { Maybe, Tree, TreeEntry, Blob, Repository, Commit } from "@/generated/graphql";
+import SubTree from "@/components/modules/Workspace/Channels/Code/Files/RepoFilesView.vue";
+import {
+  Maybe,
+  Tree,
+  TreeEntry,
+  Blob,
+  Repository,
+  Commit,
+} from "@/generated/graphql";
 import { namespace } from "vuex-class";
 const CodeChannelModule = namespace("CodeChannelModule");
 const User = namespace("UserModule");
@@ -84,19 +103,22 @@ import ServiceChannels from "@/services/channels.service";
 import CodeService from "@/services/code_channel.service";
 import * as monaco from "monaco-editor";
 import GitHubService from "@/services/github.service";
-import CryptoJS from "crypto-js";
 const WorkspaceModule = namespace("WorkspaceModule");
 import { VForm } from "@/utils/types";
 import { CodeChannel } from "@/models/codeChannel";
-@Component
+@Component({
+  components: {
+    SubTree,
+  },
+})
 export default class ViewTreeView extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public treeEntries!: Maybe<TreeEntry[]>;
 
   @Prop({
-    required: false
+    required: false,
   })
   public codeChanel!: string;
 
@@ -147,6 +169,9 @@ export default class ViewTreeView extends Vue {
   @WorkspaceModule.State("codeChannels")
   public codeChannels!: CodeChannel[];
 
+  @CodeChannelModule.Action
+  private setTreeEntry!: (tree: TreeEntry[]) => void;
+
   public nameCodeChannel = "";
 
   public serverHash: string | undefined;
@@ -179,32 +204,65 @@ export default class ViewTreeView extends Vue {
     this.loadingNewFile = true;
     let prefix = "";
     if (this.codePath.length > 0) {
-      prefix = this.codePath.map(path => path.nombre).join("/") + "/";
+      prefix = this.codePath.map((path) => path.nombre).join("/") + "/";
     }
     const response = await GitHubService.makeCommit({
       branch: {
-        repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
-        branchName: this.repository?.defaultBranchRef?.name
+        repositoryNameWithOwner:
+          this.repository?.owner.login + "/" + this.repository?.name,
+        branchName: this.repository?.defaultBranchRef?.name,
       },
       fileChanges: {
         additions: [
           {
             path: prefix + this.nameFile,
-            contents: ""
-          }
-        ]
+            contents: "",
+          },
+        ],
       },
       message: { headline: "Creaciòn de archivo " + this.nameFile, body: "" },
-      expectedHeadOid: this.branchOid
+      expectedHeadOid: this.branchOid,
     });
 
     this.setBranchOid(response.ref);
-
+    if (this.codePath.length > 0) {
+      const treeEntries = await GitHubService.getNodeFiles(
+        this.codePath[this.codePath.length - 1].id
+      );
+      if (treeEntries) {
+        this.setTreeEntry(treeEntries);
+      }
+    } else {
+      const codeChannel = this.codeChannels.find((channel) => {
+        return channel.uid == this.$route.params.idChannelCode;
+      });
+      if (codeChannel) {
+        const repo = await GitHubService.getRepo(
+          codeChannel!.propietario,
+          codeChannel!.nombre
+        );
+        const treeEntries = (
+          repo?.defaultBranchRef?.target as Commit
+        ).tree.entries?.sort((a, b) => {
+          const aType = a.type === "tree" ? -1 : 1;
+          const bType = b.type === "tree" ? -1 : 1;
+          return aType - bType;
+        });
+        if (treeEntries) {
+          this.setTreeEntry(treeEntries);
+        }
+        if (repo) {
+          this.setRepository(repo);
+        }
+      }
+    }
     //  monaco.editor.getModels().forEach(model => model.dispose());
+
     this.loadingNewFile = false;
 
     this.form.resetValidation();
     this.form.reset();
+
     this.dialogNewFile = false;
   }
 
@@ -219,15 +277,19 @@ export default class ViewTreeView extends Vue {
           if (!this.codeChanged) {
             const blob = treeEntry.object as Blob;
             if (blob.isBinary == false) {
-              const language = monaco.languages.getLanguages().find(language => {
-                return language.extensions?.includes(treeEntry.extension ?? "plaintext");
-              })?.id;
+              const language = monaco.languages
+                .getLanguages()
+                .find((language) => {
+                  return language.extensions?.includes(
+                    treeEntry.extension ?? "plaintext"
+                  );
+                })?.id;
               this.setCodeData(treeEntry);
               CodeService.sendCode(this.currentUser.uid!, {
                 channelID: this.$route.params.idChannelCode,
                 code: blob.text ?? "",
                 extension: language ?? "plaintext",
-                path: this.codeFilePath
+                path: this.codeFilePath,
               });
             }
           } else {

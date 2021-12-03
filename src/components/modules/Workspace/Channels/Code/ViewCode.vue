@@ -18,6 +18,8 @@ const CodeChannel = namespace("CodeChannelModule");
 import CodeService from "@/services/code_channel.service";
 const User = namespace("UserModule");
 import { User } from "@/models/user";
+import { Socket } from "socket.io-client";
+import { codeChannelSocket } from "@/socketio";
 @Component({
   components: {
     EditCode,
@@ -61,6 +63,7 @@ export default class ViewCode extends Vue {
   private currentUser!: User;
 
   public nameCodeChannel = "";
+  public socket?: Socket;
 
   async nameCode() {
     this.nameCodeChannel = await ServiceChannels.getChannelName(
@@ -72,18 +75,35 @@ export default class ViewCode extends Vue {
 
   changeView() {
     this.setCodePath();
-    CodeService.joinToCodeChannel(this.currentUser.uid!, this.$route.params.idChannelCode);
+    /* CodeService.joinToCodeChannel(
+      this.socket!,
+      this.$route.params.idChannelCode
+    ); */
     this.nameCode();
   }
-
+  destroyed() {
+    if (this.driverUID === "") {
+      this.$router.push({
+        name: "notChannels"
+      });
+    } else {
+      this.$router.push({
+        name: "Mainscreen"
+      });
+    }
+  }
+  /*destroyed() {
+    delete this.socket;
+  } */
   mounted() {
+    //  this.socket = codeChannelSocket(this.currentUser.uid!, true);
     CodeService.getDataCode(this.currentUser.uid!, code => {
       if (code.path !== "") {
         this.changeFilePath(code.path);
       }
     });
     CodeService.requestCurrentCode(this.currentUser.uid!, this.$route.params.idChannelCode);
-    this.setDriverUIDStatus(this.currentUser.uid!);
+
     this.changeView();
   }
 }

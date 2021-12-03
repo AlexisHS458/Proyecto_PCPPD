@@ -149,15 +149,53 @@
         </v-list-item-action>
       </v-list-item>
     </v-hover>
-    <v-list class="ml-10 mt-0">
-      <v-list-item v-for="user in usersDisplay" :key="user.uid">
+
+    <!--    <v-list class="ml-10 mt-0">
+      <v-list-item v-for="user in usersDisplay" :key="user.uid" :value="hover">
         <v-list-item-avatar size="25">
           <v-img :src="user.fotoURL" @error="imgError"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title v-text="user.nombre"></v-list-item-title>
         </v-list-item-content>
+
+        <v-list-item-action>
+          <v-menu v-if="workspace.uid_usuario === currentUser.uid" v-model="menuOptions" offset-y>
+            <template #activator="{ on }">
+              <v-btn text icon v-on="on" v-on:click.prevent>
+                <v-icon color="white">mdi-cog</v-icon>
+              </v-btn>
+            </template>
+            <v-list color="secondary">
+              <v-list-item-content class="justify-center card-list">
+                <div class="mx-auto text-right">
+                  <v-btn depressed text block class="btn" @click="muteUser(user.uid)">
+                    <v-icon color="error" class="mr-6">
+                      mdi-microphone-off
+                    </v-icon>
+                    Silenciar usuario
+                  </v-btn>
+                  <v-btn depressed text block class="btn">
+                    <v-icon color="error" class="mr-6">
+                      mdi-headphones-off
+                    </v-icon>
+                    Desconectar usuario
+                  </v-btn>
+                </div>
+              </v-list-item-content>
+            </v-list>
+          </v-menu>
+        </v-list-item-action>
       </v-list-item>
+    </v-list> -->
+
+    <v-list class="ml-10 mt-0">
+      <list-user
+        v-for="user in usersDisplay"
+        :key="user.uid"
+        :channel="channel"
+        :user="user"
+      ></list-user>
     </v-list>
     <div ref="audioContainer" class="audio-container"></div>
   </div>
@@ -180,6 +218,7 @@ const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
 const StatusVoice = namespace("VoiceChannelModule");
 import ChannelService from "@/services/channels.service";
+import ListUser from "@/components/modules/Workspace/Channels/Voice/ListUser.vue";
 /* eslint-disable */
 // @ts-ignore
 import image from "@/assets/userProfile.png";
@@ -188,7 +227,7 @@ import { ChannelType } from "@/utils/channels_types";
 import { voiceChannelSocket } from "@/socketio";
 import { Socket } from "socket.io-client";
 /* eslint-enable */
-@Component
+@Component({ components: { ListUser } })
 export default class NameChannels extends Vue {
   @Prop({
     required: true
@@ -253,6 +292,9 @@ export default class NameChannels extends Vue {
   @StatusVoice.Action
   private setIsConnectedStatus!: (status: VoiceState) => void;
 
+  @StatusVoice.Action
+  private toggleIsMuteStatus!: () => void;
+
   @StatusVoice.State("isMute")
   private isMute!: boolean;
 
@@ -263,8 +305,8 @@ export default class NameChannels extends Vue {
     this.mutePeers();
   }
 
-  
-
+  public hover = true;
+  public menuOptions = false;
   public menu = false;
   public dialog = false;
   public dialogRenameChanel = false;
@@ -302,6 +344,13 @@ export default class NameChannels extends Vue {
         this.dialogRenameChanel = false;
       }
     }
+  }
+
+  muteUser(userUId: string) {
+    VoiceService.muteUser(this.currentUser.uid!, {
+      uidUserToMute: userUId,
+      mute: true
+    });
   }
 
   /**
@@ -348,7 +397,7 @@ export default class NameChannels extends Vue {
       await this.initStream();
       VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
       VoiceService.userStatus(this.currentUser.uid!, isConnected => {
-        this.isConnected = !!isConnected;
+            this.isConnected = !!isConnected;
       });
       if (!this.isConnected) {
         const audio = new Audio(require("@/assets/connected.mp3"));
@@ -380,6 +429,7 @@ export default class NameChannels extends Vue {
         users.map(user => UserService.getUserInfoByID(user.uid))
       );
     });
+
     this.initSignaling();
   }
 
@@ -434,10 +484,9 @@ export default class NameChannels extends Vue {
     });
 
     //console.log('createPeer');
-    
 
     //console.log('estoy llamando a: ', userSocketIDToSignal);
-    console.log(this.peers);
+    //console.log(this.peers);
 
     return peer;
   }
@@ -447,8 +496,7 @@ export default class NameChannels extends Vue {
     this.peers[peerID]?.destroy();
     delete this.peers[peerID];
 
-    console.log("alguien se fue");
-
+ 
   }
 
   addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream): Peer.Instance {
@@ -489,10 +537,8 @@ export default class NameChannels extends Vue {
     });
 
     //console.log('me llama: ', callerID);
-   // console.log('addPeer');
-   console.log(this.peers);
-   
-    
+    // console.log('addPeer');
+    //console.log(this.peers);
 
     return peer;
   }
