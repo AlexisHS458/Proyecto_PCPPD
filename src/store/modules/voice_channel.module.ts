@@ -8,9 +8,12 @@ class VoiceChannelModule extends VuexModule {
 
   @Mutation
   public toggleMute(): void {
-    console.log("Ti togea");
-
     this.isMute = !this.isMute;
+  }
+
+  @Mutation
+  public setMuteState(mute: boolean): void {
+    this.isMute = mute;
   }
 
   @Mutation
@@ -26,6 +29,11 @@ class VoiceChannelModule extends VuexModule {
   @Action
   toggleIsMuteStatus(): void {
     this.context.commit("toggleMute");
+  }
+
+  @Action
+  setMute(mute : boolean): void {
+    this.context.commit("setMuteState", mute);
   }
 
   get isConnected(): VoiceState {

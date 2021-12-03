@@ -33,7 +33,7 @@
       </v-tooltip>
       <v-spacer></v-spacer>
       <v-btn icon @click="toggleMicrophone">
-        <v-icon v-if="isTalk" color="success">mdi-microphone</v-icon>
+        <v-icon v-if="!isMute" color="success">mdi-microphone</v-icon>
         <v-icon v-else color="error">mdi-microphone-off</v-icon>
       </v-btn>
       <v-btn icon @click="toggleHeadphones">
@@ -70,8 +70,14 @@ export default class UserInfo extends Vue {
   @StatusVoice.State("isConnectedStatus")
   private isConnectedStatus!: VoiceState;
 
+  @StatusVoice.State("isMute")
+  private isMute!: boolean;
+
   @StatusVoice.Action
   private toggleIsMuteStatus!: () => void;
+
+  @StatusVoice.Action
+  private setMute!: (mute: boolean) => void;
 
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
@@ -86,7 +92,6 @@ export default class UserInfo extends Vue {
   private codeChanged!: boolean;
 
   public loading = false;
-  public isTalk = true;
   public isListening = true;
   public isConnected = false;
   public iSConnectedCode = false;
@@ -94,12 +99,11 @@ export default class UserInfo extends Vue {
   public nameVoiceChannel = "";
   toggleMicrophone() {
     this.toggleIsMuteStatus();
-    this.isTalk = !this.isTalk;
   }
 
   toggleHeadphones() {
     this.isListening = !this.isListening;
-    this.isTalk = !this.isTalk;
+  
   }
 
   disconnect() {
@@ -152,8 +156,7 @@ export default class UserInfo extends Vue {
     VoiceService.listenToMute(this.currentUser.uid!, isMute => {
       console.log("me quieren mutear", isMute);
 
-      this.toggleIsMuteStatus();
-      this.isTalk = !this.isTalk;
+      this.setMute(isMute);
     });
   }
 }
