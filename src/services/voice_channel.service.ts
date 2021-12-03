@@ -76,8 +76,8 @@ class VoiceChannelService {
     });
   }
 
-  sendingSignal(uid: string, payload: SignalPayload): Socket {
-    return voiceChannelSocket(uid).emit(EventName.SENDING_SIGNAL, payload);
+  sendingSignal(socket: Socket, payload: SignalPayload): Socket {
+    return socket.emit(EventName.SENDING_SIGNAL, payload);
   }
 
   returningSignal(uid: string, payload: SignalPayload): Socket {
