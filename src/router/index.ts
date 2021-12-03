@@ -36,6 +36,15 @@ const routes: Array<RouteConfig> = [
     component: MainScreen,
     meta: {
       requiresAuth: true
+    },
+    beforeEnter: async (to, from, next) => {
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next({ name: "Register" });
+      } else {
+        next();
+      }
     }
   },
   {
@@ -44,6 +53,15 @@ const routes: Array<RouteConfig> = [
     component: EditInformation,
     meta: {
       requiresAuth: true
+    },
+    beforeEnter: async (to, from, next) => {
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next({ name: "Register" });
+      } else {
+        next();
+      }
     }
   },
   {
@@ -53,7 +71,15 @@ const routes: Array<RouteConfig> = [
     meta: {
       requiresAuth: true
     },
-
+    beforeEnter: async (to, from, next) => {
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next({ name: "Register" });
+      } else {
+        next();
+      }
+    },
     children: [
       {
         name: "messages",
@@ -122,7 +148,7 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
 
   auth.onAuthStateChanged(async user => {
-    if (!user && requiresAuth) {
+    /* if (!user && requiresAuth) {
       next({ name: "Home" });
     } else if (!requiresAuth && user) {
       next("/Mainscreen");
@@ -147,6 +173,33 @@ router.beforeEach((to, from, next) => {
     } else if (!requiresAuth && !user) {
       next();
     } else {
+      next();
+    }*/
+    if (requiresAuth && !user) {
+      next({ name: "Home" });
+    } else if (!requiresAuth && user) {
+      console.log("Entro no regitser");
+      next({ name: "MainScreen" });
+    } else if (to.fullPath == "/register" && requiresAuth && user) {
+      console.log("Entro register");
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next();
+      } else {
+        next({ name: "MainScreen" });
+      }
+    } /*else if (to.fullPath !== "/register" && requiresAuth && user) {
+      console.log("Entro no regitser");
+
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next({ name: "Register" });
+      } else {
+        next();
+      }
+    }*/ else {
       next();
     }
   });

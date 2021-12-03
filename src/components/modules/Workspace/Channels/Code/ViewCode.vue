@@ -1,7 +1,13 @@
 <template>
   <div>
-    <app-bar-options :nameChannel="nameCodeChannel" :color="'secondaryLight'"></app-bar-options>
-    <edit-code :idChannelCode="idChannelCode" v-if="codeFilePath != ''"></edit-code>
+    <app-bar-options
+      :nameChannel="nameCodeChannel"
+      :color="'secondaryLight'"
+    ></app-bar-options>
+    <edit-code
+      :idChannelCode="idChannelCode"
+      v-if="codeFilePath != ''"
+    ></edit-code>
     <not-code v-else></not-code>
   </div>
 </template>
@@ -24,12 +30,12 @@ import { codeChannelSocket } from "@/socketio";
   components: {
     EditCode,
     NotCode,
-    AppBarOptions
-  }
+    AppBarOptions,
+  },
 })
 export default class ViewCode extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public idChannelCode!: string;
 
@@ -75,19 +81,29 @@ export default class ViewCode extends Vue {
 
   changeView() {
     this.setCodePath();
+    CodeService.joinToCodeChannel(
+      this.socket!,
+      this.$route.params.idChannelCode
+    );
     this.nameCode();
   }
 
+  destroyed() {
+    delete this.socket;
+  }
   mounted() {
-    CodeService.getDataCode(this.currentUser.uid!, code => {
+    this.socket = codeChannelSocket(this.currentUser.uid!, true);
+    CodeService.getDataCode(this.currentUser.uid!, (code) => {
       if (code.path !== "") {
         this.changeFilePath(code.path);
       }
     });
-    CodeService.requestCurrentCode(this.currentUser.uid!, this.$route.params.idChannelCode);
+    CodeService.requestCurrentCode(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode
+    );
     this.setDriverUIDStatus(this.currentUser.uid!);
     this.changeView();
   }
-
 }
 </script>
