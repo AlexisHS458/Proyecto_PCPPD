@@ -8,6 +8,8 @@ class VoiceChannelModule extends VuexModule {
 
   @Mutation
   public toggleMute(): void {
+    console.log("Ti togea");
+
     this.isMute = !this.isMute;
   }
 

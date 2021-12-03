@@ -74,7 +74,6 @@ class VoiceChannelService {
     onEvent: (signalPayload: SignalPayload) => void
   ): Socket {
     return socket.on(`${ResponseEventName.USER_JOINED}-${channelID}`, payload => {
-      console.log(payload.callerID);
       onEvent(payload);
     });
   }
@@ -112,9 +111,9 @@ class VoiceChannelService {
     return voiceChannelSocket(uid).emit(EventName.MUTE_USER, payload);
   }
 
-  
-  listenToMute(uid:string, onEvent: (isMute: boolean) => void): Socket{
-    return voiceChannelSocket(uid).emit(EventName.MUTE_USER, (payload: boolean) =>{
+
+  listenToMute(uid: string, onEvent: (isMute: boolean) => void): Socket{
+    return voiceChannelSocket(uid).on(ResponseEventName.TOGGLE_MUTE, (payload: boolean) =>{
       onEvent(payload)
     });
   }

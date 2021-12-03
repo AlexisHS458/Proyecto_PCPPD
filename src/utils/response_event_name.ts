@@ -15,5 +15,5 @@ export enum ResponseEventName {
    USER_STATUS = 'user-status',
    RECEIVING_RETURNED_SIGNAL = 'receiving returned signal',
    USER_JOINED = 'user-joined',
-   TOGGLE_MUTE = "toggle-mute"
+   TOGGLE_MUTE = 'toggle-mute'
  }

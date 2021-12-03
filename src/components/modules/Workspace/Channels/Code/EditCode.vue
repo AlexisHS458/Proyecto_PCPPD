@@ -207,7 +207,6 @@ export default class EditCode extends Vue {
   changeView() {
     monaco.editor.getModels().forEach(model => model.dispose());
     this.clearPathState();
-    // CodeService.joinToCodeChannel(this.currentUser.uid!, this.$route.params.idChannelCode);
 
     this.initEditor();
     const code = this.$refs.codeappbar as any;
