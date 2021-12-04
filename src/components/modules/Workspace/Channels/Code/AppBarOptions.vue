@@ -1,6 +1,11 @@
 <template>
   <v-app-bar app clipped-right flat height="48px" :color="color">
-    <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
+    <v-icon
+      color="white"
+      class="mr-4"
+      @click="toggleShowNavigationDrawerChannels"
+      >mdi-menu</v-icon
+    >
     <v-toolbar-title class="font-weight-medium">
       {{ nameChannel }}
     </v-toolbar-title>
@@ -27,7 +32,9 @@
               </v-list>
               <v-divider></v-divider>
               <v-card-actions class="justify-center">
-                <v-btn color="success" small @click="acceptRequest">Aceptar</v-btn>
+                <v-btn color="success" small @click="acceptRequest"
+                  >Aceptar</v-btn
+                >
                 <v-btn color="error" small>Rechazar</v-btn>
               </v-card-actions>
             </template>
@@ -62,7 +69,12 @@
           <v-card>
             <v-toolbar color="secondary" dark> Realizar Commit </v-toolbar>
             <v-card-text>
-              <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+              <v-form
+                ref="form"
+                v-model="valid"
+                lazy-validation
+                @submit.prevent
+              >
                 <v-row align="center" justify="center" class="mt-6">
                   <v-col cols="9">
                     <v-text-field
@@ -111,6 +123,7 @@
               v-bind="attrs"
               v-on="on"
               :disabled="currentUser.uid != driverUID"
+              @click="compilerCode"
             >
               mdi-play-outline
             </v-icon>
@@ -135,15 +148,16 @@ import UserService from "@/services/user.service";
 import { Maybe, Repository, Commit } from "@/generated/graphql";
 import { VForm } from "@/utils/types";
 import * as monaco from "monaco-editor";
+
 @Component
 export default class AppBarOptions extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public nameChannel!: string;
 
   @Prop({
-    required: true
+    required: true,
   })
   public color!: string;
 
@@ -210,7 +224,7 @@ export default class AppBarOptions extends Vue {
   public summary = "";
   public valid = false;
   public rules = {
-    required: (v: string): string | boolean => !!v || "Campo requerido"
+    required: (v: string): string | boolean => !!v || "Campo requerido",
   };
 
   closeDialogExport() {
@@ -235,19 +249,20 @@ export default class AppBarOptions extends Vue {
       this.loadingExport = true;
       const response = await GitHubService.makeCommit({
         branch: {
-          repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
-          branchName: this.repository?.defaultBranchRef?.name
+          repositoryNameWithOwner:
+            this.repository?.owner.login + "/" + this.repository?.name,
+          branchName: this.repository?.defaultBranchRef?.name,
         },
         fileChanges: {
           additions: [
             {
               path: this.codeFilePath,
-              contents: window.btoa(monaco.editor.getModels()[0].getValue())
-            }
-          ]
+              contents: window.btoa(monaco.editor.getModels()[0].getValue()),
+            },
+          ],
         },
         message: { headline: this.summary, body: this.description },
-        expectedHeadOid: this.branchOid
+        expectedHeadOid: this.branchOid,
       });
 
       this.setShowDialogSave(false);
@@ -259,7 +274,6 @@ export default class AppBarOptions extends Vue {
 
       const commit = response.commit as Commit;
       this.setBranchOid(response.ref);
-     
 
       const urlShort = commit.url.slice(0, -25) + "...";
       this.setMessageOnSnackbar(
@@ -270,10 +284,43 @@ export default class AppBarOptions extends Vue {
   }
 
   mounted() {
-    CodeService.listenForRequest(this.currentUser.uid!, async uidRequest => {
+    CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
       this.test = true;
     });
+  }
+
+  async compilerCode() {
+    await this.axios({
+      url: "https://api.jdoodle.com/v1/execute",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      data: {
+        clientId: "a6911fa32ba6d62569966af138da374f",
+        clientSecret:
+          "830201c9bae0a69ece5a3bc406992fa60df3855c0cb6672be052ff9cdda3f0f1",
+        script:
+          "#include<iostream>\nusing namespace std;\nint main() {\nfor(int i=0;i<10;i++) cout<<i<<' ';\n}",
+        language: "cpp17",
+        versionIndex: "0",
+      },
+      method: "post",
+    });
+    /*  await this.axios
+      .get("https://api.jdoodle.com/v1/execute/s", {
+        method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "GET,POST,OPTIONS,DELETE,PUT",
+        },
+      })
+      .then((response) => response)
+      .then((data) => console.log(data.data()))
+      .catch((e) => console.log(e.message));*/
   }
 }
 </script>
