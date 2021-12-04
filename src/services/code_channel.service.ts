@@ -122,8 +122,8 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.REQUEST_CODE, codeChannelID);
   }
 
-  compileCode(uid: string, channelID: string, dataCode: any): Socket {
-    return codeChannelSocket(uid).emit(EventName.COMPILE_CODE, { ...dataCode, channelID });
+  compileCode(uid: string, codeChannelID: string, dataCode: any): Socket {
+    return codeChannelSocket(uid).emit(EventName.COMPILE_CODE, { ...dataCode, codeChannelID });
   }
 
   lisenTerminal(uid: string, channelID: string, onEvent: (data: any) => void) {
