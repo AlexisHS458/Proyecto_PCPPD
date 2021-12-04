@@ -28,6 +28,8 @@ class CodeChannelModule extends VuexModule {
 
   public repository: Maybe<Repository> = null;
 
+  public responseCompiler = "";
+
   public codeChannelName = "";
   public driverUID = "";
   public codeChanged = false;
@@ -41,7 +43,8 @@ class CodeChannelModule extends VuexModule {
     showSnackbar: false,
     showSnackbarError: false,
     showCloseDialog: false,
-    showDialogSave: false
+    showDialogSave: false,
+    showTerminal: false
   };
 
   @Mutation
@@ -173,6 +176,26 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public changeFilePathState(path: string): void {
     this.codeFilePath = path;
+  }
+
+  @Mutation
+  public setChangeTerminalState(state: boolean): void {
+    this.status.showTerminal = state;
+  }
+
+  @Mutation
+  public setResponseCompilerState(response: string): void {
+    this.responseCompiler = response;
+  }
+
+  @Action
+  public setChangeTerminal(status: boolean): void {
+    this.context.commit("setChangeTerminalState", status);
+  }
+
+  @Action
+  public setResponseCompiler(response: string): void {
+    this.context.commit("setResponseCompilerState", response);
   }
 
   @Action

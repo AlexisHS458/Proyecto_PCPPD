@@ -10,8 +10,8 @@
         ></v-text-field>
       </v-card-text>
 
-      <v-card-text v-show="showConsole">
-        <p class="white--text mb-0">Resultado {{ line }}</p>
+      <v-card-text v-show="status.showTerminal">
+        <p class="white--text mb-0">Resultado</p>
         <v-textarea
           no-resize
           solo
@@ -20,6 +20,8 @@
           background-color="black"
           dark
           width="150vh"
+          readonly
+          :value="responseCompiler"
         ></v-textarea>
       </v-card-text>
       <v-card-text v-show="showArgs">
@@ -76,13 +78,26 @@
 <script lang="ts">
 import { Position } from "monaco-editor";
 import { Component, Prop, Vue } from "vue-property-decorator";
-
+import { namespace } from "vuex-class";
+const CodeChannel = namespace("CodeChannelModule");
 @Component
 export default class EditCode extends Vue {
   @Prop({
     required: true,
   })
   public line!: number;
+
+  @CodeChannel.State("responseCompiler")
+  private responseCompiler!: string;
+
+  @CodeChannel.State("status")
+  private status!: any;
+
+  @CodeChannel.Action
+  private setChangeTerminal!: (state: boolean) => void;
+
+  @CodeChannel.State("codeFilePath")
+  private codeFilePath!: string;
 
   public showStdin = false;
   public showArgs = false;
@@ -92,11 +107,12 @@ export default class EditCode extends Vue {
     this.showStdin = !this.showStdin;
     if (this.showStdin) {
       this.showArgs = false;
-      this.showConsole = false;
+      this.setChangeTerminal(false);
+      // this.showConsole = false;
     }
   }
   closeInputConsole() {
-    this.showConsole = !this.showConsole;
+    this.status.showTerminal = !this.status.showTerminal;
     if (this.showConsole) {
       this.showArgs = false;
       this.showStdin = false;
@@ -106,7 +122,8 @@ export default class EditCode extends Vue {
   closeInputArgs() {
     this.showArgs = !this.showArgs;
     if (this.showArgs) {
-      this.showConsole = false;
+      this.setChangeTerminal(false);
+      // this.showConsole = false;
       this.showStdin = false;
     }
   }

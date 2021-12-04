@@ -7,7 +7,7 @@
       >mdi-menu</v-icon
     >
     <v-toolbar-title class="font-weight-medium">
-      {{ nameChannel }}
+      {{ nameChannel }} {{ languageName }}
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
@@ -122,7 +122,7 @@
               color="success"
               v-bind="attrs"
               v-on="on"
-              :disabled="currentUser.uid != driverUID"
+              :disabled="currentUser.uid != driverUID || codeFilePath === ''"
               @click="compilerCode"
             >
               mdi-play-outline
@@ -136,7 +136,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch, Ref } from "vue-property-decorator";
+import {
+  Component,
+  Prop,
+  Vue,
+  Watch,
+  Ref,
+  VModel,
+} from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
@@ -145,9 +152,10 @@ import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
 const WorkspaceOptions = namespace("WorkspaceModule");
 import UserService from "@/services/user.service";
-import { Maybe, Repository, Commit } from "@/generated/graphql";
+import { Maybe, Repository, Commit, TreeEntry } from "@/generated/graphql";
 import { VForm } from "@/utils/types";
 import * as monaco from "monaco-editor";
+import { REST_SERVER_ENDPOINT, SOCKET_SERVER_ENDPOINT } from "@/constants";
 
 @Component
 export default class AppBarOptions extends Vue {
@@ -194,6 +202,9 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.Action("setShowDialogSave")
   private setShowDialogSave!: (status: boolean) => void;
 
+  @CodeChannel.State("codeData")
+  private codeData!: Maybe<TreeEntry>;
+
   @WorkspaceOptions.Action
   private setMessageOnSnackbar!: (message: string) => void;
 
@@ -202,6 +213,12 @@ export default class AppBarOptions extends Vue {
 
   @CodeChannel.Action
   private setShowDialog!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setResponseCompiler!: (response: string) => void;
+
+  @CodeChannel.Action
+  private setChangeTerminal!: (state: boolean) => void;
 
   @Ref("form") readonly form!: VForm;
 
@@ -226,6 +243,19 @@ export default class AppBarOptions extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
   };
+  public languageName: Maybe<string> = "";
+
+  @Watch("codeData")
+  onChildChangedData() {
+    const language =
+      monaco.languages.getLanguages().find((language) => {
+        return language.extensions?.includes(
+          this.codeData?.extension ?? "plaintext"
+        );
+      })?.id ?? null;
+    this.languageName = language;
+    console.log("hola 10", this.languageName);
+  }
 
   closeDialogExport() {
     this.form.resetValidation();
@@ -284,43 +314,55 @@ export default class AppBarOptions extends Vue {
   }
 
   mounted() {
+    this.onChildChangedData();
     CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
       this.test = true;
     });
+    CodeService.lisenTerminal(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode,
+      (data) => {
+        this.setResponseCompiler(data.output);
+        this.setChangeTerminal(true);
+      }
+    );
   }
 
-  async compilerCode() {
-    await this.axios({
-      url: "https://api.jdoodle.com/v1/execute",
+  compilerCode() {
+    console.log("hola 2", this.languageName);
+
+    console.log(monaco.editor.getModels()[0].getValue());
+
+    CodeService.compileCode(
+      this.currentUser.uid!,
+      this.$route.params.idChannelCode,
+      {
+        script: monaco.editor.getModels()[0].getValue(),
+        language: this.languageName,
+        versionIndex: "0",
+      }
+    );
+    /*   await this.axios({
+      url: REST_SERVER_ENDPOINT + "rest/compiler",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
       },
       data: {
-        clientId: "a6911fa32ba6d62569966af138da374f",
-        clientSecret:
-          "830201c9bae0a69ece5a3bc406992fa60df3855c0cb6672be052ff9cdda3f0f1",
-        script:
-          "#include<iostream>\nusing namespace std;\nint main() {\nfor(int i=0;i<10;i++) cout<<i<<' ';\n}",
-        language: "cpp17",
+        script: monaco.editor.getModels()[0].getValue(),
+        language: this.languageName,
         versionIndex: "0",
       },
       method: "post",
-    });
-    /*  await this.axios
-      .get("https://api.jdoodle.com/v1/execute/s", {
-        method: "POST",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Methods": "GET,POST,OPTIONS,DELETE,PUT",
-        },
+    })
+      .then((response) => {
+
+        this.setResponseCompiler(response.data.output);
+        this.setChangeTerminal(true);
       })
-      .then((response) => response)
-      .then((data) => console.log(data.data()))
-      .catch((e) => console.log(e.message));*/
+      .catch((e) => {
+        console.log(e);
+      });*/
   }
 }
 </script>
