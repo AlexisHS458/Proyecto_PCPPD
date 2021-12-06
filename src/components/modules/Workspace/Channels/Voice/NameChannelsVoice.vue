@@ -8,7 +8,7 @@
         slot-scope="{ hover }"
         :class="[
           `${hover ? 'select-item' : 'no-select-item'}`,
-          `${isConnected ? 'active' : 'noActive'}`
+          `${isConnected ? 'active' : 'noActive'} `
         ]"
       >
         <v-list-item-icon>
@@ -274,6 +274,9 @@ export default class NameChannels extends Vue {
   @WorkspaceOptions.Action
   private setVisibleSnackBarWarning!: () => void;
 
+  @StatusVoice.State("isConnectedStatus")
+  private isConnectedStatus!: VoiceState;
+
   /**
    * Estado obtenido del @module User
    */
@@ -393,13 +396,15 @@ export default class NameChannels extends Vue {
     );
 
     if (hasAcces) {
-      this.setIsConnectedStatus(VoiceState.CONNECTING);
-      await this.initStream();
-      VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
-      VoiceService.userStatus(this.currentUser.uid!, isConnected => {
+      /*  VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
         this.isConnected = !!isConnected;
-      });
-      if (!this.isConnected) {
+      });*/
+      // if (!this.isConnected) {
+      if (this.isConnectedStatus == "Conectando") {
+        //  this.isConnected = true
+        this.setIsConnectedStatus(VoiceState.CONNECTING);
+        await this.initStream();
+        VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
         const audio = new Audio(require("@/assets/connected.mp3"));
         audio.play();
       }
@@ -417,6 +422,7 @@ export default class NameChannels extends Vue {
     this.socket = voiceChannelSocket(this.currentUser.uid!, true);
     VoiceService.allUsers(this.currentUser.uid!, this.channel.uid!, async users => {
       if (!users.find(user => user.uid === this.currentUser.uid)) {
+        this.isConnected = false;
         this.stream?.getTracks().forEach(track => {
           track.stop();
         });
@@ -424,6 +430,8 @@ export default class NameChannels extends Vue {
           this.disconnect(k);
         });
         delete this.stream;
+      } else {
+        this.isConnected = true;
       }
       this.usersDisplay = await Promise.all(
         users.map(user => UserService.getUserInfoByID(user.uid))
@@ -448,8 +456,6 @@ export default class NameChannels extends Vue {
   }
 
   createPeer(userSocketIDToSignal: string, callerID: string, stream: MediaStream): Peer.Instance {
-   
-    
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -522,7 +528,6 @@ export default class NameChannels extends Vue {
     });
 
     peer.on("close", () => {
-    
       this.disconnect(callerID);
     });
 
@@ -544,8 +549,7 @@ export default class NameChannels extends Vue {
     Object.keys(this.peers).forEach(k => {
       const audioTag = document.getElementById(k) as HTMLAudioElement;
       const stream = audioTag.srcObject as MediaStream;
-    
-      
+
       stream.getTracks().forEach(track => {
         track.enabled = !this.isDeafen;
       });
@@ -571,8 +575,6 @@ export default class NameChannels extends Vue {
     });
 
     VoiceService.listenUserJoined(this.socket!, this.channel.uid!, payloadSignal => {
-     
-      
       if (!this.peers[payloadSignal.callerID]) {
         const peer = this.addPeer(payloadSignal.signal, payloadSignal.callerID, this.stream!);
         this.peers[payloadSignal.callerID] = peer;

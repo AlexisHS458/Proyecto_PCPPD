@@ -4,7 +4,8 @@ import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
 import apolloClient from "@/utils/apollo_client";
-
+import axios from "axios";
+import VueAxios from "vue-axios";
 /* eslint-disable */
 // @ts-ignore
 import VueImg from "v-img";
@@ -20,6 +21,7 @@ import { provideApolloClient } from "@vue/apollo-composable";
 
 Vue.use(TooltipPlugin);
 Vue.config.productionTip = false;
+Vue.use(VueAxios, axios);
 
 new Vue({
   router,

@@ -2,7 +2,7 @@
   <v-app-bar app clipped-right flat height="48px" :color="color">
     <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
     <v-toolbar-title class="font-weight-medium">
-      {{ nameChannel }}
+      {{ nameChannel }} {{ languageName }}
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
@@ -110,7 +110,8 @@
               color="success"
               v-bind="attrs"
               v-on="on"
-              :disabled="currentUser.uid != driverUID"
+              :disabled="currentUser.uid != driverUID || codeFilePath === ''"
+              @click="compilerCode"
             >
               mdi-play-outline
             </v-icon>
@@ -123,7 +124,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch, Ref } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Ref, VModel } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
@@ -132,9 +133,11 @@ import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
 const WorkspaceOptions = namespace("WorkspaceModule");
 import UserService from "@/services/user.service";
-import { Maybe, Repository, Commit } from "@/generated/graphql";
+import { Maybe, Repository, Commit, TreeEntry } from "@/generated/graphql";
 import { VForm } from "@/utils/types";
 import * as monaco from "monaco-editor";
+import { REST_SERVER_ENDPOINT, SOCKET_SERVER_ENDPOINT } from "@/constants";
+
 @Component
 export default class AppBarOptions extends Vue {
   @Prop({
@@ -171,6 +174,9 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.State("codeFilePath")
   private codeFilePath!: string;
 
+  @CodeChannel.State("stdin")
+  private stdin!: string;
+
   @CodeChannel.Action("setBranchOid")
   private setBranchOid!: (ref: any) => void;
 
@@ -180,6 +186,9 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.Action("setShowDialogSave")
   private setShowDialogSave!: (status: boolean) => void;
 
+  @CodeChannel.State("codeData")
+  private codeData!: Maybe<TreeEntry>;
+
   @WorkspaceOptions.Action
   private setMessageOnSnackbar!: (message: string) => void;
 
@@ -188,6 +197,12 @@ export default class AppBarOptions extends Vue {
 
   @CodeChannel.Action
   private setShowDialog!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setResponseCompiler!: (response: string) => void;
+
+  @CodeChannel.Action
+  private setChangeTerminal!: (state: boolean) => void;
 
   @Ref("form") readonly form!: VForm;
 
@@ -212,6 +227,17 @@ export default class AppBarOptions extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido"
   };
+  public languageName: Maybe<string> = "";
+
+  @Watch("codeData")
+  onChildChangedData() {
+    const language =
+      monaco.languages.getLanguages().find(language => {
+        return language.extensions?.includes(this.codeData?.extension ?? "plaintext");
+      })?.id ?? null;
+    this.languageName = language;
+    console.log("hola 10", this.languageName);
+  }
 
   closeDialogExport() {
     this.form.resetValidation();
@@ -259,7 +285,6 @@ export default class AppBarOptions extends Vue {
 
       const commit = response.commit as Commit;
       this.setBranchOid(response.ref);
-     
 
       const urlShort = commit.url.slice(0, -25) + "...";
       this.setMessageOnSnackbar(
@@ -270,10 +295,49 @@ export default class AppBarOptions extends Vue {
   }
 
   mounted() {
+    this.onChildChangedData();
     CodeService.listenForRequest(this.currentUser.uid!, async uidRequest => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
       this.test = true;
     });
+    CodeService.lisenTerminal(this.currentUser.uid!, this.$route.params.idChannelCode, data => {
+      this.setResponseCompiler(data.output);
+      this.setChangeTerminal(true);
+    });
+  }
+
+  compilerCode() {
+    console.log("hola 2", this.languageName);
+
+    console.log(monaco.editor.getModels()[0].getValue());
+
+    CodeService.compileCode(this.currentUser.uid!, this.$route.params.idChannelCode, {
+      script: monaco.editor.getModels()[0].getValue(),
+      language: this.languageName,
+      versionIndex: "0",
+      stdin: this.stdin
+    });
+
+    /*   await this.axios({
+      url: REST_SERVER_ENDPOINT + "rest/compiler",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        script: monaco.editor.getModels()[0].getValue(),
+        language: this.languageName,
+        versionIndex: "0",
+      },
+      method: "post",
+    })
+      .then((response) => {
+
+        this.setResponseCompiler(response.data.output);
+        this.setChangeTerminal(true);
+      })
+      .catch((e) => {
+        console.log(e);
+      });*/
   }
 }
 </script>

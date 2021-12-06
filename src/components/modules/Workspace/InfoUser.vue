@@ -85,6 +85,9 @@ export default class UserInfo extends Vue {
   @StatusVoice.Action
   private setMute!: (mute: boolean) => void;
 
+  @StatusVoice.Action
+  private setIsConnectedStatus!: (status: VoiceState) => void;
+
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
 
@@ -117,6 +120,7 @@ export default class UserInfo extends Vue {
     // if (sound) {
     var audio = new Audio(require("@/assets/disconnected.mp3"));
     audio.play();
+    this.setIsConnectedStatus(VoiceState.CONNECTING);
     //  }
   }
 
@@ -159,10 +163,10 @@ export default class UserInfo extends Vue {
       this.iSConnectedCode = !!isConnected;
     });
     VoiceService.listenToActions(this.currentUser.uid!, actions => {
-      if (actions.mute) {
-        this.setMute(actions.mute);
-      }
+      this.setMute(actions.mute ?? false);
+
       if (actions.disconnect) {
+        this.setIsConnectedStatus(VoiceState.CONNECTING);
         VoiceService.leaveVoiceChannel(this.currentUser.uid!);
       }
     });

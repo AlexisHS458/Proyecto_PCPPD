@@ -79,8 +79,8 @@ class CodeChannelService {
    * @param uid uid de usuario
    * @param onEvent evento cuando cambia el driver
    */
-  currentDriver(socket: Socket,onEvent: (driverID: string) => void): Socket {
-    return  socket.on(ResponseEventName.DRIVER, payload => {
+  currentDriver(socket: Socket, onEvent: (driverID: string) => void): Socket {
+    return socket.on(ResponseEventName.DRIVER, payload => {
       onEvent(payload);
     });
   }
@@ -120,6 +120,16 @@ class CodeChannelService {
 
   requestCurrentCode(uid: string, codeChannelID: string): Socket {
     return codeChannelSocket(uid).emit(EventName.REQUEST_CODE, codeChannelID);
+  }
+
+  compileCode(uid: string, codeChannelID: string, dataCode: any): Socket {
+    return codeChannelSocket(uid).emit(EventName.COMPILE_CODE, { ...dataCode, codeChannelID });
+  }
+
+  lisenTerminal(uid: string, channelID: string, onEvent: (data: any) => void) {
+    return this.joinRoom(uid, channelID).on(ResponseEventName.COMPILE_DATA, payload => {
+      onEvent(payload);
+    });
   }
 }
 

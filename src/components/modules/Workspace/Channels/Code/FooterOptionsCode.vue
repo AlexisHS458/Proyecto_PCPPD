@@ -3,15 +3,17 @@
     <v-card class="flex" flat tile color="secondary">
       <v-card-text v-show="showStdin" class="mt-5">
         <v-text-field
-          label="Outlined"
+          label="Stdin"
           placeholder="Stdin"
           outlined
           background-color="grey"
+          v-model.trim="stdinModel"
+          @keyup="sendStdin"
         ></v-text-field>
       </v-card-text>
 
-      <v-card-text v-show="showConsole">
-        <p class="white--text mb-0">Resultado {{ line }}</p>
+      <v-card-text v-show="status.showTerminal">
+        <p class="white--text mb-0">Resultado</p>
         <v-textarea
           no-resize
           solo
@@ -20,9 +22,11 @@
           background-color="black"
           dark
           width="150vh"
+          readonly
+          :value="responseCompiler"
         ></v-textarea>
       </v-card-text>
-      <v-card-text v-show="showArgs">
+      <!--   <v-card-text v-show="showArgs">
         <v-textarea
           solo
           name="input-7-4"
@@ -32,21 +36,15 @@
           dark
           width="150vh"
         ></v-textarea>
-      </v-card-text>
+      </v-card-text>  -->
       <v-card-title>
         <v-icon color="white">mdi-console </v-icon>
-        <v-btn
-          depressed
-          text
-          color="white"
-          class="ml-2 text-capitalize"
-          @click="closeInputConsole"
-        >
+        <v-btn depressed text color="white" class="ml-2 text-capitalize" @click="closeInputConsole">
           Consola
         </v-btn>
 
         <v-divider vertical></v-divider>
-        <v-btn
+        <!--        <v-btn
           depressed
           text
           color="white"
@@ -54,21 +52,13 @@
           @click="closeInputArgs"
         >
           Argumentos
-        </v-btn>
+        </v-btn> -->
         <v-divider vertical></v-divider>
-        <v-btn
-          depressed
-          text
-          color="white"
-          class="mr-2 text-capitalize"
-          @click="closeInputStdin"
-        >
+        <v-btn depressed text color="white" class="mr-2 text-capitalize" @click="closeInputStdin">
           Stdin
         </v-btn>
         <v-spacer></v-spacer>
-        <strong class="subheading" style="color: white"
-          >Línea: {{ line }}</strong
-        >
+        <strong class="subheading" style="color: white">Línea: {{ line }}</strong>
       </v-card-title>
     </v-card>
   </v-footer>
@@ -76,27 +66,50 @@
 <script lang="ts">
 import { Position } from "monaco-editor";
 import { Component, Prop, Vue } from "vue-property-decorator";
-
+import { namespace } from "vuex-class";
+const CodeChannel = namespace("CodeChannelModule");
 @Component
 export default class EditCode extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public line!: number;
+
+  @CodeChannel.State("responseCompiler")
+  private responseCompiler!: string;
+
+  @CodeChannel.State("status")
+  private status!: any;
+
+  @CodeChannel.Action
+  private setChangeTerminal!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setStdin!: (stdin: string) => void;
+
+  @CodeChannel.State("codeFilePath")
+  private codeFilePath!: string;
 
   public showStdin = false;
   public showArgs = false;
   public showConsole = false;
+  public stdinModel = "";
+
+  sendStdin() {
+    this.setStdin(this.stdinModel);
+  }
 
   closeInputStdin() {
     this.showStdin = !this.showStdin;
     if (this.showStdin) {
       this.showArgs = false;
-      this.showConsole = false;
+      this.setChangeTerminal(false);
+      // this.showConsole = false;
     }
   }
+
   closeInputConsole() {
-    this.showConsole = !this.showConsole;
+    this.status.showTerminal = !this.status.showTerminal;
     if (this.showConsole) {
       this.showArgs = false;
       this.showStdin = false;
@@ -106,7 +119,8 @@ export default class EditCode extends Vue {
   closeInputArgs() {
     this.showArgs = !this.showArgs;
     if (this.showArgs) {
-      this.showConsole = false;
+      this.setChangeTerminal(false);
+      // this.showConsole = false;
       this.showStdin = false;
     }
   }

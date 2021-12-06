@@ -30,11 +30,13 @@
                   </v-icon>
                   Silenciar usuario
                 </v-btn>
+                <v-btn depressed text block class="btn" @click="unmuteUser(user.uid)">
+                  <v-icon color="success" class="mr-6"> mdi-microphone </v-icon>
+                  Desilenciar usuario
+                </v-btn>
 
                 <v-btn depressed text block class="btn" @click="disconnectUser(user.uid)">
-                  <v-icon color="error" class="mr-6">
-                    mdi-phone-remove
-                  </v-icon>
+                  <v-icon color="error" class="mr-6"> mdi-phone-remove </v-icon>
                   Desconectar usuario
                 </v-btn>
               </div>
@@ -152,7 +154,17 @@ export default class NameChannels extends Vue {
     }
   }
 
+  unmuteUser(userUId: string) {
+    if (userUId) {
+      VoiceService.sendActionToUser(this.currentUser.uid!, {
+        uidUserToMute: userUId,
+        actions: { mute: false }
+      });
+    }
+  }
+
   disconnectUser(userUId: string) {
+
     if (userUId) {
       VoiceService.sendActionToUser(this.currentUser.uid!, {
         uidUserToMute: userUId,
