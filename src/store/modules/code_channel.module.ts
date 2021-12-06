@@ -31,8 +31,12 @@ class CodeChannelModule extends VuexModule {
   public responseCompiler = "";
 
   public codeChannelName = "";
+
   public driverUID = "";
+
   public codeChanged = false;
+
+  public stdin = "";
 
   public status = {
     isLoading: true,
@@ -186,6 +190,16 @@ class CodeChannelModule extends VuexModule {
   @Mutation
   public setResponseCompilerState(response: string): void {
     this.responseCompiler = response;
+  }
+
+  @Mutation
+  public setStdinState(stdin: string): void {
+    this.stdin = stdin;
+  }
+
+  @Action
+  public setStdin(stdin: string): void {
+    this.context.commit("setStdinState", stdin);
   }
 
   @Action

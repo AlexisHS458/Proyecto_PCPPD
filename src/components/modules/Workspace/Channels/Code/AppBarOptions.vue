@@ -1,11 +1,6 @@
 <template>
   <v-app-bar app clipped-right flat height="48px" :color="color">
-    <v-icon
-      color="white"
-      class="mr-4"
-      @click="toggleShowNavigationDrawerChannels"
-      >mdi-menu</v-icon
-    >
+    <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
     <v-toolbar-title class="font-weight-medium">
       {{ nameChannel }} {{ languageName }}
     </v-toolbar-title>
@@ -32,9 +27,7 @@
               </v-list>
               <v-divider></v-divider>
               <v-card-actions class="justify-center">
-                <v-btn color="success" small @click="acceptRequest"
-                  >Aceptar</v-btn
-                >
+                <v-btn color="success" small @click="acceptRequest">Aceptar</v-btn>
                 <v-btn color="error" small>Rechazar</v-btn>
               </v-card-actions>
             </template>
@@ -69,12 +62,7 @@
           <v-card>
             <v-toolbar color="secondary" dark> Realizar Commit </v-toolbar>
             <v-card-text>
-              <v-form
-                ref="form"
-                v-model="valid"
-                lazy-validation
-                @submit.prevent
-              >
+              <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
                 <v-row align="center" justify="center" class="mt-6">
                   <v-col cols="9">
                     <v-text-field
@@ -136,14 +124,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-  Watch,
-  Ref,
-  VModel,
-} from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Ref, VModel } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
@@ -160,12 +141,12 @@ import { REST_SERVER_ENDPOINT, SOCKET_SERVER_ENDPOINT } from "@/constants";
 @Component
 export default class AppBarOptions extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public nameChannel!: string;
 
   @Prop({
-    required: true,
+    required: true
   })
   public color!: string;
 
@@ -192,6 +173,9 @@ export default class AppBarOptions extends Vue {
 
   @CodeChannel.State("codeFilePath")
   private codeFilePath!: string;
+
+  @CodeChannel.State("stdin")
+  private stdin!: string;
 
   @CodeChannel.Action("setBranchOid")
   private setBranchOid!: (ref: any) => void;
@@ -241,17 +225,15 @@ export default class AppBarOptions extends Vue {
   public summary = "";
   public valid = false;
   public rules = {
-    required: (v: string): string | boolean => !!v || "Campo requerido",
+    required: (v: string): string | boolean => !!v || "Campo requerido"
   };
   public languageName: Maybe<string> = "";
 
   @Watch("codeData")
   onChildChangedData() {
     const language =
-      monaco.languages.getLanguages().find((language) => {
-        return language.extensions?.includes(
-          this.codeData?.extension ?? "plaintext"
-        );
+      monaco.languages.getLanguages().find(language => {
+        return language.extensions?.includes(this.codeData?.extension ?? "plaintext");
       })?.id ?? null;
     this.languageName = language;
     console.log("hola 10", this.languageName);
@@ -279,20 +261,19 @@ export default class AppBarOptions extends Vue {
       this.loadingExport = true;
       const response = await GitHubService.makeCommit({
         branch: {
-          repositoryNameWithOwner:
-            this.repository?.owner.login + "/" + this.repository?.name,
-          branchName: this.repository?.defaultBranchRef?.name,
+          repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+          branchName: this.repository?.defaultBranchRef?.name
         },
         fileChanges: {
           additions: [
             {
               path: this.codeFilePath,
-              contents: window.btoa(monaco.editor.getModels()[0].getValue()),
-            },
-          ],
+              contents: window.btoa(monaco.editor.getModels()[0].getValue())
+            }
+          ]
         },
         message: { headline: this.summary, body: this.description },
-        expectedHeadOid: this.branchOid,
+        expectedHeadOid: this.branchOid
       });
 
       this.setShowDialogSave(false);
@@ -315,18 +296,14 @@ export default class AppBarOptions extends Vue {
 
   mounted() {
     this.onChildChangedData();
-    CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
+    CodeService.listenForRequest(this.currentUser.uid!, async uidRequest => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
       this.test = true;
     });
-    CodeService.lisenTerminal(
-      this.currentUser.uid!,
-      this.$route.params.idChannelCode,
-      (data) => {
-        this.setResponseCompiler(data.output);
-        this.setChangeTerminal(true);
-      }
-    );
+    CodeService.lisenTerminal(this.currentUser.uid!, this.$route.params.idChannelCode, data => {
+      this.setResponseCompiler(data.output);
+      this.setChangeTerminal(true);
+    });
   }
 
   compilerCode() {
@@ -334,15 +311,13 @@ export default class AppBarOptions extends Vue {
 
     console.log(monaco.editor.getModels()[0].getValue());
 
-    CodeService.compileCode(
-      this.currentUser.uid!,
-      this.$route.params.idChannelCode,
-      {
-        script: monaco.editor.getModels()[0].getValue(),
-        language: this.languageName,
-        versionIndex: "0",
-      }
-    );
+    CodeService.compileCode(this.currentUser.uid!, this.$route.params.idChannelCode, {
+      script: monaco.editor.getModels()[0].getValue(),
+      language: this.languageName,
+      versionIndex: "0",
+      stdin: this.stdin
+    });
+
     /*   await this.axios({
       url: REST_SERVER_ENDPOINT + "rest/compiler",
       headers: {

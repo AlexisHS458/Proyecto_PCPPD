@@ -41,7 +41,7 @@
                     color="primary"
                     prepend-inner-icon="mdi-file"
                     @keydown.esc="closeDialogNewFile"
-                    v-model="nameFile"
+                    v-model.trim="nameFile"
                   ></v-text-field>
                 </v-col>
               </v-row>

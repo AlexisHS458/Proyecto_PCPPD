@@ -8,7 +8,7 @@
         slot-scope="{ hover }"
         :class="[
           `${hover ? 'select-item' : 'no-select-item'}`,
-          `${isConnected ? 'active' : 'noActive'} `,
+          `${isConnected ? 'active' : 'noActive'} `
         ]"
       >
         <v-list-item-icon>
@@ -22,19 +22,9 @@
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-menu
-            v-if="workspace.uid_usuario == currentUser.uid"
-            v-model="menu"
-            offset-y
-          >
+          <v-menu v-if="workspace.uid_usuario == currentUser.uid" v-model="menu" offset-y>
             <template #activator="{ on }">
-              <v-btn
-                text
-                icon
-                v-on="on"
-                v-on:click.prevent
-                :class="{ hidden: !hover && !menu }"
-              >
+              <v-btn text icon v-on="on" v-on:click.prevent :class="{ hidden: !hover && !menu }">
                 <v-icon color="white">mdi-cog</v-icon>
               </v-btn>
             </template>
@@ -84,14 +74,7 @@
                     v-model="dialogRenameChanel"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        depressed
-                        text
-                        block
-                        class="btn"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
+                      <v-btn depressed text block class="btn" v-bind="attrs" v-on="on">
                         <v-icon color="info" class="mr-6"> mdi-pencil </v-icon>
                         Renombrar canal
                       </v-btn>
@@ -101,12 +84,7 @@
                         Ingresa el nuevo nombre del canal
                       </v-toolbar>
                       <v-card-text>
-                        <v-form
-                          ref="form"
-                          v-model="valid"
-                          lazy-validation
-                          @submit.prevent
-                        >
+                        <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
                           <v-row align="center" justify="center" class="mt-6">
                             <v-col cols="9">
                               <v-text-field
@@ -117,10 +95,7 @@
                                 color="primary"
                                 prepend-inner-icon="mdi-account-voice"
                                 v-model="newNameChannel"
-                                :rules="[
-                                  rules.required,
-                                  rules.regexNameChannel,
-                                ]"
+                                :rules="[rules.required, rules.regexNameChannel]"
                                 @keyup.enter="editChannel"
                                 @keydown.esc="closeAddSpace"
                               ></v-text-field>
@@ -129,10 +104,7 @@
                         </v-form>
                       </v-card-text>
                       <v-card-actions class="justify-end">
-                        <v-btn
-                          color="success"
-                          :loading="loadingRenameChanel"
-                          @click="editChannel"
+                        <v-btn color="success" :loading="loadingRenameChanel" @click="editChannel"
                           >Aceptar</v-btn
                         >
                         <v-btn text @click="closeAddSpace">Cancelar</v-btn>
@@ -145,14 +117,7 @@
                     v-model="dialogDelete"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        depressed
-                        text
-                        block
-                        class="btn"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
+                      <v-btn depressed text block class="btn" v-bind="attrs" v-on="on">
                         <v-icon color="error" class="mr-6"> mdi-delete </v-icon>
                         Eliminar
                       </v-btn>
@@ -167,19 +132,13 @@
                           <p>ESTA ACCIÓN NO SE PUEDE DESAHACER</p>
                         </div>
                         <v-row align="center" justify="center">
-                          <v-btn
-                            color="error"
-                            @click="deleteChannel"
-                            :loading="loadingDelete"
-                          >
+                          <v-btn color="error" @click="deleteChannel" :loading="loadingDelete">
                             SI, QUIERO ELIMINARLO
                           </v-btn>
                         </v-row>
                       </v-card-text>
                       <v-card-actions class="justify-end">
-                        <v-btn text @click="dialogDelete = false"
-                          >Cancelar</v-btn
-                        >
+                        <v-btn text @click="dialogDelete = false">Cancelar</v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
@@ -271,22 +230,22 @@ import { Socket } from "socket.io-client";
 @Component({ components: { ListUser } })
 export default class NameChannels extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public channel!: VoiceChannel;
 
   @Prop({
-    required: true,
+    required: true
   })
   public icon!: string;
 
   @Prop({
-    required: true,
+    required: true
   })
   public users!: User[];
 
   @Prop({
-    required: true,
+    required: true
   })
   public workspaceUID!: string;
 
@@ -315,6 +274,9 @@ export default class NameChannels extends Vue {
   @WorkspaceOptions.Action
   private setVisibleSnackBarWarning!: () => void;
 
+  @StatusVoice.State("isConnectedStatus")
+  private isConnectedStatus!: VoiceState;
+
   /**
    * Estado obtenido del @module User
    */
@@ -326,13 +288,9 @@ export default class NameChannels extends Vue {
    * Acciones obtenidas del @module Permissions
    */
   @Permissions.Action
-  private AddVoicePermission!: (
-    permissionsPath: PermissionsPath
-  ) => Promise<void>;
+  private AddVoicePermission!: (permissionsPath: PermissionsPath) => Promise<void>;
   @Permissions.Action
-  private RemoveVoicePermission!: (
-    permissionsPath: PermissionsPath
-  ) => Promise<void>;
+  private RemoveVoicePermission!: (permissionsPath: PermissionsPath) => Promise<void>;
 
   @StatusVoice.Action
   private setIsConnectedStatus!: (status: VoiceState) => void;
@@ -373,8 +331,7 @@ export default class NameChannels extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
-      /^[_A-z\u00C0-\u00FF0-9]*((\s)*[_A-z\u00C0-\u00FF0-9])*$/.test(v) ||
-      "Nombre inválido",
+      /^[_A-z\u00C0-\u00FF0-9]*((\s)*[_A-z\u00C0-\u00FF0-9])*$/.test(v) || "Nombre inválido"
   };
   public usersDisplay: User[] = [];
   public isConnected = false;
@@ -420,7 +377,7 @@ export default class NameChannels extends Vue {
       uidWorkSpace: this.workspaceUID,
       uidChannel: this.channel.uid!,
       nameUser: userName,
-      nameChannel: this.channel.nombre,
+      nameChannel: this.channel.nombre
     };
     if (e.includes(userUID)) {
       await this.AddVoicePermission(this.permissions);
@@ -439,13 +396,14 @@ export default class NameChannels extends Vue {
     );
 
     if (hasAcces) {
-      this.setIsConnectedStatus(VoiceState.CONNECTING);
-      await this.initStream();
-
       /*  VoiceService.userStatus(this.currentUser.uid!, (isConnected) => {
         this.isConnected = !!isConnected;
       });*/
-      if (!this.isConnected) {
+      // if (!this.isConnected) {
+      if (this.isConnectedStatus == "Conectando") {
+        //  this.isConnected = true
+        this.setIsConnectedStatus(VoiceState.CONNECTING);
+        await this.initStream();
         VoiceService.joinToVoiceChannel(this.channel.uid!, this.socket!);
         const audio = new Audio(require("@/assets/connected.mp3"));
         audio.play();
@@ -462,27 +420,23 @@ export default class NameChannels extends Vue {
 
   mounted() {
     this.socket = voiceChannelSocket(this.currentUser.uid!, true);
-    VoiceService.allUsers(
-      this.currentUser.uid!,
-      this.channel.uid!,
-      async (users) => {
-        if (!users.find((user) => user.uid === this.currentUser.uid)) {
-          this.isConnected = false;
-          this.stream?.getTracks().forEach((track) => {
-            track.stop();
-          });
-          Object.keys(this.peers).forEach((k) => {
-            this.disconnect(k);
-          });
-          delete this.stream;
-        } else {
-          this.isConnected = true;
-        }
-        this.usersDisplay = await Promise.all(
-          users.map((user) => UserService.getUserInfoByID(user.uid))
-        );
+    VoiceService.allUsers(this.currentUser.uid!, this.channel.uid!, async users => {
+      if (!users.find(user => user.uid === this.currentUser.uid)) {
+        this.isConnected = false;
+        this.stream?.getTracks().forEach(track => {
+          track.stop();
+        });
+        Object.keys(this.peers).forEach(k => {
+          this.disconnect(k);
+        });
+        delete this.stream;
+      } else {
+        this.isConnected = true;
       }
-    );
+      this.usersDisplay = await Promise.all(
+        users.map(user => UserService.getUserInfoByID(user.uid))
+      );
+    });
 
     this.initSignaling();
   }
@@ -501,26 +455,22 @@ export default class NameChannels extends Vue {
     this.dialogRenameChanel = false;
   }
 
-  createPeer(
-    userSocketIDToSignal: string,
-    callerID: string,
-    stream: MediaStream
-  ): Peer.Instance {
+  createPeer(userSocketIDToSignal: string, callerID: string, stream: MediaStream): Peer.Instance {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream,
+      stream
     });
 
-    peer.on("signal", (signal) => {
+    peer.on("signal", signal => {
       VoiceService.sendingSignal(this.socket!, {
         signal: signal,
         callerID: callerID,
-        userIDToSignal: userSocketIDToSignal,
+        userIDToSignal: userSocketIDToSignal
       });
     });
 
-    peer.on("stream", (stream) => {
+    peer.on("stream", stream => {
       const audio = document.createElement("audio");
       audio.srcObject = stream;
       audio.id = userSocketIDToSignal;
@@ -536,7 +486,7 @@ export default class NameChannels extends Vue {
       this.disconnect(userSocketIDToSignal);
     });
 
-    peer.on("error", (err) => {
+    peer.on("error", err => {
       console.log(err);
       this.disconnect(userSocketIDToSignal);
     });
@@ -550,26 +500,22 @@ export default class NameChannels extends Vue {
     delete this.peers[peerID];
   }
 
-  addPeer(
-    incomingSignal: Peer.SignalData,
-    callerID: string,
-    stream: MediaStream
-  ): Peer.Instance {
+  addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream): Peer.Instance {
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      stream,
+      stream
     });
-    peer.on("signal", (signal) => {
+    peer.on("signal", signal => {
       VoiceService.returningSignal(this.currentUser.uid!, {
         signal: signal,
-        callerID: callerID,
+        callerID: callerID
       });
     });
 
     peer.signal(incomingSignal);
 
-    peer.on("stream", (stream) => {
+    peer.on("stream", stream => {
       const audio = document.createElement("audio");
       audio.id = callerID;
       audio.srcObject = stream;
@@ -585,7 +531,7 @@ export default class NameChannels extends Vue {
       this.disconnect(callerID);
     });
 
-    peer.on("error", (err) => {
+    peer.on("error", err => {
       console.log(err);
       this.disconnect(callerID);
     });
@@ -594,17 +540,17 @@ export default class NameChannels extends Vue {
   }
 
   muteMe(): void {
-    this.stream?.getAudioTracks().forEach((track) => {
+    this.stream?.getAudioTracks().forEach(track => {
       track.enabled = !this.isMute;
     });
   }
 
   deafenMe(): void {
-    Object.keys(this.peers).forEach((k) => {
+    Object.keys(this.peers).forEach(k => {
       const audioTag = document.getElementById(k) as HTMLAudioElement;
       const stream = audioTag.srcObject as MediaStream;
 
-      stream.getTracks().forEach((track) => {
+      stream.getTracks().forEach(track => {
         track.enabled = !this.isDeafen;
       });
     });
@@ -614,49 +560,33 @@ export default class NameChannels extends Vue {
     if (!this.stream) {
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: false,
-        audio: true,
+        audio: true
       });
     }
   }
 
   initSignaling(): void {
-    VoiceService.joinedUsers(this.socket!, this.channel.uid!, (users) => {
+    VoiceService.joinedUsers(this.socket!, this.channel.uid!, users => {
       users
-        .filter((user) => user.uid != this.currentUser.uid)
-        .forEach((user) => {
-          this.peers[user.uid] = this.createPeer(
-            user.uid,
-            this.currentUser.uid!,
-            this.stream!
-          );
+        .filter(user => user.uid != this.currentUser.uid)
+        .forEach(user => {
+          this.peers[user.uid] = this.createPeer(user.uid, this.currentUser.uid!, this.stream!);
         });
     });
 
-    VoiceService.listenUserJoined(
-      this.socket!,
-      this.channel.uid!,
-      (payloadSignal) => {
-        if (!this.peers[payloadSignal.callerID]) {
-          const peer = this.addPeer(
-            payloadSignal.signal,
-            payloadSignal.callerID,
-            this.stream!
-          );
-          this.peers[payloadSignal.callerID] = peer;
-        }
+    VoiceService.listenUserJoined(this.socket!, this.channel.uid!, payloadSignal => {
+      if (!this.peers[payloadSignal.callerID]) {
+        const peer = this.addPeer(payloadSignal.signal, payloadSignal.callerID, this.stream!);
+        this.peers[payloadSignal.callerID] = peer;
       }
-    );
+    });
 
-    VoiceService.listenReturningSignal(
-      this.currentUser.uid!,
-      this.channel.uid!,
-      (payloadSignal) => {
-        if (payloadSignal.userIDToSignal) {
-          const item = this.peers[payloadSignal.userIDToSignal];
-          item?.signal(payloadSignal.signal);
-        }
+    VoiceService.listenReturningSignal(this.currentUser.uid!, this.channel.uid!, payloadSignal => {
+      if (payloadSignal.userIDToSignal) {
+        const item = this.peers[payloadSignal.userIDToSignal];
+        item?.signal(payloadSignal.signal);
       }
-    );
+    });
   }
 }
 </script>
