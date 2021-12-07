@@ -50,8 +50,8 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.SENT_COORDINATES, coordinates);
   }
 
-  getCoordinates(uid: string, onEvent: (coordinates: CursorCoordinates[]) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.COORDINAES, payload => {
+  getCoordinates(uid: string,codeChannelID:string, onEvent: (coordinates: CursorCoordinates[]) => void): Socket {
+    return this.joinRoom(uid,codeChannelID).on(ResponseEventName.COORDINAES, payload => {
       onEvent(payload);
     });
   }
@@ -68,8 +68,10 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
   }
 
-  getDataCode(uid: string, onEvent: (code: Code) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.CODE, payload => {
+  getDataCode(uid: string, codeChannelID: string, onEvent: (code: Code) => void): Socket {
+    return codeChannelSocket(uid).on(`${ResponseEventName.CODE}-${codeChannelID}`, payload => {
+      console.log("Estos recibiendo info de codigo");
+
       onEvent(payload);
     });
   }

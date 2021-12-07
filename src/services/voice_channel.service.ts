@@ -72,7 +72,6 @@ class VoiceChannelService {
     channelID: string,
     onEvent: (signalPayload: SignalPayload) => void
   ): Socket {
-    console.log('USER_JOINED');
     return socket.on(`${ResponseEventName.USER_JOINED}-${channelID}`, payload => {
       onEvent(payload);
     });
@@ -124,8 +123,6 @@ class VoiceChannelService {
     onEvent: (actions: { mute?: boolean; deafen?: boolean; disconnect?: boolean }) => void
   ): Socket {
     return voiceChannelSocket(uid).on(ResponseEventName.ACTIONS, payload => {
-      console.log(payload);
-      
       onEvent(payload);
     });
   }

@@ -2,7 +2,7 @@
   <v-app-bar app clipped-right flat height="48px" :color="color">
     <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
     <v-toolbar-title class="font-weight-medium">
-      {{ nameChannel }} {{ languageName }}
+      {{ nameChannel }}
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
@@ -54,7 +54,7 @@
               v-on="on"
               size="25px"
               color="info"
-              :disabled="currentUser.uid != driverUID"
+              :disabled="currentUser.uid != driverUID || codeFilePath === ''"
             >
               mdi-content-save
             </v-icon>
@@ -204,6 +204,12 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.Action
   private setChangeTerminal!: (state: boolean) => void;
 
+  @CodeChannel.Action
+  private setMessageError!: (message: string) => void;
+
+  @CodeChannel.Action
+  private setVisibleSnackBarError!: () => void;
+
   @Ref("form") readonly form!: VForm;
 
   /**
@@ -236,7 +242,6 @@ export default class AppBarOptions extends Vue {
         return language.extensions?.includes(this.codeData?.extension ?? "plaintext");
       })?.id ?? null;
     this.languageName = language;
-    console.log("hola 10", this.languageName);
   }
 
   closeDialogExport() {
@@ -259,7 +264,7 @@ export default class AppBarOptions extends Vue {
   async doCommit() {
     if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       this.loadingExport = true;
-      const response = await GitHubService.makeCommit({
+      await GitHubService.makeCommit({
         branch: {
           repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
           branchName: this.repository?.defaultBranchRef?.name
@@ -274,23 +279,33 @@ export default class AppBarOptions extends Vue {
         },
         message: { headline: this.summary, body: this.description },
         expectedHeadOid: this.branchOid
-      });
+      })
+        .then(response => {
+          this.setShowDialogSave(false);
+          this.setCodeChanged(false);
+          this.setShowDialog(false);
+          this.form.resetValidation();
+          this.form.reset();
+          this.setVisibleSnackBar();
 
-      this.setShowDialogSave(false);
-      this.setCodeChanged(false);
-      this.setShowDialog(false);
-      this.form.resetValidation();
-      this.form.reset();
-      this.setVisibleSnackBar();
+          const commit = response.commit as Commit;
+          this.setBranchOid(response.ref);
 
-      const commit = response.commit as Commit;
-      this.setBranchOid(response.ref);
+          const urlShort = commit.url.slice(0, -25) + "...";
+          this.setMessageOnSnackbar(
+            "Puedes consultar tu commit copiando esta URL en tu navegador:\n" +
+              `<a href="${commit.url}"  target="_blank">${urlShort}</a>`
+          );
+        })
 
-      const urlShort = commit.url.slice(0, -25) + "...";
-      this.setMessageOnSnackbar(
-        "Puedes consultar tu commit copiando esta URL en tu navegador:\n" +
-          `<a href="${commit.url}"  target="_blank">${urlShort}</a>`
-      );
+        .catch((e: Error) => {
+          this.loadingExport = false;
+          this.form.resetValidation();
+          this.form.reset();
+          this.setShowDialogSave(false);
+          this.setVisibleSnackBarError();
+          this.setMessageError(e.message);
+        });
     }
   }
 
@@ -307,10 +322,6 @@ export default class AppBarOptions extends Vue {
   }
 
   compilerCode() {
-    console.log("hola 2", this.languageName);
-
-    console.log(monaco.editor.getModels()[0].getValue());
-
     CodeService.compileCode(this.currentUser.uid!, this.$route.params.idChannelCode, {
       script: monaco.editor.getModels()[0].getValue(),
       language: this.languageName,

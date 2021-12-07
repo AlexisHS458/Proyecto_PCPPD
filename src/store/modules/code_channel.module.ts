@@ -306,6 +306,11 @@ class CodeChannelModule extends VuexModule {
     this.context.commit("setSnackBarMessage", message);
   }
 
+  @Action
+  public setMessageError(message: string): void {
+    this.context.commit("setSnackBarMessageError", message);
+  }
+
   /**
    * Hace visible el snackbar
    */
