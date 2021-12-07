@@ -55,27 +55,59 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-dialog
+        transition="dialog-top-transition"
+        max-width="600"
+        v-model="dialogNewFolder"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on">
+            <v-icon>mdi-folder-plus</v-icon>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-toolbar color="secondary" dark> Nueva carpeta </v-toolbar>
+          <v-card-text>
+            <v-form
+              ref="formFolder"
+              v-model="validFolder"
+              lazy-validation
+              @submit.prevent
+            >
+              <v-row align="center" justify="center" class="mt-6">
+                <v-col cols="9">
+                  <v-text-field
+                    label="Ingresa el nombre de la carpeta"
+                    outlined
+                    dense
+                    color="primary"
+                    prepend-inner-icon="mdi-folder"
+                    @keydown.esc="closeDialogNewFolder"
+                    v-model.trim="nameFolder"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              color="success"
+              @click="addFolder"
+              :loading="loadingNewFolder"
+            >
+              Crear
+            </v-btn>
+            <v-btn text @click="closeDialogNewFolder">Cancelar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-toolbar>
     <v-list dark>
-      <v-list-item
+      <list-tree
         v-for="treeEntry in treeEntries"
         :key="treeEntry.object.id"
-        @click="goToPath(treeEntry)"
-      >
-        <v-list-item-avatar>
-          <v-icon dark v-if="treeEntry.type == 'tree'"> mdi-folder </v-icon>
-          <v-icon
-            dark
-            v-else-if="treeEntry.type == 'blob'"
-            :color="getColor(treeEntry.extension.replace('.', ''))"
-          >
-            mdi-file
-          </v-icon>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title v-text="treeEntry.name"></v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+        :treeEntry="treeEntry"
+      ></list-tree>
     </v-list>
   </div>
 </template>
@@ -84,6 +116,7 @@
 import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { CodePath } from "@/models/codePath";
 import SubTree from "@/components/modules/Workspace/Channels/Code/Files/RepoFilesView.vue";
+import ListTree from "@/components/modules/Workspace/Channels/Code/Files/ListTree.vue";
 import {
   Maybe,
   Tree,
@@ -109,6 +142,7 @@ import { CodeChannel } from "@/models/codeChannel";
 @Component({
   components: {
     SubTree,
+    ListTree,
   },
 })
 export default class ViewTreeView extends Vue {
@@ -173,16 +207,21 @@ export default class ViewTreeView extends Vue {
   private setTreeEntry!: (tree: TreeEntry[]) => void;
 
   public nameCodeChannel = "";
-
   public serverHash: string | undefined;
   public dialogNewFile = false;
   public valid = false;
   public loadingNewFile = false;
   public nameFile = "";
-
+  public nameFolder = "";
+  public validFolder = false;
+  public dialogNewFolder = false;
+  public loadingNewFolder = false;
+  public dialogDelete = false;
   public treeEntriess: Maybe<TreeEntry[]> | undefined = null;
+  public loadingDelete = false;
 
   @Ref("form") readonly form!: VForm;
+  @Ref("formFolder") readonly formFolder!: VForm;
 
   getColor(extensionFile: string): string {
     return Colors.toColor(StringUtils.getHashCode(extensionFile));
@@ -266,46 +305,20 @@ export default class ViewTreeView extends Vue {
     this.dialogNewFile = false;
   }
 
-  async goToPath(treeEntry: TreeEntry) {
-    switch ((treeEntry.object as any)?.__typename) {
-      case "Tree":
-        const tree = treeEntry.object as Tree;
-        this.addPathState({ id: tree.id, nombre: treeEntry.name });
-        break;
-      case "Blob":
-        if (this.driverUID === this.currentUser.uid!) {
-          if (!this.codeChanged) {
-            const blob = treeEntry.object as Blob;
-            if (blob.isBinary == false) {
-              const language = monaco.languages
-                .getLanguages()
-                .find((language) => {
-                  return language.extensions?.includes(
-                    treeEntry.extension ?? "plaintext"
-                  );
-                })?.id;
-              this.setCodeData(treeEntry);
-              CodeService.sendCode(this.currentUser.uid!, {
-                channelID: this.$route.params.idChannelCode,
-                code: blob.text ?? "",
-                extension: language ?? "plaintext",
-                path: this.codeFilePath,
-              });
-            }
-          } else {
-            this.setShowDialog(this.codeChanged);
-          }
-        }
-        break;
-      default:
-        break;
-    }
+  addFolder() {
+    console.log("Añadir archivos");
   }
 
   closeDialogNewFile() {
     this.form.resetValidation();
     this.form.reset();
     this.dialogNewFile = false;
+  }
+
+  closeDialogNewFolder() {
+    this.formFolder.resetValidation();
+    this.formFolder.reset();
+    this.dialogNewFolder = false;
   }
 }
 </script>
