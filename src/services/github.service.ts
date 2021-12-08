@@ -1,5 +1,4 @@
 import {
-  Commit,
   GetNodeFiles,
   GetNodeFilesQuery,
   GetRepo,
@@ -10,12 +9,12 @@ import {
   Repository,
   TreeEntry,
   Tree,
-  Ref,
   CreateCommitOnBranchInput,
   MakeCommitMutation,
   MakeCommit
 } from "@/generated/graphql";
 import apollo_client from "@/utils/apollo_client";
+import { GraphQLError } from "graphql";
 class GitHubService {
   async getUserRepos(): Promise<Repository[]> {
     const response: GetRepositoriesQuery = (
@@ -53,8 +52,6 @@ class GitHubService {
           fetchPolicy: "network-only"
         })
         .then(res => {
-       
-
           return res;
         })
     ).data;
@@ -69,18 +66,28 @@ class GitHubService {
 
   async makeCommit(commitInput: CreateCommitOnBranchInput): Promise<any> {
     const response: MakeCommitMutation = (
-      await apollo_client.mutate({
-        mutation: MakeCommit,
-        variables: {
-          input: commitInput
-        },
-      }).then((res)=>{
-       
-        return res
-        
-      })
+      await apollo_client
+        .mutate({
+          mutation: MakeCommit,
+          variables: {
+            input: commitInput
+          }
+        })
+        .then(res => {
+          return res;
+        })
+        .catch(err => {          
+          const errorGraphQl = err as GraphQLError;
+          if (errorGraphQl.message.includes("permission")) {
+            throw new Error(
+              "Lo sentimos, no tienes permisos de acceso a este repositorio para realizar esta acción. Cambia de rol con alguien con permisos o contacta al dueño del repositorio."
+            );
+          }
+
+          return err;
+        })
     ).data;
-    
+
     return response.createCommitOnBranch as any;
   }
 }

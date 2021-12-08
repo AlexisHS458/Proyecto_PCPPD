@@ -148,40 +148,11 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
 
   auth.onAuthStateChanged(async user => {
-    /* if (!user && requiresAuth) {
-      next({ name: "Home" });
-    } else if (!requiresAuth && user) {
-      next("/Mainscreen");
-    } else if (to.fullPath == "/register" && requiresAuth && user) {
-      await store.dispatch("UserModule/fetchCurrentUser");
-      const currentUser = store.getters["UserModule/getUser"];
-      if (currentUser.boleta == "") {
-        next();
-      } else {
-        next({ name: "MainScreen" });
-      }
-    } else if (to.fullPath !== "/register" && requiresAuth && user) {
-      await store.dispatch("UserModule/fetchCurrentUser");
-      const currentUser = store.getters["UserModule/getUser"];
-      if (currentUser.boleta == "") {
-        next({ name: "Register" });
-      } else {
-        next();
-      }
-    } else if (requiresAuth && user) {
-      next();
-    } else if (!requiresAuth && !user) {
-      next();
-    } else {
-      next();
-    }*/
     if (requiresAuth && !user) {
       next({ name: "Home" });
     } else if (!requiresAuth && user) {
-      
       next({ name: "MainScreen" });
     } else if (to.fullPath == "/register" && requiresAuth && user) {
-      
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
       if (currentUser.boleta == "") {
@@ -189,17 +160,7 @@ router.beforeEach((to, from, next) => {
       } else {
         next({ name: "MainScreen" });
       }
-    } /*else if (to.fullPath !== "/register" && requiresAuth && user) {
-      console.log("Entro no regitser");
-
-      await store.dispatch("UserModule/fetchCurrentUser");
-      const currentUser = store.getters["UserModule/getUser"];
-      if (currentUser.boleta == "") {
-        next({ name: "Register" });
-      } else {
-        next();
-      }
-    }*/ else {
+    } else {
       next();
     }
   });

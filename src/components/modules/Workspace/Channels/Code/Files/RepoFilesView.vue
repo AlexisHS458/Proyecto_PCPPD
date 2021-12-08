@@ -47,6 +47,9 @@ export default class RepoFilesView extends Vue {
   @WorkspaceModule.State("codeChannels")
   public codeChannels!: CodeChannel[];
 
+  @CodeChannelModule.State("treeEntry")
+  private treeEntriesFromFiles!: Maybe<TreeEntry[] | undefined>;
+
   @Watch("idChannelCode")
   onChildChangedView() {
     this.viewTree();
@@ -55,6 +58,11 @@ export default class RepoFilesView extends Vue {
   @Watch("codeChannels")
   onChildChanged() {
     this.viewTree();
+  }
+
+  @Watch("treeEntriesFromFiles")
+  onTreeChanged(val: TreeEntry[]) {
+    this.treeEntries = val;
   }
 
   public treeEntries: Maybe<TreeEntry[]> | undefined = null;
@@ -68,16 +76,13 @@ export default class RepoFilesView extends Vue {
       return channel.uid == this.$route.params.idChannelCode;
     });
     if (codeChannel) {
-      const repo = await GitHubService.getRepo(
-        codeChannel!.propietario,
-        codeChannel!.nombre
-      );
+      const repo = await GitHubService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
       this.treeEntries = (repo?.defaultBranchRef?.target as Commit).tree.entries?.sort((a, b) => {
         const aType = a.type === "tree" ? -1 : 1;
         const bType = b.type === "tree" ? -1 : 1;
         return aType - bType;
       });
-      if(repo){
+      if (repo) {
         this.setRepository(repo);
       }
     }

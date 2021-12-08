@@ -75,10 +75,6 @@ export default class ViewCode extends Vue {
 
   changeView() {
     this.setCodePath();
-    /* CodeService.joinToCodeChannel(
-      this.socket!,
-      this.$route.params.idChannelCode
-    ); */
     this.nameCode();
   }
   destroyed() {
@@ -91,14 +87,15 @@ export default class ViewCode extends Vue {
   /*destroyed() {
     delete this.socket;
   } */
-  mounted() {
-    //  this.socket = codeChannelSocket(this.currentUser.uid!, true);
-    CodeService.getDataCode(this.currentUser.uid!, code => {
+  mounted() {    
+   
+    
+    CodeService.requestCurrentCode(this.currentUser.uid!, this.$route.params.idChannelCode);
+    CodeService.getDataCode(this.currentUser.uid!,this.$route.params.idChannelCode, code => {
       if (code.path !== "") {
         this.changeFilePath(code.path);
       }
     });
-    CodeService.requestCurrentCode(this.currentUser.uid!, this.$route.params.idChannelCode);
 
     this.changeView();
   }

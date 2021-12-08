@@ -387,7 +387,6 @@ export default class NameChannels extends Vue {
   }
 
   async conectToVoiceChannel() {
-    //console.log(this.activeItem);
     const hasAcces = await ChannelService.getUsersInChannel(
       this.currentUser.uid!,
       ChannelType.VOICE,
