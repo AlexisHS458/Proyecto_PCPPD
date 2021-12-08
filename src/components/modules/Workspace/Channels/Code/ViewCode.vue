@@ -75,10 +75,6 @@ export default class ViewCode extends Vue {
 
   changeView() {
     this.setCodePath();
-    /* CodeService.joinToCodeChannel(
-      this.socket!,
-      this.$route.params.idChannelCode
-    ); */
     this.nameCode();
   }
   destroyed() {
@@ -92,6 +88,8 @@ export default class ViewCode extends Vue {
     delete this.socket;
   } */
   mounted() {    
+    console.log('mounted de viewCode');
+    
     CodeService.requestCurrentCode(this.currentUser.uid!, this.$route.params.idChannelCode);
     CodeService.getDataCode(this.currentUser.uid!,this.$route.params.idChannelCode, code => {
       if (code.path !== "") {

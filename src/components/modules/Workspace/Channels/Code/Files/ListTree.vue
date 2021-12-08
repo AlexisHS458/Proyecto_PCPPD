@@ -15,19 +15,9 @@
         <v-list-item-title v-text="treeEntry.name"></v-list-item-title>
       </v-list-item-content>
       <v-list-item-icon>
-        <v-dialog
-          transition="dialog-top-transition"
-          max-width="600"
-          v-model="dialogDelete"
-        >
+        <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogDelete">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              text
-              icon
-              v-bind="attrs"
-              v-on="on"
-              :class="{ hidden: !hover }"
-            >
+            <v-btn text icon v-bind="attrs" v-on="on" :class="{ hidden: !hover }">
               <v-icon color="error"> mdi-delete </v-icon>
             </v-btn>
           </template>
@@ -37,15 +27,11 @@
             </v-toolbar>
             <v-card-text>
               <div class="text-h6 pa-5 text-center">
-                <p>¿SEGURO QUE DESEAS ELIMINAR ESTE CANAL?</p>
+                <p>¿SEGURO QUE DESEAS ELIMINAR ESTE ARCHIVO?</p>
                 <p>ESTA ACCIÓN NO SE PUEDE DESAHACER</p>
               </div>
               <v-row align="center" justify="center">
-                <v-btn
-                  color="error"
-                  @click="deleteFolder"
-                  :loading="loadingDelete"
-                >
+                <v-btn color="error" @click="deleteFolder(treeEntry.name)" :loading="loadingDelete">
                   SI, QUIERO ELIMINARLO
                 </v-btn>
               </v-row>
@@ -64,14 +50,7 @@
 import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { CodePath } from "@/models/codePath";
 
-import {
-  Maybe,
-  Tree,
-  TreeEntry,
-  Blob,
-  Repository,
-  Commit,
-} from "@/generated/graphql";
+import { Maybe, Tree, TreeEntry, Blob, Repository, Commit } from "@/generated/graphql";
 import { namespace } from "vuex-class";
 const CodeChannelModule = namespace("CodeChannelModule");
 const User = namespace("UserModule");
@@ -89,7 +68,7 @@ import { CodeChannel } from "@/models/codeChannel";
 @Component
 export default class ViewTreeView extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public treeEntry!: Maybe<TreeEntry>;
 
@@ -117,6 +96,21 @@ export default class ViewTreeView extends Vue {
   @WorkspaceModule.State("codeChannels")
   public codeChannels!: CodeChannel[];
 
+  @CodeChannelModule.Action("setRepository")
+  private setRepository!: (repo: Repository) => void;
+
+  @CodeChannelModule.Action
+  private setTreeEntry!: (tree: TreeEntry[]) => void;
+
+  @CodeChannelModule.State("codePath")
+  private codePath!: CodePath[];
+
+  @CodeChannelModule.State("repository")
+  private repository!: Maybe<Repository>;
+
+  @CodeChannelModule.State("branchOid")
+  private branchOid!: string;
+
   public dialogNewFolder = false;
   public loadingNewFolder = false;
   public dialogDelete = false;
@@ -138,19 +132,15 @@ export default class ViewTreeView extends Vue {
           if (!this.codeChanged) {
             const blob = treeEntry.object as Blob;
             if (blob.isBinary == false) {
-              const language = monaco.languages
-                .getLanguages()
-                .find((language) => {
-                  return language.extensions?.includes(
-                    treeEntry.extension ?? "plaintext"
-                  );
-                })?.id;
+              const language = monaco.languages.getLanguages().find(language => {
+                return language.extensions?.includes(treeEntry.extension ?? "plaintext");
+              })?.id;
               this.setCodeData(treeEntry);
               CodeService.sendCode(this.currentUser.uid!, {
                 channelID: this.$route.params.idChannelCode,
                 code: blob.text ?? "",
                 extension: language ?? "plaintext",
-                path: this.codeFilePath,
+                path: this.codeFilePath
               });
             }
           } else {
@@ -163,8 +153,54 @@ export default class ViewTreeView extends Vue {
     }
   }
 
-  deleteFolder() {
-    console.log("Hola");
+  async fileActions(commitBody: any): Promise<void> {
+    await GitHubService.makeCommit(commitBody);
+    const codeChannel = this.codeChannels.find(channel => {
+      return channel.uid == this.$route.params.idChannelCode;
+    });
+    if (codeChannel) {
+      const repo = await GitHubService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+      const treeEntries = (repo?.defaultBranchRef?.target as Commit).tree.entries?.sort((a, b) => {
+        const aType = a.type === "tree" ? -1 : 1;
+        const bType = b.type === "tree" ? -1 : 1;
+        return aType - bType;
+      });
+      if (treeEntries) {
+        this.setTreeEntry(treeEntries);
+      }
+      if (repo) {
+        this.setRepository(repo);
+      }
+    }
+  }
+
+  async deleteFolder(name: string) {
+    this.loadingDelete = true;
+    let prefix = "";
+    if (this.codePath.length > 0) {
+      prefix = this.codePath.map(path => path.nombre).join("/") + "/";
+    }
+    const commitBody = {
+      branch: {
+        repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+        branchName: this.repository?.defaultBranchRef?.name
+      },
+      fileChanges: {
+        deletions: [
+          {
+            path: prefix + name
+          }
+        ]
+      },
+      message: { headline: "Se eliminó el archivo " + name, body: "" },
+      expectedHeadOid: this.branchOid
+    };
+    //console.log(commitBody);
+
+    await this.fileActions(commitBody);
+    this.loadingDelete = false;
+
+    this.dialogDelete = false;
   }
 }
 </script>

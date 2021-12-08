@@ -1,28 +1,15 @@
 <template>
   <div>
     <v-toolbar color="primaryDark" flat dense>
-      <v-icon
-        color="grey darken-2"
-        @click="goBackAction"
-        v-if="codePath.length > 0"
-        class="mr-4"
-      >
+      <v-icon color="grey darken-2" @click="goBackAction" v-if="codePath.length > 0" class="mr-4">
         mdi-arrow-left
       </v-icon>
 
       <v-toolbar-title class="grey--text text--darken-4 font">
-        {{
-          codePath.length > 0
-            ? codePath[codePath.length - 1].nombre
-            : nameCodeChannel
-        }}
+        {{ codePath.length > 0 ? codePath[codePath.length - 1].nombre : nameCodeChannel }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-dialog
-        transition="dialog-top-transition"
-        max-width="600"
-        v-model="dialogNewFile"
-      >
+      <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogNewFile">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
             <v-icon>mdi-file-plus</v-icon>
@@ -36,6 +23,7 @@
                 <v-col cols="9">
                   <v-text-field
                     label="Ingresa el nombre del archivo con extensiòn"
+                    :rules="[rules.required]"
                     outlined
                     dense
                     color="primary"
@@ -55,11 +43,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog
-        transition="dialog-top-transition"
-        max-width="600"
-        v-model="dialogNewFolder"
-      >
+      <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogNewFolder">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
             <v-icon>mdi-folder-plus</v-icon>
@@ -68,15 +52,11 @@
         <v-card>
           <v-toolbar color="secondary" dark> Nueva carpeta </v-toolbar>
           <v-card-text>
-            <v-form
-              ref="formFolder"
-              v-model="validFolder"
-              lazy-validation
-              @submit.prevent
-            >
+            <v-form ref="formFolder" v-model="validFolder" lazy-validation @submit.prevent>
               <v-row align="center" justify="center" class="mt-6">
                 <v-col cols="9">
                   <v-text-field
+                    :rules="[rules.required]"
                     label="Ingresa el nombre de la carpeta"
                     outlined
                     dense
@@ -90,11 +70,7 @@
             </v-form>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn
-              color="success"
-              @click="addFolder"
-              :loading="loadingNewFolder"
-            >
+            <v-btn color="success" @click="addFolder" :loading="loadingNewFolder">
               Crear
             </v-btn>
             <v-btn text @click="closeDialogNewFolder">Cancelar</v-btn>
@@ -124,6 +100,7 @@ import {
   Blob,
   Repository,
   Commit,
+  Ref as RefGraphQL
 } from "@/generated/graphql";
 import { namespace } from "vuex-class";
 const CodeChannelModule = namespace("CodeChannelModule");
@@ -139,20 +116,21 @@ import GitHubService from "@/services/github.service";
 const WorkspaceModule = namespace("WorkspaceModule");
 import { VForm } from "@/utils/types";
 import { CodeChannel } from "@/models/codeChannel";
+import { GraphQLResolveInfo } from "graphql";
 @Component({
   components: {
     SubTree,
-    ListTree,
-  },
+    ListTree
+  }
 })
 export default class ViewTreeView extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public treeEntries!: Maybe<TreeEntry[]>;
 
   @Prop({
-    required: false,
+    required: false
   })
   public codeChanel!: string;
 
@@ -217,8 +195,11 @@ export default class ViewTreeView extends Vue {
   public dialogNewFolder = false;
   public loadingNewFolder = false;
   public dialogDelete = false;
-  public treeEntriess: Maybe<TreeEntry[]> | undefined = null;
   public loadingDelete = false;
+  public treeEntryFromFileActions: Maybe<TreeEntry[]> = null;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido"
+  };
 
   @Ref("form") readonly form!: VForm;
   @Ref("formFolder") readonly formFolder!: VForm;
@@ -239,74 +220,90 @@ export default class ViewTreeView extends Vue {
     this.nameCode();
   }
 
-  async addFile() {
-    this.loadingNewFile = true;
-    let prefix = "";
-    if (this.codePath.length > 0) {
-      prefix = this.codePath.map((path) => path.nombre).join("/") + "/";
-    }
-    const response = await GitHubService.makeCommit({
-      branch: {
-        repositoryNameWithOwner:
-          this.repository?.owner.login + "/" + this.repository?.name,
-        branchName: this.repository?.defaultBranchRef?.name,
-      },
-      fileChanges: {
-        additions: [
-          {
-            path: prefix + this.nameFile,
-            contents: "",
-          },
-        ],
-      },
-      message: { headline: "Creaciòn de archivo " + this.nameFile, body: "" },
-      expectedHeadOid: this.branchOid,
+  async fileActions(commitBody: any): Promise<void> {
+    await GitHubService.makeCommit(commitBody);
+    const codeChannel = this.codeChannels.find(channel => {
+      return channel.uid == this.$route.params.idChannelCode;
     });
-
-    this.setBranchOid(response.ref);
-    if (this.codePath.length > 0) {
-      const treeEntries = await GitHubService.getNodeFiles(
-        this.codePath[this.codePath.length - 1].id
-      );
+    if (codeChannel) {
+      const repo = await GitHubService.getRepo(codeChannel!.propietario, codeChannel!.nombre);
+      const treeEntries = (repo?.defaultBranchRef?.target as Commit).tree.entries?.sort((a, b) => {
+        const aType = a.type === "tree" ? -1 : 1;
+        const bType = b.type === "tree" ? -1 : 1;
+        return aType - bType;
+      });
       if (treeEntries) {
         this.setTreeEntry(treeEntries);
       }
-    } else {
-      const codeChannel = this.codeChannels.find((channel) => {
-        return channel.uid == this.$route.params.idChannelCode;
-      });
-      if (codeChannel) {
-        const repo = await GitHubService.getRepo(
-          codeChannel!.propietario,
-          codeChannel!.nombre
-        );
-        const treeEntries = (
-          repo?.defaultBranchRef?.target as Commit
-        ).tree.entries?.sort((a, b) => {
-          const aType = a.type === "tree" ? -1 : 1;
-          const bType = b.type === "tree" ? -1 : 1;
-          return aType - bType;
-        });
-        if (treeEntries) {
-          this.setTreeEntry(treeEntries);
-        }
-        if (repo) {
-          this.setRepository(repo);
-        }
+      if (repo) {
+        this.setRepository(repo);
       }
     }
-    //  monaco.editor.getModels().forEach(model => model.dispose());
-
-    this.loadingNewFile = false;
-
-    this.form.resetValidation();
-    this.form.reset();
-
-    this.dialogNewFile = false;
   }
 
-  addFolder() {
-    console.log("Añadir archivos");
+  async addFile() {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loadingNewFile = true;
+      let prefix = "";
+      if (this.codePath.length > 0) {
+        prefix = this.codePath.map(path => path.nombre).join("/") + "/";
+      }
+      const commitBody = {
+        branch: {
+          repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+          branchName: this.repository?.defaultBranchRef?.name
+        },
+        fileChanges: {
+          additions: [
+            {
+              path: prefix + this.nameFile,
+              contents: ""
+            }
+          ]
+        },
+        message: { headline: "Creación de archivo " + this.nameFile, body: "" },
+        expectedHeadOid: this.branchOid
+      };
+
+      await this.fileActions(commitBody);
+      this.loadingNewFile = false;
+      this.form.resetValidation();
+      this.form.reset();
+      this.dialogNewFile = false;
+    }
+  }
+
+  async addFolder() {
+    if ((this.$refs.formFolder as Vue & { validate: () => boolean }).validate()) {
+      this.loadingNewFolder = true;
+      let prefix = "";
+      if (this.codePath.length > 0) {
+        prefix = this.codePath.map(path => path.nombre).join("/") + "/";
+      }
+      const commitBody = {
+        branch: {
+          repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+          branchName: this.repository?.defaultBranchRef?.name
+        },
+        fileChanges: {
+          additions: [
+            {
+              path: prefix + this.nameFolder + "/.gitkeep",
+              contents: ""
+            }
+          ]
+        },
+        message: { headline: "Creación de carpeta " + this.nameFolder, body: "" },
+        expectedHeadOid: this.branchOid
+      };
+
+      console.log(commitBody);
+      await this.fileActions(commitBody);
+      this.loadingNewFolder = false;
+      this.formFolder.resetValidation();
+      this.formFolder.reset();
+      this.dialogNewFolder = false;
+    }
   }
 
   closeDialogNewFile() {

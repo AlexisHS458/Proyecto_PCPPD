@@ -77,8 +77,10 @@ class GitHubService {
           return res;
         })
         .catch(err => {
+          console.log(err);
+          
           const errorGraphQl = err as GraphQLError;
-          if (errorGraphQl.message.includes("CreateCommitOnBranch")) {
+          if (errorGraphQl.message.includes("permission")) {
             throw new Error(
               "Lo sentimos, no tienes permisos de acceso a este repositorio para realizar esta acción. Cambia de rol con alguien con permisos o contacta al dueño del repositorio."
             );
