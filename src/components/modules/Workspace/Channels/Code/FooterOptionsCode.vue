@@ -54,7 +54,14 @@
           Argumentos
         </v-btn> -->
         <v-divider vertical></v-divider>
-        <v-btn depressed text color="white" class="mr-2 text-capitalize" @click="closeInputStdin">
+        <v-btn
+          depressed
+          text
+          color="white"
+          class="mr-2 text-capitalize"
+          @click="closeInputStdin"
+          v-if="currentUser.uid == driverUID"
+        >
           Stdin
         </v-btn>
         <v-spacer></v-spacer>
@@ -67,6 +74,8 @@
 import { Position } from "monaco-editor";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+const User = namespace("UserModule");
+import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
 @Component
 export default class EditCode extends Vue {
@@ -89,6 +98,15 @@ export default class EditCode extends Vue {
 
   @CodeChannel.State("codeFilePath")
   private codeFilePath!: string;
+
+  @CodeChannel.State("driverUID")
+  private driverUID!: string | undefined;
+
+  /**
+   * Estado obtenido del @module User
+   */
+  @User.State("user")
+  private currentUser!: User;
 
   public showStdin = false;
   public showArgs = false;
