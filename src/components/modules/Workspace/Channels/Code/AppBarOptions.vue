@@ -328,27 +328,6 @@ export default class AppBarOptions extends Vue {
       versionIndex: "0",
       stdin: this.stdin
     });
-
-    /*   await this.axios({
-      url: REST_SERVER_ENDPOINT + "rest/compiler",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {
-        script: monaco.editor.getModels()[0].getValue(),
-        language: this.languageName,
-        versionIndex: "0",
-      },
-      method: "post",
-    })
-      .then((response) => {
-
-        this.setResponseCompiler(response.data.output);
-        this.setChangeTerminal(true);
-      })
-      .catch((e) => {
-        console.log(e);
-      });*/
   }
 }
 </script>
