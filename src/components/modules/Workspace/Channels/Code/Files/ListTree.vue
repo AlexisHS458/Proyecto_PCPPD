@@ -195,7 +195,6 @@ export default class ViewTreeView extends Vue {
       message: { headline: "Se eliminó el archivo " + name, body: "" },
       expectedHeadOid: this.branchOid
     };
-    //console.log(commitBody);
 
     await this.fileActions(commitBody);
     this.loadingDelete = false;

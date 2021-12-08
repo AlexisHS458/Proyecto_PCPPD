@@ -130,15 +130,12 @@ export default class EditCode extends Vue {
 
   @Watch("driverUID")
   currentDriverWatch(val: string) {
-    //   monaco.editor.getModels().forEach(model => model.dispose());
-    console.log("Entro watch driver");
+
     if (val) {
       if (this.currentUser.uid !== this.driverUID) {
         this.setCodeChanged(false);
-        console.log("Entro if");
         this.options?.updateOptions({ readOnly: true });
       } else {
-        console.log("Entro else");
         if (this.currentCode?.hash !== this.currentCode?.currentHash) {
           this.setCodeChanged(true);
         } else {
@@ -273,10 +270,12 @@ export default class EditCode extends Vue {
   }
 
   initEditor() {
+    
     const blob = this.codeData?.object as Blob | undefined;
     const language = monaco.languages.getLanguages().find(language => {
       return language.extensions?.includes(this.codeData?.extension ?? "plaintext");
     })?.id;
+    
     this.options = monaco.editor.create(document.getElementById("container") as HTMLElement, {
       value: blob?.text ?? "",
 
@@ -285,6 +284,12 @@ export default class EditCode extends Vue {
       automaticLayout: true,
       columnSelection: true
     });
+    if (this.currentUser.uid !== this.driverUID){
+      this.options?.updateOptions({ readOnly: true });
+    }
+    else{
+      this.options?.updateOptions({ readOnly: false });
+    }
   }
 
   saveDialog() {
