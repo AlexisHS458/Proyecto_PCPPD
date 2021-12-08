@@ -23,7 +23,7 @@
                 <v-col cols="9">
                   <v-text-field
                     label="Ingresa el nombre del archivo con extensiòn"
-                    :rules="[rules.required]"
+                    :rules="[rules.required, rules.regexNameFile]"
                     outlined
                     dense
                     color="primary"
@@ -56,7 +56,7 @@
               <v-row align="center" justify="center" class="mt-6">
                 <v-col cols="9">
                   <v-text-field
-                    :rules="[rules.required]"
+                    :rules="[rules.required, rules.regexNameFolder]"
                     label="Ingresa el nombre de la carpeta"
                     outlined
                     dense
@@ -198,7 +198,10 @@ export default class ViewTreeView extends Vue {
   public loadingDelete = false;
   public treeEntryFromFileActions: Maybe<TreeEntry[]> = null;
   public rules = {
-    required: (v: string): string | boolean => !!v || "Campo requerido"
+    required: (v: string): string | boolean => !!v || "Campo requerido",
+    regexNameFile: (v: string): string | boolean =>
+      /([a-zA-Z0-9\s_\\.\-\(\):])+(.cpp|.java)$/.test(v) || "Nombre inválido",
+    regexNameFolder: (v: string): string | boolean => /^[A-Za-z0-9]*$/.test(v) || "Nombre inválido"
   };
 
   @Ref("form") readonly form!: VForm;
@@ -297,7 +300,6 @@ export default class ViewTreeView extends Vue {
         expectedHeadOid: this.branchOid
       };
 
-  
       await this.fileActions(commitBody);
       this.loadingNewFolder = false;
       this.formFolder.resetValidation();
