@@ -62,7 +62,6 @@ export default class RepoFilesView extends Vue {
 
   @Watch("treeEntriesFromFiles")
   onTreeChanged(val: TreeEntry[]) {
-    console.log("entro al watch");
     this.treeEntries = val;
   }
 

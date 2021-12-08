@@ -297,7 +297,7 @@ export default class ViewTreeView extends Vue {
         expectedHeadOid: this.branchOid
       };
 
-      console.log(commitBody);
+  
       await this.fileActions(commitBody);
       this.loadingNewFolder = false;
       this.formFolder.resetValidation();

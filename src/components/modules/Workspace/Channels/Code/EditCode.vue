@@ -132,7 +132,6 @@ export default class EditCode extends Vue {
   currentDriverWatch(val: string) {
     //   monaco.editor.getModels().forEach(model => model.dispose());
     console.log("Entro watch driver");
-//hay andas?
     if (val) {
       if (this.currentUser.uid !== this.driverUID) {
         this.setCodeChanged(false);

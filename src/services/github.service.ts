@@ -76,9 +76,7 @@ class GitHubService {
         .then(res => {
           return res;
         })
-        .catch(err => {
-          console.log(err);
-          
+        .catch(err => {          
           const errorGraphQl = err as GraphQLError;
           if (errorGraphQl.message.includes("permission")) {
             throw new Error(

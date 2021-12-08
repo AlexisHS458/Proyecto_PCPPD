@@ -88,7 +88,7 @@ export default class ViewCode extends Vue {
     delete this.socket;
   } */
   mounted() {    
-    console.log('mounted de viewCode');
+   
     
     CodeService.requestCurrentCode(this.currentUser.uid!, this.$route.params.idChannelCode);
     CodeService.getDataCode(this.currentUser.uid!,this.$route.params.idChannelCode, code => {

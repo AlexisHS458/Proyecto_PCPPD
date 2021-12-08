@@ -70,8 +70,6 @@ class CodeChannelService {
 
   getDataCode(uid: string, codeChannelID: string, onEvent: (code: Code) => void): Socket {
     return codeChannelSocket(uid).on(`${ResponseEventName.CODE}-${codeChannelID}`, payload => {
-      console.log("Estos recibiendo info de codigo");
-
       onEvent(payload);
     });
   }
