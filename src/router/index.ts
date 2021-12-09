@@ -28,6 +28,15 @@ const routes: Array<RouteConfig> = [
     component: Register,
     meta: {
       requiresAuth: true
+    },
+    beforeEnter: async (to, from, next) => {
+      await store.dispatch("UserModule/fetchCurrentUser");
+      const currentUser = store.getters["UserModule/getUser"];
+      if (currentUser.boleta == "") {
+        next();
+      } else {
+        next({ name: "MainScreen" });
+      }
     }
   },
   {
@@ -152,14 +161,6 @@ router.beforeEach((to, from, next) => {
       next({ name: "Home" });
     } else if (!requiresAuth && user) {
       next({ name: "MainScreen" });
-    } else if (to.fullPath == "/register" && requiresAuth && user) {
-      await store.dispatch("UserModule/fetchCurrentUser");
-      const currentUser = store.getters["UserModule/getUser"];
-      if (currentUser.boleta == "") {
-        next();
-      } else {
-        next({ name: "MainScreen" });
-      }
     } else {
       next();
     }
