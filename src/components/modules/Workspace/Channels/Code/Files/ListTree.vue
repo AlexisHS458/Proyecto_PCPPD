@@ -135,6 +135,8 @@ export default class ViewTreeView extends Vue {
               const language = monaco.languages.getLanguages().find(language => {
                 return language.extensions?.includes(treeEntry.extension ?? "plaintext");
               })?.id;
+              console.log('treeEntry', treeEntry);
+              
               this.setCodeData(treeEntry);
               CodeService.sendCode(this.currentUser.uid!, {
                 channelID: this.$route.params.idChannelCode,

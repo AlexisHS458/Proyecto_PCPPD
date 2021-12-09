@@ -24,7 +24,6 @@ class UserService {
                 //const token = auth.signInWithRedirect(new firebase.auth.GithubAuthProvider());
                 const userData = {
                   ...value.data(),
-                  oAuthToken: ""
                 } as User;
                 
                 if (userData) {

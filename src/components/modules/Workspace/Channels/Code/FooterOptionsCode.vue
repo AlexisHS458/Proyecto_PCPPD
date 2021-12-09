@@ -55,11 +55,13 @@
         </v-btn> -->
         <v-divider vertical></v-divider>
         <v-btn
+
           depressed
           text
           color="white"
           class="mr-2 text-capitalize"
           @click="closeInputStdin"
+
           v-if="currentUser.uid == driverUID"
         >
           Stdin
@@ -71,12 +73,14 @@
   </v-footer>
 </template>
 <script lang="ts">
+import { User } from "@/models/user";
 import { Position } from "monaco-editor";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 const User = namespace("UserModule");
 import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
+const User = namespace("UserModule");
 @Component
 export default class EditCode extends Vue {
   @Prop({
