@@ -15,7 +15,7 @@ class WorkSpaceService {
    */
   async createWorkSpace(workspace: Workspace): Promise<Workspace> {
     const workspaceRef = (await db.collection(Collection.WORK_SPACE).add(workspace)).get();
-    const workspaceData = <Workspace>(await workspaceRef).data()
+    const workspaceData = <Workspace>(await workspaceRef).data();
     UserService.updateUserWorkspaceCount(workspace.uid_usuario, true);
     return workspaceData;
   }
@@ -26,21 +26,52 @@ class WorkSpaceService {
    */
   async deleteWorkSpace(id: string): Promise<void> {
     const workspaceRef = await this.getWorkspaceInfo(id);
-    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.TEXT_CHANNEL).onSnapshot(snapshot => {
-      snapshot.docs.forEach(async doc =>{
-        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.TEXT_CHANNEL).doc(doc.id).delete()
-      })
+    db.collection(Collection.WORK_SPACE)
+      .doc(id)
+      .collection(Collection.TEXT_CHANNEL)
+      .onSnapshot(snapshot => {
+        snapshot.docs.forEach(async doc => {
+          await db
+            .collection(Collection.WORK_SPACE)
+            .doc(id)
+            .collection(Collection.TEXT_CHANNEL)
+            .doc(doc.id)
+            .delete();
+        });
+      });
+    db.collection(Collection.WORK_SPACE)
+      .doc(id)
+      .collection(Collection.VOICE_CHANNEL)
+      .onSnapshot(snapshot => {
+        snapshot.docs.forEach(async doc => {
+          await db
+            .collection(Collection.WORK_SPACE)
+            .doc(id)
+            .collection(Collection.VOICE_CHANNEL)
+            .doc(doc.id)
+            .delete();
+        });
+      });
+    db.collection(Collection.WORK_SPACE)
+      .doc(id)
+      .collection(Collection.CODE_CHANNEL)
+      .onSnapshot(snapshot => {
+        snapshot.docs.forEach(async doc => {
+          await db
+            .collection(Collection.WORK_SPACE)
+            .doc(id)
+            .collection(Collection.CODE_CHANNEL)
+            .doc(doc.id)
+            .delete();
+        });
+      });
+
+    workspaceRef.usuarios.forEach(async id => {
+      if (id !== workspaceRef.uid_usuario) {
+        await UserService.updateUserWorkspaceCollab(id, false);
+      }
     });
-    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.VOICE_CHANNEL).onSnapshot(snapshot => {
-      snapshot.docs.forEach(async doc =>{
-        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.VOICE_CHANNEL).doc(doc.id).delete()
-      })
-    });
-    db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.CODE_CHANNEL).onSnapshot(snapshot => {
-      snapshot.docs.forEach(async doc =>{
-        await db.collection(Collection.WORK_SPACE).doc(id).collection(Collection.CODE_CHANNEL).doc(doc.id).delete()
-      })
-    });
+
     await db
       .collection(Collection.WORK_SPACE)
       .doc(id)
@@ -122,22 +153,25 @@ class WorkSpaceService {
       });
   }
 
-  async updateWorkspaceStorage(workspaceId: string, isIncrement: boolean, value: number): Promise<void>{
-    if(isIncrement){
+  async updateWorkspaceStorage(
+    workspaceId: string,
+    isIncrement: boolean,
+    value: number
+  ): Promise<void> {
+    if (isIncrement) {
       await db
-      .collection(Collection.WORK_SPACE)
-      .doc(workspaceId)
-      .update({
-        almacenamiento: FieldValue.increment(value)
-      });
-    }
-    else{
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceId)
+        .update({
+          almacenamiento: FieldValue.increment(value)
+        });
+    } else {
       await db
-      .collection(Collection.WORK_SPACE)
-      .doc(workspaceId)
-      .update({
-        almacenamiento: FieldValue.increment(-value)
-      });
+        .collection(Collection.WORK_SPACE)
+        .doc(workspaceId)
+        .update({
+          almacenamiento: FieldValue.increment(-value)
+        });
     }
   }
 }

@@ -23,8 +23,6 @@ export interface User {
    */
   fotoURL: string,
 
-  oAuthToken: string,
-
   workspacesCount?: number,
 
   workspacesCollab?: number

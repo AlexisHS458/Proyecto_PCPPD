@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch, Ref, VModel } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
@@ -217,7 +217,8 @@ export default class AppBarOptions extends Vue {
    */
   @User.State("user")
   private currentUser!: User;
-
+  
+  public options!: monaco.editor.IStandaloneCodeEditor;
   public loadingExport = false;
   public dialogImport = false;
   public validImport = true;
@@ -237,11 +238,19 @@ export default class AppBarOptions extends Vue {
 
   @Watch("codeData")
   onChildChangedData() {
+    console.log('codeData', this.codeData);
+    
     const language =
       monaco.languages.getLanguages().find(language => {
         return language.extensions?.includes(this.codeData?.extension ?? "plaintext");
       })?.id ?? null;
+    
+    console.log();
+    
+    
     this.languageName = language;
+    //console.log('codeData', this.options.getModel());
+    
   }
 
   closeDialogExport() {
@@ -322,9 +331,16 @@ export default class AppBarOptions extends Vue {
   }
 
   compilerCode() {
+    let extension = this.languageName;
+
+    if(extension === null){
+      const filepathsplit = this.codeFilePath.split(".")
+      extension = filepathsplit[filepathsplit.length -1];
+    }
+    
     CodeService.compileCode(this.currentUser.uid!, this.$route.params.idChannelCode, {
       script: monaco.editor.getModels()[0].getValue(),
-      language: this.languageName,
+      language: extension,
       versionIndex: "0",
       stdin: this.stdin
     });
