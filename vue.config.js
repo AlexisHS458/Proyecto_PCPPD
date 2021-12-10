@@ -11,7 +11,7 @@ module.exports = {
       appId: "mx.ipn.kun",
       productName: "Kun",
       win: {
-        icon: "./buildResources/icon.png"
+        icon: "./buildResources/icon.ico"
       }
     }
   }
