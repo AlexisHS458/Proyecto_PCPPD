@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-app-bar v-if="iSConnectedCode" color="primaryDark" dense class="toolbar">
-      <v-toolbar-title class="text-color">
-        Conectado: {{ nameCodeChannel }}</v-toolbar-title
-      >
+      <v-toolbar-title class="text-color"> Conectado: {{ nameCodeChannel }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="disconnectCode" v-if="iSConnectedCode">
         <v-icon color="errorLight">mdi-xml</v-icon>
@@ -11,16 +9,10 @@
     </v-app-bar>
 
     <v-app-bar v-if="isConnected" color="primaryDark" dense class="toolbar">
-      <v-toolbar-title
-        v-if="isConnectedStatus == 'Conectando'"
-        class="text-color-connecting"
-      >
+      <v-toolbar-title v-if="isConnectedStatus == 'Conectando'" class="text-color-connecting">
         {{ isConnectedStatus + " a: " + nameVoiceChannel }}
       </v-toolbar-title>
-      <v-toolbar-title
-        v-else-if="isConnectedStatus == 'Conectado'"
-        class="text-color"
-      >
+      <v-toolbar-title v-else-if="isConnectedStatus == 'Conectado'" class="text-color">
         {{ isConnectedStatus + ": " + nameVoiceChannel }}
       </v-toolbar-title>
 
@@ -40,12 +32,12 @@
         <span>{{ currentUser.nombre + " " + currentUser.apellido }}</span>
       </v-tooltip>
       <v-spacer></v-spacer>
-      <v-btn icon @click="toggleMicrophone">
-        <v-icon v-if="isTalk" color="success">mdi-microphone</v-icon>
+      <v-btn icon @click="toggleMicrophone" v-if="isConnected">
+        <v-icon v-if="!isMute" color="success">mdi-microphone</v-icon>
         <v-icon v-else color="error">mdi-microphone-off</v-icon>
       </v-btn>
-      <v-btn icon @click="toggleHeadphones">
-        <v-icon v-if="isListening" color="success">mdi-headphones</v-icon>
+      <v-btn icon @click="toggleHeadphones" v-if="isConnected">
+        <v-icon v-if="!isDeafen" color="success">mdi-headphones</v-icon>
         <v-icon v-else color="error">mdi-headphones-off</v-icon>
       </v-btn>
     </v-app-bar>
@@ -67,37 +59,59 @@ import { Workspace } from "@/models/workspace";
 const User = namespace("UserModule");
 const StatusVoice = namespace("VoiceChannelModule");
 const MyWorkSpace = namespace("WorkspaceModule");
+const CodeChannel = namespace("CodeChannelModule");
 @Component
 export default class UserInfo extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
   @StatusVoice.State("isConnectedStatus")
   private isConnectedStatus!: VoiceState;
 
+  @StatusVoice.State("isMute")
+  private isMute!: boolean;
+
   @StatusVoice.Action
   private toggleIsMuteStatus!: () => void;
+
+  @StatusVoice.State("isDeafen")
+  private isDeafen!: boolean;
+
+  @StatusVoice.Action
+  private toggleIsDeafenStatus!: () => void;
+
+  @StatusVoice.Action
+  private setMute!: (mute: boolean) => void;
+
+  @StatusVoice.Action
+  private setIsConnectedStatus!: (status: VoiceState) => void;
 
   @MyWorkSpace.State("workspace")
   private workspace!: Workspace;
 
+  @CodeChannel.Action
+  private setCodeChanged!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setShowDialog!: (state: boolean) => void;
+
+  @CodeChannel.State("codeChanged")
+  private codeChanged!: boolean;
+
   public loading = false;
-  public isTalk = true;
-  public isListening = true;
+
   public isConnected = false;
   public iSConnectedCode = false;
   public nameCodeChannel = "";
   public nameVoiceChannel = "";
   toggleMicrophone() {
     this.toggleIsMuteStatus();
-    this.isTalk = !this.isTalk;
   }
 
   toggleHeadphones() {
-    this.isListening = !this.isListening;
-    this.isTalk = !this.isTalk;
+    this.toggleIsDeafenStatus();
   }
 
   disconnect() {
@@ -106,23 +120,28 @@ export default class UserInfo extends Vue {
     // if (sound) {
     var audio = new Audio(require("@/assets/disconnected.mp3"));
     audio.play();
+    this.setIsConnectedStatus(VoiceState.CONNECTING);
     //  }
   }
 
   disconnectCode() {
-    CodeService.leaveCodeChannel(this.currentUser.uid!);
-    var audio = new Audio(require("@/assets/disconnected.mp3"));
-    audio.play();
-    if (
-      (this.$route.path != "/space/" + this.$route.params.id,
-      +"/code/" + this.$route.params.idChannelCode)
-    ) {
-      this.$router.replace({ name: "notChannels" });
+    if (!this.codeChanged) {
+      CodeService.leaveCodeChannel(this.currentUser.uid!);
+      var audio = new Audio(require("@/assets/disconnected.mp3"));
+      audio.play();
+      if (
+        (this.$route.path != "/space/" + this.$route.params.id,
+        +"/code/" + this.$route.params.idChannelCode)
+      ) {
+        this.$router.replace({ name: "notChannels" });
+      }
+    } else {
+      this.setShowDialog(true);
     }
   }
 
   mounted() {
-    VoiceService.userStatus(this.currentUser.uid!, async (isConnected) => {
+    VoiceService.userStatus(this.currentUser.uid!, async isConnected => {
       if (isConnected) {
         this.nameVoiceChannel = await ServiceChannels.getChannelName(
           ChannelType.VOICE,
@@ -132,7 +151,7 @@ export default class UserInfo extends Vue {
       }
       this.isConnected = !!isConnected;
     });
-    CodeService.userStatus(this.currentUser.uid!, async (isConnected) => {
+    CodeService.userStatus(this.currentUser.uid!, async isConnected => {
       if (isConnected) {
         this.nameCodeChannel = await ServiceChannels.getChannelName(
           ChannelType.CODE,
@@ -140,7 +159,16 @@ export default class UserInfo extends Vue {
           isConnected
         );
       }
+
       this.iSConnectedCode = !!isConnected;
+    });
+    VoiceService.listenToActions(this.currentUser.uid!, actions => {
+      this.setMute(actions.mute ?? false);
+
+      if (actions.disconnect) {
+        this.setIsConnectedStatus(VoiceState.CONNECTING);
+        VoiceService.leaveVoiceChannel(this.currentUser.uid!);
+      }
     });
   }
 }

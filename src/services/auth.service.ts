@@ -11,7 +11,9 @@ class AuthService {
    */
   async logout(): Promise<void> {
     presence.setPresence(Status.OFFLINE, auth.currentUser?.uid);
+    localStorage.removeItem('github-token');
     return await auth.signOut();
+
   }
 }
 

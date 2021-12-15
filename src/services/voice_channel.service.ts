@@ -11,8 +11,8 @@ class VoiceChannelService {
    * @param uid ID del usuario a conectar
    * @param voiceChannelID ID del canal de voz al cual para conectar al usuario
    */
-  joinToVoiceChannel(uid: string, voiceChannelID: string): Socket {
-    return voiceChannelSocket(uid).emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
+  joinToVoiceChannel(voiceChannelID: string, socket: Socket): Socket {
+    return socket.emit(EventName.JOIN_VOICE_CHANNEL, voiceChannelID);
   }
 
   /**
@@ -51,10 +51,12 @@ class VoiceChannelService {
   /**
    * Obtiene la lista de usuario cuando un usuario nuevo se une al canal de voz
    * @param uid ID del usuario
+   * @param channelID: ID del canal a conectar
    * @param onEvent suscripción al eventro
    */
-  joinedUsers(uid: string, onEvent: (users: SocketUser[]) => void): Socket {
-    return voiceChannelSocket(uid).on(ResponseEventName.JOINED_USERS, payload => {
+  joinedUsers(socket: Socket, channelID: string, onEvent: (users: SocketUser[]) => void): Socket {
+    
+    return socket.on(`${ResponseEventName.JOINED_USERS}-${channelID}`, payload => {
       onEvent(Object.values(payload));
     });
   }
@@ -65,27 +67,64 @@ class VoiceChannelService {
     });
   }
 
-  listenUserJoined(uid: string, onEvent: (signalPayload: SignalPayload) => void): Socket {
-    return voiceChannelSocket(uid).on(ResponseEventName.USER_JOINED, payload => {
+  listenUserJoined(
+    socket: Socket,
+    channelID: string,
+    onEvent: (signalPayload: SignalPayload) => void
+  ): Socket {
+    return socket.on(`${ResponseEventName.USER_JOINED}-${channelID}`, payload => {
       onEvent(payload);
     });
   }
 
-  sendingSignal(uid: string, payload: SignalPayload): Socket {
-    return voiceChannelSocket(uid).emit(EventName.SENDING_SIGNAL, payload);
+  sendingSignal(socket: Socket, payload: SignalPayload): Socket {
+    return socket.emit(EventName.SENDING_SIGNAL, payload);
   }
 
   returningSignal(uid: string, payload: SignalPayload): Socket {
     return voiceChannelSocket(uid).emit(EventName.RETURNING_SIGNAL, payload);
   }
 
-  listenReturningSignal(uid: string, onEvent: (signalPayload: SignalPayload) => void): Socket {
-    return this.joinRoom(uid, uid, false).on(
-      ResponseEventName.RECEIVING_RETURNED_SIGNAL,
+  listenReturningSignal(
+    uid: string,
+    voiceChannelID: string,
+    onEvent: (signalPayload: SignalPayload) => void
+  ): Socket {
+    return this.joinRoom(uid, uid).on(
+      `${ResponseEventName.RECEIVING_RETURNED_SIGNAL}-${voiceChannelID}`,
       payload => {
         onEvent(payload);
       }
     );
+  }
+
+
+
+  /**
+   * Mutea el microfono de un usuario
+   * @param uid uid del usuario actual
+   * @param payload  contine uid del usuario y las acciones a realizar
+   */
+  sendActionToUser(
+    uid: string,
+    payload: {
+      uidUserToMute: string;
+      actions: {
+        mute?: boolean;
+        disconnect?: boolean;
+      };
+    }
+  ): Socket {
+    return voiceChannelSocket(uid).emit(EventName.ACTION_USER, payload);
+  }
+
+  listenToActions(
+    uid: string,
+    onEvent: (actions: { mute?: boolean; deafen?: boolean; disconnect?: boolean }) => void
+  ): Socket {
+    return voiceChannelSocket(uid).on(ResponseEventName.ACTIONS, payload => {
+      onEvent(payload);
+    });
   }
 }
 

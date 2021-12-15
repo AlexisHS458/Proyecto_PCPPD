@@ -34,6 +34,11 @@ class TextChannelModule extends VuexModule {
   public snackbarMessageError = "";
 
   /**
+   * Estado de consulta de archivos
+   */
+  public isLoadingFile: string[] = [];
+
+  /**
    * Estatos de consulta del canal de texto
    */
   public status = {
@@ -174,8 +179,8 @@ class TextChannelModule extends VuexModule {
    * @param id  del documento a eliminar
    */
   @Action
-  async deleteMessage(id: string | undefined): Promise<void> {
-    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, id)
+  async deleteMessage(message: Message): Promise<void> {
+    return await MessageService.deleteMessage(this.workspaceID, this.textChannelID, message)
       .then(() => {
         this.context.commit("messageDeletedSuccess");
         this.context.commit("setSnackBarMessage", "Mensaje eliminado correctamente");
@@ -187,6 +192,23 @@ class TextChannelModule extends VuexModule {
         this.context.commit("setShowSnackBarMessageError", true);
       });
   }
+
+  /*@Action
+  async uploadFile(data: {
+    workspaceID: string;
+    textChannelID: string;
+    message: Message;
+    file: File;
+  }): Promise<void> {
+
+    const message=
+    await MessageService.sendMessageFile(
+      data.workspaceID,
+      data.textChannelID,
+      data.message,
+      data.file
+    );
+  }*/
 
   /**
    * Recupera los mensajes dentro del canal de texto

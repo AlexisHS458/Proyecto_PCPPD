@@ -17,7 +17,7 @@
     </v-btn>
   </v-speed-dial> -->
   <a
-    href="https://correoipn-my.sharepoint.com/:b:/g/personal/hgalvang1701_alumno_ipn_mx/EW_2eYj07aVCn9C58N59xh4B-HkrcZ1Q_afVUfrOYyxRiQ?e=9dWLPg"
+    href="https://drive.google.com/file/d/10DPJz7aK298rR7oPAe2xDR8S9R6CouQW/view?usp=sharing"
     target="_blank"
   >
     <v-tooltip right>

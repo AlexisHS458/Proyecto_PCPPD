@@ -5,6 +5,15 @@ module.exports = {
     plugins: [
       new MonacoWebpackPlugin() // Place it here
     ]
+  },
+  pluginOptions:{
+    electronBuilder:{
+      appId: "mx.ipn.kun",
+      productName: "Kun",
+      win: {
+        icon: "./buildResources/icon.ico"
+      }
+    }
   }
   /* plugins: [new MonacoWebpackPlugin()] */
 };

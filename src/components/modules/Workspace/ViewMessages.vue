@@ -15,8 +15,14 @@
             :key="message.uid"
             :message="message"
             :currentUser="currentUser"
+            :messages="messages"
           >
-            {{ message.contenido }}
+            <!--<template v-if="message.isFile">
+              {{ message.contenido }}
+            </template>
+            <template v-else>
+              {{ message.contenido }}
+            </template> -->
           </messages-in-messages>
         </messages-list>
       </template>
@@ -79,6 +85,7 @@ const MyWorkSpace = namespace("WorkspaceModule");
 const Messages = namespace("TextChannelModule");
 const Invitations = namespace("InvitationsModule");
 const Permissions = namespace("PermissionsModule");
+import MessageService from "@/services/message.service";
 @Component({
   components: {
     Snackbar,
@@ -226,13 +233,13 @@ export default class MessagesPage extends Vue {
         //Mostrar scroll inverso
         const vList = this.$refs.vList as any;
         vList.$el.scrollTop = vList.$el.scrollHeight;
-      }, 200);
+      }, 1000);
     });
   }
 }
 </script>
 
-<style scoped lang="scss" >
+<style scoped lang="scss">
 .div-progress-circular {
   margin: auto;
   width: 100%;
@@ -290,5 +297,3 @@ export default class MessagesPage extends Vue {
   display: block;
 }
 </style>
-
-

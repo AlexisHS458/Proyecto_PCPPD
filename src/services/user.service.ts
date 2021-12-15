@@ -1,4 +1,6 @@
 import { db, auth, FieldValue } from "@/utils/firebase";
+import firebase from "firebase/app";
+import "firebase/auth";
 import { User } from "@/models/user";
 import { Collection } from "@/utils/collections";
 
@@ -13,15 +15,20 @@ class UserService {
   async getUserAuthInfo(onSnapshot: (user: User) => void): Promise<User> {
     return new Promise((resolve, reject) => {
       auth.onAuthStateChanged(user => {
-        if (user) {
+        
+        if (user){
           db.collection(Collection.USERS)
             .doc(user?.uid)
             .onSnapshot(
               value => {
-                const userData = value.data();
+                //const token = auth.signInWithRedirect(new firebase.auth.GithubAuthProvider());
+                const userData = {
+                  ...value.data(),
+                } as User;
+                
                 if (userData) {
-                  onSnapshot(<User>userData);
-                  resolve(<User>userData);
+                  onSnapshot(userData);
+                  resolve(userData);
                 }
               },
               error => {
@@ -104,15 +111,15 @@ class UserService {
     return users;
   }
 
-  updateUserWorkspaceCount(uid: string, isIncrement: boolean): void {
+  async updateUserWorkspaceCount(uid: string, isIncrement: boolean): Promise<void> {
     if (isIncrement) {
-      db.collection(Collection.USERS)
+      return await db.collection(Collection.USERS)
         .doc(uid)
         .update({
           workspacesCount: FieldValue.increment(1)
         });
     } else {
-      db.collection(Collection.USERS)
+      return await db.collection(Collection.USERS)
         .doc(uid)
         .update({
           workspacesCount: FieldValue.increment(-1)

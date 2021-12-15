@@ -1,3 +1,4 @@
+import { Code } from "@/models/code";
 import { CursorCoordinates } from "@/models/cursorCoordinates";
 import { SocketUser } from "@/models/socketUser";
 import { codeChannelSocket } from "@/socketio";
@@ -6,16 +7,16 @@ import { ResponseEventName } from "@/utils/response_event_name";
 import { Socket } from "socket.io-client";
 
 class CodeChannelService {
-  joinToCodeChannel(uid: string, codeChannelID: string): Socket {
-    return codeChannelSocket(uid).emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
+  joinToCodeChannel(socket: Socket, codeChannelID: string): Socket {
+    return socket.emit(EventName.JOIN_CODE_CHANNEL, codeChannelID);
   }
 
   joinRoom(uid: string, roomID: string, createNewSocket = true): Socket {
     return codeChannelSocket(uid, createNewSocket).emit(EventName.CODE_JOIN_ROOM, roomID);
   }
 
-  leaveCodeChannel(uid: string) {
-    codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
+  leaveCodeChannel(uid: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.LEAVE_CODE_CHANNEL);
   }
 
   allUsers(uid: string, codeChannelID: string, onEvent: (users: SocketUser[]) => void): Socket {
@@ -26,8 +27,8 @@ class CodeChannelService {
       .emit(EventName.CODE_EMIT_USERS, codeChannelID);
   }
 
-  joinedUsers(uid: string, onEvent: (users: SocketUser[]) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.CODE_JOINED_USERS, payload => {
+  joinedUsers(socket: Socket, onEvent: (users: SocketUser[]) => void): Socket {
+    return socket.on(ResponseEventName.CODE_JOINED_USERS, payload => {
       onEvent(Object.values(payload));
     });
   }
@@ -49,8 +50,8 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.SENT_COORDINATES, coordinates);
   }
 
-  getCoordinates(uid: string, onEvent: (coordinates: CursorCoordinates[]) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.COORDINAES, payload => {
+  getCoordinates(uid: string,codeChannelID:string, onEvent: (coordinates: CursorCoordinates[]) => void): Socket {
+    return this.joinRoom(uid,codeChannelID).on(ResponseEventName.COORDINAES, payload => {
       onEvent(payload);
     });
   }
@@ -60,13 +61,15 @@ class CodeChannelService {
     codeData: {
       channelID: string;
       code: string;
+      extension: string;
+      path: string;
     }
   ): Socket {
     return codeChannelSocket(uid).emit(EventName.SEND_CODE, codeData);
   }
 
-  getDataCode(uid: string, onEvent: (code: string) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.CODE, payload => {
+  getDataCode(uid: string, codeChannelID: string, onEvent: (code: Code) => void): Socket {
+    return codeChannelSocket(uid).on(`${ResponseEventName.CODE}-${codeChannelID}`, payload => {
       onEvent(payload);
     });
   }
@@ -76,8 +79,8 @@ class CodeChannelService {
    * @param uid uid de usuario
    * @param onEvent evento cuando cambia el driver
    */
-  currentDriver(uid: string, onEvent: (driverID: string) => void): Socket {
-    return codeChannelSocket(uid).on(ResponseEventName.DRIVER,payload => {
+  currentDriver(socket: Socket, onEvent: (driverID: string) => void): Socket {
+    return socket.on(ResponseEventName.DRIVER, payload => {
       onEvent(payload);
     });
   }
@@ -111,15 +114,22 @@ class CodeChannelService {
     return codeChannelSocket(uid).emit(EventName.ACCEPT_REQUEST, newDriverID);
   }
 
-  requestCurrentDriver(
-    uid: string,
-    codeChannelID: string,
-  ): Socket {
+  requestCurrentDriver(uid: string, codeChannelID: string): Socket {
     return codeChannelSocket(uid).emit(EventName.GET_DRIVER, codeChannelID);
   }
 
-  delay(ms: number){
-    return new Promise(resolve => setTimeout(resolve,ms));
+  requestCurrentCode(uid: string, codeChannelID: string): Socket {
+    return codeChannelSocket(uid).emit(EventName.REQUEST_CODE, codeChannelID);
+  }
+
+  compileCode(uid: string, codeChannelID: string, dataCode: any): Socket {
+    return codeChannelSocket(uid).emit(EventName.COMPILE_CODE, { ...dataCode, codeChannelID });
+  }
+
+  lisenTerminal(uid: string, channelID: string, onEvent: (data: any) => void) {
+    return this.joinRoom(uid, channelID).on(ResponseEventName.COMPILE_DATA, payload => {
+      onEvent(payload);
+    });
   }
 }
 

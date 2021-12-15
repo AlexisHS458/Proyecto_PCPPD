@@ -1,11 +1,6 @@
 <template>
-  <v-app-bar app clipped-right flat height="48px" color="primary">
-    <v-icon
-      color="white"
-      class="mr-4"
-      @click="toggleShowNavigationDrawerChannels"
-      >mdi-menu</v-icon
-    >
+  <v-app-bar app clipped-right flat height="48px" :color="color">
+    <v-icon color="white" class="mr-4" @click="toggleShowNavigationDrawerChannels">mdi-menu</v-icon>
     <v-toolbar-title class="font-weight-medium">
       {{ nameChannel }}
     </v-toolbar-title>
@@ -21,6 +16,7 @@
           </template>
           <v-card color="infoDark">
             <template v-if="userRequest">
+              <div v-show="userRequest"></div>
               <v-list color="infoDark">
                 <v-list-item>
                   <v-list-item-title class="text-center">
@@ -31,9 +27,7 @@
               </v-list>
               <v-divider></v-divider>
               <v-card-actions class="justify-center">
-                <v-btn color="success" small @click="acceptRequest"
-                  >Aceptar</v-btn
-                >
+                <v-btn color="success" small @click="acceptRequest">Aceptar</v-btn>
                 <v-btn color="error" small>Rechazar</v-btn>
               </v-card-actions>
             </template>
@@ -48,158 +42,63 @@
             </template>
           </v-card>
         </v-menu>
-
-        <v-icon
-          size="25px"
-          color="info"
-          :disabled="currentUser.uid != driverUID"
+        <!-- dialogExport-->
+        <v-dialog
+          transition="dialog-top-transition"
+          max-width="600"
+          v-model="status.showDialogSave"
         >
-          mdi-content-save
-        </v-icon>
-        <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-icon
+              v-bind="attrs"
+              v-on="on"
               size="25px"
               color="info"
-              v-on="on"
-              v-bind="attrs"
-              :disabled="currentUser.uid != driverUID"
+              :disabled="currentUser.uid != driverUID || codeFilePath === ''"
             >
-              mdi-github
+              mdi-content-save
             </v-icon>
           </template>
-          <v-card color="secondary">
-            <v-list color="secondary" dark>
-              <v-list-item>
-                <v-list-item-title>Opciones de GitHub</v-list-item-title>
-              </v-list-item>
-            </v-list>
-
-            <v-divider></v-divider>
-
-            <v-list color="secondary" dark>
-              <v-dialog
-                transition="dialog-top-transition"
-                max-width="600"
-                v-model="dialogImport"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item v-bind="attrs" v-on="on">
-                    <v-list-item-action>
-                      <v-icon color="info"> mdi-file-import-outline</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-title>
-                      Importar código de GitHub
-                    </v-list-item-title>
-                  </v-list-item>
-                </template>
-                <v-card>
-                  <v-toolbar color="primary" dark> Importar código </v-toolbar>
-                  <v-card-text>
-                    <v-form
-                      ref="form"
-                      v-model="validImport"
-                      lazy-validation
-                      @submit.prevent
-                    >
-                      <v-row align="center" justify="center" class="mt-6">
-                        <v-col cols="9">
-                          <v-text-field
-                            label="URL"
-                            placeholder="Ingresa URL de repositorio a clonar"
-                            outlined
-                            dense
-                            color="primary"
-                            prepend-inner-icon="mdi-code-tags"
-                            autocomplete="off"
-                          ></v-text-field>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn color="success">Aceptar</v-btn>
-                    <v-btn text>Cerrar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-              <v-dialog
-                transition="dialog-top-transition"
-                max-width="600"
-                v-model="dialogExport"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item v-bind="attrs" v-on="on">
-                    <v-list-item-action>
-                      <v-icon color="info"> mdi-file-export-outline</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-title
-                      >Exportar código de GitHub</v-list-item-title
-                    >
-                  </v-list-item>
-                </template>
-                <v-card>
-                  <v-toolbar color="primary" dark> Importar código </v-toolbar>
-                  <v-card-text>
-                    <v-form
-                      ref="form"
-                      v-model="validExport"
-                      lazy-validation
-                      @submit.prevent
-                    >
-                      <v-row align="center" justify="center" class="mt-6">
-                        <v-col cols="9">
-                          <v-text-field
-                            label="Descripción"
-                            placeholder="Exportar código"
-                            outlined
-                            dense
-                            color="primary"
-                            prepend-inner-icon="mdi-text "
-                            autocomplete="off"
-                          ></v-text-field>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn color="success">Aceptar</v-btn>
-                    <v-btn text>Cerrar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-              <v-dialog
-                transition="dialog-top-transition"
-                max-width="600"
-                v-model="dialogExit"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-list-item v-bind="attrs" v-on="on">
-                    <v-list-item-action>
-                      <v-icon color="error"> mdi-logout</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-title>
-                      Desvicular cuenta de GitHub
-                    </v-list-item-title>
-                  </v-list-item>
-                </template>
-                <v-card>
-                  <v-toolbar color="warning" dark> Cerrar Sesión </v-toolbar>
-                  <v-card-text>
-                    <div class="text-h6 pa-5 text-center">
-                      <p>¿ESTAS SEGURO QUE QUIERES DESVINCULAR</p>
-                      <p>TU CUENTA DE GITHUB?</p>
-                    </div>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn color="warning">Aceptar</v-btn>
-                    <v-btn text>Cerrar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-list>
+          <v-card>
+            <v-toolbar color="secondary" dark> Realizar Commit </v-toolbar>
+            <v-card-text>
+              <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
+                <v-row align="center" justify="center" class="mt-6">
+                  <v-col cols="9">
+                    <v-text-field
+                      label="Summary"
+                      outlined
+                      dense
+                      color="primary"
+                      prepend-inner-icon="mdi-message-text "
+                      :rules="[rules.required]"
+                      autocomplete="off"
+                      v-model="summary"
+                    ></v-text-field>
+                    <v-textarea
+                      v-model.trim="description"
+                      label="Descripción"
+                      class="chat-input"
+                      outlined
+                      dense
+                      color="primary"
+                      prepend-inner-icon="mdi-message"
+                      @keydown="inputHandler"
+                      autocomplete="off"
+                      no-resize
+                    ></v-textarea>
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn color="success" :loading="loadingExport" @click="doCommit">
+                Commit
+              </v-btn>
+              <v-btn text @click="closeDialogExport">Cancelar</v-btn>
+            </v-card-actions>
           </v-card>
-        </v-menu>
+        </v-dialog>
 
         <v-icon size="25px" color="info" @click="toggleShowTreeView">
           mdi-folder-open
@@ -211,7 +110,8 @@
               color="success"
               v-bind="attrs"
               v-on="on"
-              :disabled="currentUser.uid != driverUID"
+              :disabled="currentUser.uid != driverUID || codeFilePath === ''"
+              @click="compilerCode"
             >
               mdi-play-outline
             </v-icon>
@@ -223,31 +123,32 @@
   </v-app-bar>
 </template>
 
-
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CodeService from "@/services/code_channel.service";
 import { User } from "@/models/user";
 const CodeChannel = namespace("CodeChannelModule");
+import GitHubService from "@/services/github.service";
 const User = namespace("UserModule");
+const WorkspaceOptions = namespace("WorkspaceModule");
 import UserService from "@/services/user.service";
+import { Maybe, Repository, Commit, TreeEntry } from "@/generated/graphql";
+import { VForm } from "@/utils/types";
+import * as monaco from "monaco-editor";
+import { REST_SERVER_ENDPOINT, SOCKET_SERVER_ENDPOINT } from "@/constants";
+
 @Component
 export default class AppBarOptions extends Vue {
   @Prop({
-    required: true,
+    required: true
   })
   public nameChannel!: string;
 
-  @Watch("driverUID")
-  currentDriverWatch(val: string) {
-    this.driverUID = val;
-  }
-
-  @Watch("status.showRequestDriver")
-  Watch(val: string) {
-    console.log(val);
-  }
+  @Prop({
+    required: true
+  })
+  public color!: string;
 
   @CodeChannel.Action
   private toggleShowTreeView!: () => void;
@@ -264,30 +165,184 @@ export default class AppBarOptions extends Vue {
   @CodeChannel.State("driverUID")
   private driverUID!: string | undefined;
 
+  @CodeChannel.State("repository")
+  private repository!: Maybe<Repository>;
+
+  @CodeChannel.State("branchOid")
+  private branchOid!: string;
+
+  @CodeChannel.State("codeFilePath")
+  private codeFilePath!: string;
+
+  @CodeChannel.State("stdin")
+  private stdin!: string;
+
+  @CodeChannel.Action("setBranchOid")
+  private setBranchOid!: (ref: any) => void;
+
+  @CodeChannel.Action
+  private setCodeChanged!: (state: boolean) => void;
+
+  @CodeChannel.Action("setShowDialogSave")
+  private setShowDialogSave!: (status: boolean) => void;
+
+  @CodeChannel.State("codeData")
+  private codeData!: Maybe<TreeEntry>;
+
+  @WorkspaceOptions.Action
+  private setMessageOnSnackbar!: (message: string) => void;
+
+  @WorkspaceOptions.Action
+  private setVisibleSnackBar!: () => void;
+
+  @CodeChannel.Action
+  private setShowDialog!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setResponseCompiler!: (response: string) => void;
+
+  @CodeChannel.Action
+  private setChangeTerminal!: (state: boolean) => void;
+
+  @CodeChannel.Action
+  private setMessageError!: (message: string) => void;
+
+  @CodeChannel.Action
+  private setVisibleSnackBarError!: () => void;
+
+  @Ref("form") readonly form!: VForm;
+
   /**
    * Estado obtenido del @module User
    */
-
   @User.State("user")
   private currentUser!: User;
-
+  
+  public options!: monaco.editor.IStandaloneCodeEditor;
+  public loadingExport = false;
   public dialogImport = false;
   public validImport = true;
   public dialogExport = false;
   public validExport = true;
   public dialogExit = false;
   public validExit = false;
-  public userRequest: User | undefined = undefined;
+  public userRequest: Maybe<User> = null;
   public test = false;
+  public description = "";
+  public summary = "";
+  public valid = false;
+  public rules = {
+    required: (v: string): string | boolean => !!v || "Campo requerido"
+  };
+  public languageName: Maybe<string> = "";
+
+  @Watch("codeData")
+  onChildChangedData() {
+    console.log('codeData', this.codeData);
+    
+    const language =
+      monaco.languages.getLanguages().find(language => {
+        return language.extensions?.includes(this.codeData?.extension ?? "plaintext");
+      })?.id ?? null;
+    
+    console.log();
+    
+    
+    this.languageName = language;
+    //console.log('codeData', this.options.getModel());
+    
+  }
+
+  closeDialogExport() {
+    this.form.resetValidation();
+    this.form.reset();
+    this.setShowDialogSave(false);
+  }
 
   acceptRequest() {
     CodeService.acceptRequest(this.currentUser.uid!, this.userRequest!.uid!);
   }
 
+  inputHandler(e: KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      // this.editMessages();
+    }
+  }
+
+  async doCommit() {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
+      this.loadingExport = true;
+      await GitHubService.makeCommit({
+        branch: {
+          repositoryNameWithOwner: this.repository?.owner.login + "/" + this.repository?.name,
+          branchName: this.repository?.defaultBranchRef?.name
+        },
+        fileChanges: {
+          additions: [
+            {
+              path: this.codeFilePath,
+              contents: window.btoa(monaco.editor.getModels()[0].getValue())
+            }
+          ]
+        },
+        message: { headline: this.summary, body: this.description },
+        expectedHeadOid: this.branchOid
+      })
+        .then(response => {
+          this.setShowDialogSave(false);
+          this.setCodeChanged(false);
+          this.setShowDialog(false);
+          this.form.resetValidation();
+          this.form.reset();
+          this.setVisibleSnackBar();
+
+          const commit = response.commit as Commit;
+          this.setBranchOid(response.ref);
+
+          const urlShort = commit.url.slice(0, -25) + "...";
+          this.setMessageOnSnackbar(
+            "Puedes consultar tu commit copiando esta URL en tu navegador:\n" +
+              `<a href="${commit.url}"  target="_blank">${urlShort}</a>`
+          );
+        })
+
+        .catch((e: Error) => {
+          this.loadingExport = false;
+          this.form.resetValidation();
+          this.form.reset();
+          this.setShowDialogSave(false);
+          this.setVisibleSnackBarError();
+          this.setMessageError(e.message);
+        });
+    }
+  }
+
   mounted() {
-    CodeService.listenForRequest(this.currentUser.uid!, async (uidRequest) => {
+    this.onChildChangedData();
+    CodeService.listenForRequest(this.currentUser.uid!, async uidRequest => {
       this.userRequest = await UserService.getUserInfoByID(uidRequest);
       this.test = true;
+    });
+    CodeService.lisenTerminal(this.currentUser.uid!, this.$route.params.idChannelCode, data => {
+      this.setResponseCompiler(data.output);
+      this.setChangeTerminal(true);
+    });
+  }
+
+  compilerCode() {
+    let extension = this.languageName;
+
+    if(extension === null){
+      const filepathsplit = this.codeFilePath.split(".")
+      extension = filepathsplit[filepathsplit.length -1];
+    }
+    
+    CodeService.compileCode(this.currentUser.uid!, this.$route.params.idChannelCode, {
+      script: monaco.editor.getModels()[0].getValue(),
+      language: extension,
+      versionIndex: "0",
+      stdin: this.stdin
     });
   }
 }

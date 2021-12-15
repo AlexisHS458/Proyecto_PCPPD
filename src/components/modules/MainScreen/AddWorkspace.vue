@@ -89,7 +89,8 @@ export default class AddCard extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
-      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
+      /^[_A-z\u00C0-\u00FF0-9]*((\s)*[_A-z\u00C0-\u00FF0-9])*$/.test(v) ||
+      "Nombre inválido",
   };
 
   /**
@@ -101,6 +102,7 @@ export default class AddCard extends Vue {
       this.workspace.uid_usuario = this.currentUser.uid!;
       this.workspace.nombre = this.workspaceName;
       this.workspace.usuarios = [this.currentUser.uid!];
+      this.workspace.almacenamiento = 0;
       await this.addWorkSpace(this.workspace);
       this.form.resetValidation();
       this.form.reset();

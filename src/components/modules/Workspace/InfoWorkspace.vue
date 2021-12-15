@@ -1,12 +1,6 @@
 <template>
   <v-hover>
-    <v-app-bar
-      slot-scope="{ hover }"
-      @click="() => {}"
-      color="primaryDark"
-      dense
-      class="toolbar"
-    >
+    <v-app-bar slot-scope="{ hover }" @click="() => {}" color="primaryDark" dense class="toolbar">
       <v-btn depressed text fab small class="mr-4" @click="changeStatus">
         <v-img
           class="img"
@@ -21,13 +15,13 @@
       <v-toolbar-title
         class="toolbar-title font-weight-bold"
         :to="{
-          name: 'notChannels',
+          name: 'notChannels'
         }"
       >
         <router-link
           style="text-decoration: none; color: inherit"
           :to="{
-            name: 'notChannels',
+            name: 'notChannels'
           }"
         >
           {{ workspace.nombre }}
@@ -35,11 +29,7 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <v-menu
-        v-if="workspace.uid_usuario !== currentUser.uid"
-        v-model="menu"
-        offset-y
-      >
+      <v-menu v-if="workspace.uid_usuario !== currentUser.uid" v-model="menu" offset-y>
         <template #activator="{ on }">
           <v-btn text icon v-on="on" :class="{ hidden: !hover && !menu }">
             <v-icon color="white">mdi-cog</v-icon>
@@ -48,20 +38,9 @@
         <v-list color="secondary">
           <v-list-item-content class="justify-center card-list">
             <div class="mx-auto text-right">
-              <v-dialog
-                transition="dialog-top-transition"
-                max-width="600"
-                v-model="dialogLeave"
-              >
+              <v-dialog transition="dialog-top-transition" max-width="600" v-model="dialogLeave">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    depressed
-                    text
-                    block
-                    class="btn"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
+                  <v-btn depressed text block class="btn" v-bind="attrs" v-on="on">
                     <v-icon color="error" class="mr-6"> mdi-arrow-left </v-icon>
                     Abandonar espacio de trabajo
                   </v-btn>
@@ -73,8 +52,7 @@
                   <v-card-text>
                     <div class="text-h6 pa-5 text-center">
                       <p>
-                        ¿ESTAS SEGURO QUE DESEAS ABANDONAR ESTE ESPACIO DE
-                        TRABAJO?
+                        ¿ESTAS SEGURO QUE DESEAS ABANDONAR ESTE ESPACIO DE TRABAJO?
                       </p>
                     </div>
                     <v-row align="center" justify="center">
@@ -103,14 +81,7 @@
             <div class="mx-auto text-right">
               <v-dialog transition="dialog-top-transition">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    depressed
-                    text
-                    block
-                    class="btn"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
+                  <v-btn depressed text block class="btn" v-bind="attrs" v-on="on">
                     <v-icon color="error" class="mr-6"> mdi-delete </v-icon>
                     Eliminar archivos
                   </v-btn>
@@ -134,9 +105,7 @@
                     </v-data-table>
                   </v-card-text>
                   <v-card-actions class="justify-end">
-                    <v-btn @click="dialog = false" color="error"
-                      >Eliminar</v-btn
-                    >
+                    <v-btn @click="dialog = false" color="error">Eliminar</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
@@ -148,7 +117,6 @@
   </v-hover>
 </template>
 
-
 <script lang="ts">
 import { User } from "@/models/user";
 import { Workspace } from "@/models/workspace";
@@ -159,21 +127,26 @@ import { LeaveWorkspace } from "@/models/leaveWorkspace";
 const CodeChannel = namespace("CodeChannelModule");
 import VoiceService from "@/services/voice_channel.service";
 import CodeService from "@/services/code_channel.service";
+import { VoiceState } from "@/utils/voiceState";
+const StatusVoice = namespace("VoiceChannelModule");
 @Component
 export default class Toolbar extends Vue {
   @CodeChannel.State("status")
   private status!: any;
 
   @CodeChannel.Action
+  private setShowDialog!: (state: boolean) => void;
+
+  @CodeChannel.Action
   private toggleShowTreeView!: () => void;
 
   @Prop({
-    required: true,
+    required: true
   })
   public workspace!: Workspace;
 
   @Prop({
-    required: true,
+    required: true
   })
   public currentUser!: User;
 
@@ -182,6 +155,9 @@ export default class Toolbar extends Vue {
    */
   @LeaveWorkspace.Action
   private leaveWorkSpace!: (leaveWorkSpace: LeaveWorkspace) => Promise<void>;
+
+  @StatusVoice.Action
+  private setIsConnectedStatus!: (status: VoiceState) => void;
 
   public show = false;
   public menu = false;
@@ -195,63 +171,63 @@ export default class Toolbar extends Vue {
     {
       sortable: false,
       value: "icon",
-      align: "center",
+      align: "center"
     },
     { text: "Nombre del archivo", value: "name" },
     { text: "Fecha", value: "date" },
-    { text: "Tamaño", value: "size" },
+    { text: "Tamaño", value: "size" }
   ];
   public files = [
     {
       icon: "mdi-file",
       name: "Práctica 1.cpp",
       date: "2021-12-14",
-      size: "1 MB",
+      size: "1 MB"
     },
     {
       icon: "mdi-file",
       name: "Práctica 2.java",
       date: "2021-1-14",
-      size: "5 MB",
+      size: "5 MB"
     },
     {
       icon: "mdi-file",
       name: "Botella tras botella.mp44",
       date: "2020-12-30",
-      size: "8 MB",
+      size: "8 MB"
     },
     {
       icon: "mdi-file",
       name: "Reporte práctica 1.pdf",
       date: "2022-12-24",
-      size: "4 MB",
+      size: "4 MB"
     },
     {
       icon: "mdi-file",
       name: "Práctica 1.cpp",
       date: "2021-12-24",
-      size: "1 MB",
+      size: "1 MB"
     },
     {
       icon: "mdi-file",
       name: "Práctica 1.cpp",
       date: "2021-12-24",
-      size: "1 MB",
+      size: "1 MB"
     },
 
     {
       icon: "mdi-file",
       name: "Práctica 1.cpp",
       date: "2021-12-24",
-      size: "1 MB",
-    },
+      size: "1 MB"
+    }
   ];
 
   async leaveUserWorkspace() {
     this.userLeave = {
       uidUser: this.currentUser.uid!,
       uidWorkspace: this.workspace.uid!,
-      nombreWorkspace: this.workspace.nombre,
+      nombreWorkspace: this.workspace.nombre
     };
     await this.leaveWorkSpace(this.userLeave);
     this.dialogLeave = false;
@@ -276,13 +252,13 @@ export default class Toolbar extends Vue {
     //  if (this.isConnected) {
     VoiceService.leaveVoiceChannel(this.currentUser.uid!);
     CodeService.leaveCodeChannel(this.currentUser.uid!);
+    this.setIsConnectedStatus(VoiceState.CONNECTING);
     //   var audio = new Audio(require("@/assets/disconnected.mp3"));
     //  audio.play();
     // }
   }
 }
 </script>
-
 
 <style scoped>
 .toolbar {

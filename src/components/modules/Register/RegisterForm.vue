@@ -4,11 +4,11 @@
       <v-col cols="10">
         <v-card rounded="lg" height="100%" width="100%">
           <v-row no-gutters>
-            <v-col cols="7" class="arrow">
+            <!--<v-col cols="7" class="arrow">
               <v-btn class="ma-2" text icon to="/">
                 <v-icon large> mdi-arrow-left </v-icon>
               </v-btn>
-            </v-col>
+            </v-col>-->
             <v-col
               cols="12"
               lg="7"
@@ -214,9 +214,9 @@ export default class Register extends Vue {
     //Se obtiene información del usuario.
     await this.fetchCurrentUser();
     //Si el usuario ya esta regsitrado será redireccionado a la pantalla principal
-    if (this.isLoggedIn) {
+    /*   if (this.isLoggedIn) {
       this.$router.push("/Mainscreen");
-    }
+    } */
   }
 
   /**
@@ -254,7 +254,7 @@ export default class Register extends Vue {
 }
 </script>
 
-<style scoped >
+<style scoped>
 .img {
   border-radius: 25px;
 }

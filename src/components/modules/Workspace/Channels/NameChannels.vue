@@ -2,11 +2,16 @@
   <v-hover>
     <v-list-item
       slot-scope="{ hover }"
-      :to="{
-        name: 'messages',
-        params: { idChannel: channel.uid },
-      }"
-      :class="`${hover ? 'select-item' : 'no-select-item'}`"
+      @click="goToTextChannel"
+      :class="[
+        `${hover ? 'select-item' : 'no-select-item'}`,
+        `${
+          '/space/' + workspaceUID + '/' + channel.uid !== $route.path
+            ? ''
+            : 'active'
+        }`,
+      ]"
+      active-class="active"
       color="white"
       class="mb-1"
     >
@@ -198,6 +203,8 @@ import { namespace } from "vuex-class";
 const WorkspaceOptions = namespace("WorkspaceModule");
 const User = namespace("UserModule");
 const Permissions = namespace("PermissionsModule");
+import ChannelService from "@/services/channels.service";
+import { ChannelType } from "@/utils/channels_types";
 @Component
 export default class NameChannels extends Vue {
   @Prop({
@@ -228,6 +235,12 @@ export default class NameChannels extends Vue {
 
   @WorkspaceOptions.Action
   private deleteTextChannel!: (textChannelID: string) => Promise<void>;
+
+  @WorkspaceOptions.Action
+  private setMessageOnSnackbarWarning!: (message: string) => void;
+
+  @WorkspaceOptions.Action
+  private setVisibleSnackBarWarning!: () => void;
 
   /**
    * Estado obtenido del @module Workspace
@@ -270,7 +283,8 @@ export default class NameChannels extends Vue {
   public rules = {
     required: (v: string): string | boolean => !!v || "Campo requerido",
     regexNameChannel: (v: string): string | boolean =>
-      /^[_A-z0-9]*((\s)*[_A-z0-9])*$/.test(v) || "Nombre inválido",
+      /^[_A-z\u00C0-\u00FF0-9]*((\s)*[_A-z\u00C0-\u00FF0-9])*$/.test(v) ||
+      "Nombre inválido",
   };
   public permissions = {} as PermissionsPath;
   public statusCheckbox = false;
@@ -337,6 +351,33 @@ export default class NameChannels extends Vue {
     this.form.reset();
     this.dialogRenameChanel = false;
   }
+
+  async goToTextChannel() {
+    const hasAcces = await ChannelService.getUsersInChannel(
+      this.currentUser.uid!,
+      ChannelType.TEXT,
+      this.workspaceUID,
+      this.channel.uid!
+    );
+    if (hasAcces) {
+      if (
+        this.$route.path !=
+        "/space/" + this.workspaceUID + "/" + this.channel.uid!
+      ) {
+        this.$router.push({
+          name: "messages",
+          params: { idChannel: this.channel.uid! },
+        });
+      }
+    } else {
+      this.setVisibleSnackBarWarning();
+      this.setMessageOnSnackbarWarning(
+        "No tienes permiso para entrar a " +
+          this.channel.nombre +
+          ". Comunícate con el administrador."
+      );
+    }
+  }
 }
 </script>
 
@@ -384,5 +425,9 @@ export default class NameChannels extends Vue {
 
 .no-select-item {
   background-color: #000029;
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 </style>

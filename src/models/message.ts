@@ -31,4 +31,20 @@ export interface Message {
    * URL de la imagen de perfil del usuario
    */
   fotoURL: string;
+
+  /**
+   * Saber si es archivo
+   */
+  isFile: boolean;
+
+  /**
+   * Nombre del archivo
+   */
+  nombreArchivo?: string;
+
+  /**
+   * Tipo de archivo
+   */
+
+  contentType?: string;
 }

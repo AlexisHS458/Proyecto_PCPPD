@@ -4,6 +4,7 @@ import UserService from "@/services/user.service";
 import AuthService from "@/services/auth.service";
 import presenceServices from "@/services/presence.service";
 import { Status } from "@/models/status";
+import { auth } from "@/utils/firebase";
 
 
 /**
