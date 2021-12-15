@@ -17,12 +17,12 @@ async function createWindow() {
     height: 600,
     autoHideMenuBar: true,
     icon: path.join(__dirname, "./public/favicon.ico"),
-    
+
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      
-      devTools: false,
+
+      //  devTools: false,
       nodeIntegration: (process.env.ELECTRON_NODE_INTEGRATION as unknown) as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
@@ -65,14 +65,12 @@ app.on("ready", async () => {
     } catch (e) {
       console.error("Vue Devtools failed to install:", e);
     }
-  } else {
+  } /*  else {
     globalShortcut.register("Control+Shift+I", () => {
-      // When the user presses Ctrl + Shift + I, this function will get called
-      // You can modify this function to do other things, but if you just want
-      // to disable the shortcut, you can just return false
+  
       return false;
     });
-  }
+  } */
   createWindow();
 });
 
