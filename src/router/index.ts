@@ -29,6 +29,7 @@ const routes: Array<RouteConfig> = [
     meta: {
       requiresAuth: true
     },
+    
     beforeEnter: async (to, from, next) => {
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
