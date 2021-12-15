@@ -41,7 +41,7 @@ const routes: Array<RouteConfig> = [
           next({ name: "Register" });
         }
       } else {
-        next({ name: "Register" });
+        next();
       }
       /*      if (currentUser.boleta == "") {
         next();
