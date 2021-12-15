@@ -34,12 +34,20 @@ const routes: Array<RouteConfig> = [
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
       console.log("boleta", currentUser.boleta);
-
-      if (currentUser.boleta == "") {
+      if (currentUser.boleta) {
+        if (currentUser.boleta !== "") {
+          next();
+        } else {
+          next({ name: "Register" });
+        }
+      } else {
+        next({ name: "Register" });
+      }
+      /*      if (currentUser.boleta == "") {
         next();
       } else {
         next({ name: "MainScreen" });
-      }
+      } */
     }
   },
   {
@@ -52,14 +60,11 @@ const routes: Array<RouteConfig> = [
     beforeEnter: async (to, from, next) => {
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
-      if (currentUser) {
-        if (currentUser.boleta !== "") {
-          next();
-        } else {
-          next({ name: "Register" });
-        }
-      } else {
+
+      if (currentUser.boleta == "") {
         next({ name: "Register" });
+      } else {
+        next();
       }
     }
   },
