@@ -34,21 +34,23 @@ const routes: Array<RouteConfig> = [
       await store.dispatch("UserModule/fetchCurrentUser");
       const currentUser = store.getters["UserModule/getUser"];
       console.log("boleta", currentUser.boleta);
+      /*  if (currentUser.boleta) { */
       if (currentUser.boleta) {
-        if (currentUser.boleta !== "") {
-          next();
-        } else {
-          next({ name: "Register" });
-        }
+        console.log("Entro if");
+        next({ name: "MainScreen" });
       } else {
         next();
       }
-      /*      if (currentUser.boleta == "") {
+    } /*  else {
+        next();
+      } */
+    /*      if (currentUser.boleta == "") {
         next();
       } else {
         next({ name: "MainScreen" });
       } */
-    }
+
+    //  }
   },
   {
     path: "/Mainscreen",
